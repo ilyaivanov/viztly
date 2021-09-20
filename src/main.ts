@@ -1,17 +1,27 @@
 import { root } from "./store";
 
-const canvas = document.createElement("canvas");
+const createFullScreenCanvas = (): HTMLCanvasElement => {
+  const res = document.createElement("canvas");
 
+  const updateHeight = () => {
+    res.setAttribute("width", window.innerWidth + "");
+    res.setAttribute("height", window.innerHeight + "");
+  };
+  updateHeight();
+  window.addEventListener("resize", () => {
+    updateHeight();
+    render();
+  });
+  return res;
+};
+
+const canvas = createFullScreenCanvas();
 const ctx = canvas.getContext("2d")!;
 
-canvas.setAttribute("width", window.innerWidth + "");
-canvas.setAttribute("height", window.innerHeight + "");
 document.body.appendChild(canvas);
 
 const fontSize = 16;
 const color2 = "#2A3135";
-ctx.fillStyle = color2;
-ctx.font = `${fontSize}px Segoe UI`;
 
 const drawCircle = (x: number, y: number, r: number) => {
   ctx.beginPath();
@@ -32,6 +42,7 @@ const xStep = 25;
 const render = () => {
   ctx.clearRect(0, 0, Number.MAX_VALUE, Number.MAX_VALUE);
   ctx.fillStyle = color2;
+  ctx.font = `${fontSize}px Segoe UI`;
   let currentXOffset = 0;
 
   const viewItem = (item: Item, level: number) => {
