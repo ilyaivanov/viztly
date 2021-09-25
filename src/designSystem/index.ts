@@ -27,10 +27,18 @@ export const fontSizes = {
 
 export const c = {
   fontSize: 16,
-  color2: "#2A3135",
 
   xBase: 40,
   yBase: 40,
   xStep: 25,
   yStep: 25,
+
+  //light theme
+  // circle: "#2A3135",
+  // circle: "black",
+
+  //dark theme
+  circle: "white",
+  text: "white",
+  selectedItem: "#ACE854",
 };

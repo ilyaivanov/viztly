@@ -3,6 +3,8 @@ const listIfItems = (prefix: string, count: number) =>
 
 const createItem = (title: string, children: Item[] = []): Item => ({
   title,
+  isOpen: true,
+  isSelected: false,
   children,
 });
 

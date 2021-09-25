@@ -21,9 +21,9 @@ export class Canvas {
 
   clear = () => this.ctx.clearRect(0, 0, Number.MAX_VALUE, Number.MAX_VALUE);
 
-  drawText = (at: Vector, text: string, fontSize: number) => {
+  drawText = (at: Vector, text: string, fontSize: number, color: string) => {
     this.ctx.font = `${fontSize}px Segoe UI`;
-
+    this.ctx.fillStyle = color;
     this.ctx.fillText(text, at.x, at.y);
   };
 
