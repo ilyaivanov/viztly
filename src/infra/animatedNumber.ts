@@ -2,12 +2,12 @@ import { engine, Animated } from "./animationEngine";
 
 //constant speed animation
 export class AnimatedNumber implements Animated {
-  value = 0;
-
-  speed = 100; //pixels per second
-  targetValue = 0;
+  private speed = 100; //pixels per second
+  private targetValue = 0;
   isAnimating: boolean = false;
-  animationDirection: "increating" | "decreasing" = "decreasing";
+  private animationDirection: "increating" | "decreasing" = "decreasing";
+
+  constructor(public value = 0) {}
 
   tick(deltaTimeMs: number) {
     const deltaTimeSeconds = deltaTimeMs / 1000;

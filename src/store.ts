@@ -9,7 +9,7 @@ const createItem = (title: string, children: Item[] = []): Item => ({
 });
 
 export const root: Item = createItem("Home", [
-  createItem("Music"),
+  createItem("Music", [createItem("Ambient")]),
   createItem("Software Development", [
     createItem("Front-End", listIfItems("Item ", 3)),
     createItem("Back-End", listIfItems("Item ", 2)),

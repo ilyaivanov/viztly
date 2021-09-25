@@ -30,8 +30,8 @@ export const c = {
 
   xBase: 40,
   yBase: 40,
-  xStep: 25,
-  yStep: 25,
+  xStep: 23,
+  yStep: 23,
 
   //light theme
   // circle: "#2A3135",
@@ -41,4 +41,6 @@ export const c = {
   circle: "white",
   text: "white",
   selectedItem: "#ACE854",
+  line: "#3C413D",
+  lineSelected: "#638038",
 };
