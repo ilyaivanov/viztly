@@ -24,3 +24,13 @@ export const fontSizes = {
   regular: 13,
   big: 16,
 };
+
+export const c = {
+  fontSize: 16,
+  color2: "#2A3135",
+
+  xBase: 40,
+  yBase: 40,
+  xStep: 25,
+  yStep: 25,
+};
