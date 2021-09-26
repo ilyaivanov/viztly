@@ -12,13 +12,16 @@ export const createItemViews = (
 
   let currentYOffset = offset;
   const viewItem = (item: Item, level: number) => {
+    const itemHeight = level === 0 ? c.level1ItemHeight : c.itemHeight;
+    currentYOffset += itemHeight / 2;
     visibleItems.push({
       item,
       level,
+      itemHeight,
       lineColor: new AnimatedColor(c.line),
       position: { y: currentYOffset, x: c.xBase + level * c.xStep },
     });
-    currentYOffset += c.yStep;
+    currentYOffset += itemHeight / 2;
     item.isOpen && item.children.forEach((c) => viewItem(c, level + 1));
   };
 
@@ -43,18 +46,21 @@ export const viewItem = (canvas: Canvas, itemView: ItemViewModel) => {
   }
   canvas.drawCircle(p, 3.5, item.isSelected ? c.selectedItem : c.circle);
 
-  const textPosition = add(p, { x: 10, y: c.fontSize * 0.32 });
+  const fontSize = itemView.level === 0 ? c.level1FontSize : c.fontSize;
+  0;
+  const textPosition = add(p, { x: 10, y: fontSize * 0.32 });
 
   canvas.drawText(
     textPosition,
     itemView.item.title,
-    c.fontSize,
+    fontSize,
     item.isSelected ? c.selectedItem : c.text
   );
 };
 
 export type ItemViewModel = {
   position: Vector;
+  itemHeight: number;
   level: number;
   lineColor: AnimatedColor;
   item: Item;
@@ -79,6 +85,8 @@ export const getVisibleChildren = (item: Item): Item[] => {
 
 //TODO: this assumes all children have the same height
 export const countChildrenHeight = (item: Item) =>
-  visibleChildrenCount(item) * c.yStep;
+  visibleChildrenCount(item) * c.itemHeight;
 // const hasSelectedChild = (item: Item) =>
 //   item.children.some((child) => child.isSelected);
+
+//need to traverse children of itemViews

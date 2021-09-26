@@ -3,7 +3,6 @@ import { engine } from "./infra/animationEngine";
 import { Canvas } from "./infra/canvas";
 import {
   createItemViews,
-  getVisibleChildren,
   hasVisibleChildren,
   ItemViewModel,
   viewItem,
@@ -58,8 +57,8 @@ document.addEventListener("keydown", (e) => {
 const closeItem = (itemView: ItemViewModel) => {
   const index = visibleItems.indexOf(itemView) + 1;
 
-  //this offset assumes items have an equal height
-  const offset = visibleChildrenCount(itemView.item) * c.yStep;
+  //asumes items are of level2+
+  const offset = visibleChildrenCount(itemView.item) * c.itemHeight;
   visibleItems.splice(index, visibleChildrenCount(itemView.item));
   visibleItems.slice(index).forEach((item) => (item.position.y -= offset));
   itemView.item.isOpen = false;
@@ -71,11 +70,12 @@ const openItem = (itemView: ItemViewModel) => {
   const views = createItemViews(
     itemView.item,
     itemView.level + 1,
-    itemView.position.y + c.yStep
+    itemView.position.y + itemView.itemHeight / 2
   );
   visibleItems.splice(index, 0, ...views);
 
-  const offsetAdded = views.length * c.yStep;
+  //asumes items are of level2+
+  const offsetAdded = views.length * c.itemHeight;
   visibleItems
     .slice(index + views.length)
     .forEach((item) => (item.position.y += offsetAdded));

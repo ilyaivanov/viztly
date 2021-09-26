@@ -26,12 +26,14 @@ export const fontSizes = {
 };
 
 export const c = {
-  fontSize: 16,
-
+  fontSize: 15,
+  level1FontSize: 20,
   xBase: 40,
   yBase: 40,
   xStep: 23,
-  yStep: 23,
+
+  itemHeight: 22,
+  level1ItemHeight: 28,
 
   //light theme
   // circle: "#2A3135",
