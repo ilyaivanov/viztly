@@ -12,3 +12,9 @@ type Vector = {
   x: number;
   y: number;
 };
+
+type Line = {
+  start: Vector;
+  end: Vector;
+  color: string;
+};

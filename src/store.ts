@@ -1,7 +1,7 @@
 const listIfItems = (prefix: string, count: number) =>
   Array.from(new Array(count)).map((_, i) => createItem(prefix + (i + 1)));
 
-const createItem = (title: string, children: Item[] = []): Item => ({
+export const createItem = (title: string, children: Item[] = []): Item => ({
   title,
   isOpen: true,
   isSelected: false,

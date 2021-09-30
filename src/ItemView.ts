@@ -1,4 +1,4 @@
-import { c } from "./designSystem";
+import { spacings, c } from "./designSystem";
 import { AnimatedColor } from "./infra/animatedColor";
 import { Canvas } from "./infra/canvas";
 import { add } from "./infra/vector";
@@ -12,14 +12,18 @@ export const createItemViews = (
 
   let currentYOffset = offset;
   const viewItem = (item: Item, level: number) => {
-    const itemHeight = level === 0 ? c.level1ItemHeight : c.itemHeight;
+    const itemHeight =
+      level === 0 ? spacings.level1ItemHeight : spacings.itemHeight;
     currentYOffset += itemHeight / 2;
     visibleItems.push({
       item,
       level,
       itemHeight,
       lineColor: new AnimatedColor(c.line),
-      position: { y: currentYOffset, x: c.xBase + level * c.xStep },
+      position: {
+        y: currentYOffset,
+        x: spacings.xBase + level * spacings.xStep,
+      },
     });
     currentYOffset += itemHeight / 2;
     item.isOpen && item.children.forEach((c) => viewItem(c, level + 1));
@@ -46,7 +50,8 @@ export const viewItem = (canvas: Canvas, itemView: ItemViewModel) => {
   }
   canvas.drawCircle(p, 3.5, item.isSelected ? c.selectedItem : c.circle);
 
-  const fontSize = itemView.level === 0 ? c.level1FontSize : c.fontSize;
+  const fontSize =
+    itemView.level === 0 ? spacings.level1FontSize : spacings.fontSize;
   0;
   const textPosition = add(p, { x: 10, y: fontSize * 0.32 });
 
@@ -74,18 +79,20 @@ export const visibleChildrenCount = (item: Item) =>
 
 export const getVisibleChildren = (item: Item): Item[] => {
   let childs: Item[] = [];
-  const traverseChildren = (child: Item) => {
+  const gatherChildren = (child: Item) => {
     childs.push(child);
-    if (hasVisibleChildren(child)) child.children.forEach(traverseChildren);
+    traverseChildren(child);
   };
-  if (hasVisibleChildren(item)) item.children.forEach(traverseChildren);
+  const traverseChildren = (i: Item) =>
+    hasVisibleChildren(i) && i.children.forEach(gatherChildren);
 
+  traverseChildren(item);
   return childs;
 };
 
 //TODO: this assumes all children have the same height
 export const countChildrenHeight = (item: Item) =>
-  visibleChildrenCount(item) * c.itemHeight;
+  visibleChildrenCount(item) * spacings.itemHeight;
 // const hasSelectedChild = (item: Item) =>
 //   item.children.some((child) => child.isSelected);
 
