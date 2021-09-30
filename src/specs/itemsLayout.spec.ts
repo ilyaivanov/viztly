@@ -36,7 +36,11 @@ describe("viewing one item with a child", () => {
     expect(list.visibleItems[0].childrenBorder).toEqual<Line>({
       start: {
         x: sp.xBase,
-        y: sp.yBase + sp.circleRadius + 2 + sp.level1ItemHeight / 2,
+        y:
+          sp.yBase +
+          sp.circleRadius +
+          sp.lineDistanceToCircle +
+          sp.level1ItemHeight / 2,
       },
       end: {
         x: sp.xBase,
@@ -45,7 +49,7 @@ describe("viewing one item with a child", () => {
           sp.level1ItemHeight +
           sp.itemHeight +
           -sp.circleRadius -
-          2 +
+          sp.lineDistanceToCircle +
           sp.level1ItemHeight / 2,
       },
       color: c.line,
