@@ -48,19 +48,19 @@ export const viewItem = (canvas: Canvas, itemView: ItemViewModel) => {
       itemView.lineColor.getHexColor()
     );
   }
-  canvas.drawCircle(p, 3.5, item.isSelected ? c.selectedItem : c.circle);
+  // canvas.drawCircle(p, 3.5, item.isSelected ? c.selectedItem : c.circle);
 
   const fontSize =
     itemView.level === 0 ? spacings.level1FontSize : spacings.fontSize;
   0;
   const textPosition = add(p, { x: 10, y: fontSize * 0.32 });
 
-  canvas.drawText(
-    textPosition,
-    itemView.item.title,
-    fontSize,
-    item.isSelected ? c.selectedItem : c.text
-  );
+  // canvas.drawText(
+  //   textPosition,
+  //   itemView.item.title,
+  //   fontSize,
+  //   item.isSelected ? c.selectedItem : c.text
+  // );
 };
 
 export type ItemViewModel = {

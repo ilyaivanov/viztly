@@ -59,6 +59,26 @@ export class FlatednedList {
     this.selectedItemIndex += 1;
     this.visibleItems[this.selectedItemIndex].textColor = c.selectedItem;
   };
+
+  closeSelected = () => {
+    const view = this.visibleItems[this.selectedItemIndex];
+
+    const childrenCount = tree.visibleChildrenCount(view.item);
+
+    //asumes items are of level2+
+    const offset = childrenCount * sp.itemHeight;
+
+    this.visibleItems.splice(this.selectedItemIndex + 1, childrenCount);
+
+    view.item.isOpen = false;
+
+    view.childrenBorder = undefined;
+    this.visibleItems
+      .slice(this.selectedItemIndex + 1)
+      .forEach((item) => (item.position.y -= offset));
+  };
+
+  getSelectedItem = (): Item => this.visibleItems[this.selectedItemIndex].item;
 }
 
 const createBorder = (item: FlatItemView): Line => {

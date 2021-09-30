@@ -50,12 +50,12 @@ document.addEventListener("keydown", (e) => {
   //       render();
   //     }
   //   }
-  //   if (e.code === "ArrowLeft") {
-  //     if (hasVisibleChildren(getSelectedItem().item))
-  //       closeItem(getSelectedItem());
-  //     else selectParent(getSelectedItem().item);
-  //     render();
-  //   }
+  if (e.code === "ArrowLeft") {
+    if (list.getSelectedItem().isOpen) list.closeSelected();
+    //   closeItem(getSelectedItem());
+    // else selectParent(getSelectedItem().item);
+    render();
+  }
   //   if (e.code === "ArrowRight") {
   //     const item = getSelectedItem().item;
   //     if (canBeOpen(item)) openItem(getSelectedItem());

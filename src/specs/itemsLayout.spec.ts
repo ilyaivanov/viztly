@@ -69,6 +69,35 @@ describe("viewing one item with a child", () => {
       expect(list.visibleItems[1].textColor).toBe(c.selectedItem);
     });
   });
+
+  describe("closing first item", () => {
+    beforeEach(() => list.closeSelected());
+
+    it("removes all first children", () =>
+      expect(list.visibleItems.map((i) => i.item.title)).toEqual([
+        "First",
+        "Second",
+      ]));
+
+    it("removes all first children", () =>
+      expect(list.visibleItems).toHaveLength(2));
+
+    it("changes item model", () =>
+      expect(list.visibleItems[0].item.isOpen).toBe(false));
+
+    it("removes border for selected item", () =>
+      expect(list.visibleItems[0].childrenBorder).toBeUndefined());
+
+    it("doesn't change position of the first item", () =>
+      expect(list.visibleItems[0].position.y).toBe(
+        sp.yBase + sp.level1ItemHeight / 2
+      ));
+
+    it("udates position of the Second item", () =>
+      expect(list.visibleItems[1].position.y).toBe(
+        sp.yBase + sp.level1ItemHeight + sp.level1ItemHeight / 2
+      ));
+  });
 });
 
 //key ideas
