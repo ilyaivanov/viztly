@@ -55,10 +55,22 @@ describe("viewing one item with a child", () => {
       color: c.line,
     });
   });
+
+  it("first item is selected", () => {
+    expect(list.visibleItems[0].textColor).toBe(c.selectedItem);
+    expect(list.visibleItems[1].textColor).toBe(c.text);
+  });
+
+  describe("selecting next item", () => {
+    beforeEach(() => list.selectNextItem());
+
+    it("should select second item", () => {
+      expect(list.visibleItems[0].textColor).toBe(c.text);
+      expect(list.visibleItems[1].textColor).toBe(c.selectedItem);
+    });
+  });
 });
 
-// write test for children border height
-
-//First
-//  First child1
-//Second
+//key ideas
+// [] Separate animation from FlatViewModel. Animating one value should not change your ViewModel
+// [] Write tests for selecting items

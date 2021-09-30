@@ -1,19 +1,12 @@
-import { spacings, colors, c } from "./designSystem";
+import { spacings as sp, colors, c } from "./designSystem";
 import { engine } from "./infra/animationEngine";
 import { Canvas } from "./infra/canvas";
 import { add } from "./infra/vector";
-import {
-  createItemViews,
-  hasVisibleChildren,
-  ItemViewModel,
-  visibleChildrenCount,
-} from "./ItemView";
 import { FlatednedList, FlatItemView } from "./specs/itemsLayout";
 import { root } from "./store";
 
 const canvas = new Canvas();
 const list = new FlatednedList(root);
-// let visibleItems: ItemViewModel[] = createItemViews(root, 0, spacings.yBase);
 
 const viewItem = (view: FlatItemView) => {
   const { position, item, level } = view;
@@ -21,13 +14,10 @@ const viewItem = (view: FlatItemView) => {
   const fontSize = level === 0 ? 22 : 14;
   const textPosition = add(position, { x: 10, y: fontSize * 0.32 });
 
-  canvas.drawCircle(position, 3.5, item.isSelected ? c.selectedItem : c.circle);
-  canvas.drawText(
-    textPosition,
-    item.title,
-    fontSize,
-    item.isSelected ? c.selectedItem : c.text
-  );
+  const color = view.textColor;
+  canvas.drawCircle(position, sp.circleRadius, color);
+
+  canvas.drawText(textPosition, item.title, fontSize, color);
 
   if (view.childrenBorder) {
     const b = view.childrenBorder;
@@ -47,34 +37,32 @@ document.body.appendChild(canvas.el);
 
 let selectedItemIndex = 0;
 
-// document.addEventListener("keydown", (e) => {
-//   if (e.code === "ArrowDown") {
-//     if (selectedItemIndex < list.visibleItems.length - 1) {
-//       selectItemAt(selectedItemIndex + 1);
-//       render();
-//     }
-//   }
-//   if (e.code === "ArrowUp") {
-//     if (selectedItemIndex > 0) {
-//       selectItemAt(selectedItemIndex - 1);
-//       render();
-//     }
-//   }
-//   if (e.code === "ArrowLeft") {
-//     if (hasVisibleChildren(getSelectedItem().item))
-//       closeItem(getSelectedItem());
-//     else selectParent(getSelectedItem().item);
-
-//     render();
-//   }
-//   if (e.code === "ArrowRight") {
-//     const item = getSelectedItem().item;
-//     if (canBeOpen(item)) openItem(getSelectedItem());
-//     else if (hasVisibleChildren(item)) selectItem(item.children[0]);
-
-//     render();
-//   }
-// });
+document.addEventListener("keydown", (e) => {
+  if (e.code === "ArrowDown") {
+    if (selectedItemIndex < list.visibleItems.length - 1) {
+      list.selectNextItem();
+      render();
+    }
+  }
+  //   if (e.code === "ArrowUp") {
+  //     if (selectedItemIndex > 0) {
+  //       selectItemAt(selectedItemIndex - 1);
+  //       render();
+  //     }
+  //   }
+  //   if (e.code === "ArrowLeft") {
+  //     if (hasVisibleChildren(getSelectedItem().item))
+  //       closeItem(getSelectedItem());
+  //     else selectParent(getSelectedItem().item);
+  //     render();
+  //   }
+  //   if (e.code === "ArrowRight") {
+  //     const item = getSelectedItem().item;
+  //     if (canBeOpen(item)) openItem(getSelectedItem());
+  //     else if (hasVisibleChildren(item)) selectItem(item.children[0]);
+  //     render();
+  //   }
+});
 
 // const closeItem = (itemView: ItemViewModel) => {
 //   const index = visibleItems.indexOf(itemView) + 1;

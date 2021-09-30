@@ -1,5 +1,5 @@
-import { c, colors, spacings as sp } from "../designSystem";
-import { countChildrenHeight, hasVisibleChildren } from "../ItemView";
+import { c, spacings as sp } from "../designSystem";
+import * as tree from "./itemTree";
 
 export type FlatItemView = {
   item: Item;
@@ -7,11 +7,14 @@ export type FlatItemView = {
   position: Vector;
   childrenBorder?: Line;
 
+  textColor: string;
   //to think about
   itemHeight: number;
 };
 
 export class FlatednedList {
+  selectedItemIndex: number = 0;
+
   visibleItems: FlatItemView[] = [];
 
   constructor(root: Item) {
@@ -25,13 +28,16 @@ export class FlatednedList {
         level,
 
         itemHeight,
-        // lineColor: new AnimatedColor(c.line),
+        textColor:
+          this.visibleItems.length === this.selectedItemIndex
+            ? c.selectedItem
+            : c.text,
         position: {
           y: offset,
           x: sp.xBase + level * sp.xStep,
         },
       };
-      if (hasVisibleChildren(item)) {
+      if (tree.hasVisibleChildren(item)) {
         itemView.childrenBorder = createBorder(itemView);
       }
       this.visibleItems.push(itemView);
@@ -47,10 +53,16 @@ export class FlatednedList {
 
     traverseChildren(root, 0);
   }
+
+  selectNextItem = () => {
+    this.visibleItems[this.selectedItemIndex].textColor = c.text;
+    this.selectedItemIndex += 1;
+    this.visibleItems[this.selectedItemIndex].textColor = c.selectedItem;
+  };
 }
 
 const createBorder = (item: FlatItemView): Line => {
-  const lineHeight = countChildrenHeight(item.item);
+  const lineHeight = tree.visibleChildrenCount(item.item) * sp.itemHeight;
   const start = {
     x: item.position.x,
     y: item.position.y + sp.circleRadius + sp.lineDistanceToCircle,

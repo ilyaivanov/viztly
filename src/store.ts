@@ -4,7 +4,6 @@ const listIfItems = (prefix: string, count: number) =>
 export const createItem = (title: string, children: Item[] = []): Item => ({
   title,
   isOpen: true,
-  isSelected: false,
   children,
 });
 
