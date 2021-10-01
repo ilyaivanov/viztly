@@ -21,7 +21,13 @@ const viewItem = (view: FlatItemView) => {
 
   if (view.childrenBorder) {
     const b = view.childrenBorder;
-    canvas.drawLine(b.start, b.end, 2, b.color);
+    const endY = position.y + b.height;
+    canvas.drawLine(
+      add(position, { x: 0, y: sp.circleRadius }),
+      { x: position.x, y: endY },
+      2,
+      b.color
+    );
   }
 };
 

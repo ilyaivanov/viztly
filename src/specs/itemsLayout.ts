@@ -5,11 +5,16 @@ export type FlatItemView = {
   item: Item;
   level: number;
   position: Vector;
-  childrenBorder?: Line;
+  childrenBorder?: ChildrenBorder;
 
   textColor: string;
   //to think about
   itemHeight: number;
+};
+
+export type ChildrenBorder = {
+  height: number;
+  color: string;
 };
 
 export class FlatednedList {
@@ -81,23 +86,10 @@ export class FlatednedList {
   getSelectedItem = (): Item => this.visibleItems[this.selectedItemIndex].item;
 }
 
-const createBorder = (item: FlatItemView): Line => {
-  const lineHeight = tree.visibleChildrenCount(item.item) * sp.itemHeight;
-  const start = {
-    x: item.position.x,
-    y: item.position.y + sp.circleRadius + sp.lineDistanceToCircle,
-  };
+const createBorder = (item: FlatItemView): ChildrenBorder => {
+  const lineHeight = (tree.visibleChildrenCount(item.item) + 1) * sp.itemHeight;
   return {
-    start,
-    end: {
-      x: item.position.x,
-      y:
-        start.y +
-        lineHeight +
-        item.itemHeight -
-        sp.circleRadius * 2 -
-        sp.lineDistanceToCircle * 2,
-    },
     color: c.line,
+    height: lineHeight,
   };
 };

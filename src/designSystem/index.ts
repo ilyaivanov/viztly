@@ -46,7 +46,7 @@ export const spacings = {
   xStep: 23,
 
   circleRadius: 3.5,
-  lineDistanceToCircle: 6.5,
+  extendChildrenBorderBy: 2,
   itemHeight: 22,
   level1ItemHeight: 28,
 };

@@ -1,6 +1,6 @@
 import { c, spacings as sp } from "../designSystem";
 import { createItem } from "../store";
-import { FlatednedList } from "./itemsLayout";
+import { ChildrenBorder, FlatednedList } from "./itemsLayout";
 
 const createFlatList = (children: Item[]) =>
   new FlatednedList(createItem("Home", children));
@@ -33,25 +33,8 @@ describe("viewing one item with a child", () => {
   });
 
   it("creates a proper border", () => {
-    expect(list.visibleItems[0].childrenBorder).toEqual<Line>({
-      start: {
-        x: sp.xBase,
-        y:
-          sp.yBase +
-          sp.circleRadius +
-          sp.lineDistanceToCircle +
-          sp.level1ItemHeight / 2,
-      },
-      end: {
-        x: sp.xBase,
-        y:
-          sp.yBase +
-          sp.level1ItemHeight +
-          sp.itemHeight +
-          -sp.circleRadius -
-          sp.lineDistanceToCircle +
-          sp.level1ItemHeight / 2,
-      },
+    expect(list.visibleItems[0].childrenBorder).toEqual<ChildrenBorder>({
+      height: sp.itemHeight * 2,
       color: c.line,
     });
   });
