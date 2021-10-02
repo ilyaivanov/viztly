@@ -51,6 +51,24 @@ describe("viewing one item with a child", () => {
       expect(list.visibleItems[0].textColor).toBe(c.text);
       expect(list.visibleItems[1].textColor).toBe(c.selectedItem);
     });
+
+    describe("selecting parent should select first", () => {
+      beforeEach(() => list.selectParent());
+
+      it("should select second item", () => {
+        expect(list.visibleItems[0].textColor).toBe(c.selectedItem);
+        expect(list.visibleItems[1].textColor).toBe(c.text);
+      });
+    });
+
+    describe("selecting previous item", () => {
+      beforeEach(() => list.selectPreviousItem());
+
+      it("should select first item again", () => {
+        expect(list.visibleItems[1].textColor).toBe(c.text);
+        expect(list.visibleItems[0].textColor).toBe(c.selectedItem);
+      });
+    });
   });
 
   describe("closing first item", () => {
@@ -80,9 +98,46 @@ describe("viewing one item with a child", () => {
       expect(list.visibleItems[1].position.y).toBe(
         sp.yBase + sp.level1ItemHeight + sp.level1ItemHeight / 2
       ));
+
+    describe("opening first item", () => {
+      beforeEach(() => list.openSelected());
+
+      it("removes all first children", () =>
+        expect(list.visibleItems.map((i) => i.item.title)).toEqual([
+          "First",
+          "First child",
+          "Second",
+        ]));
+
+      it("removes all first children", () =>
+        expect(list.visibleItems).toHaveLength(3));
+
+      it("changes item model", () =>
+        expect(list.visibleItems[0].item.isOpen).toBe(true));
+
+      it("adds border for selected item", () =>
+        expect(list.visibleItems[0].childrenBorder).toEqual<ChildrenBorder>({
+          color: c.line,
+          height: sp.itemHeight * 2,
+        }));
+
+      it("doesn't change position of the first item", () =>
+        expect(list.visibleItems[0].position.y).toBe(
+          sp.yBase + sp.level1ItemHeight / 2
+        ));
+
+      it("udates position of the First child item", () =>
+        expect(list.visibleItems[1].position.y).toBe(
+          sp.yBase + sp.level1ItemHeight + sp.itemHeight / 2
+        ));
+
+      it("udates position of the Second child item", () =>
+        expect(list.visibleItems[2].position.y).toBe(
+          sp.yBase +
+            sp.level1ItemHeight +
+            sp.itemHeight +
+            sp.level1ItemHeight / 2
+        ));
+    });
   });
 });
-
-//key ideas
-// [] Separate animation from FlatViewModel. Animating one value should not change your ViewModel
-// [] Write tests for selecting items
