@@ -1,39 +1,15 @@
-import { spacings as sp, colors, c } from "./designSystem";
 import { engine } from "./infra/animationEngine";
 import { Canvas } from "./infra/canvas";
-import { add } from "./infra/vector";
-import { FlatednedList, FlatItemView } from "./specs/itemsLayout";
+import { drawItem } from "./specs/drawItem";
+import { FlatednedList } from "./specs/itemsLayout";
 import { root } from "./store";
 
 const canvas = new Canvas();
 const list = new FlatednedList(root);
 
-const viewItem = (view: FlatItemView) => {
-  const { position, item, level } = view;
-
-  const fontSize = level === 0 ? 22 : 14;
-  const textPosition = add(position, { x: 10, y: fontSize * 0.32 });
-
-  const color = view.textColor;
-  canvas.drawCircle(position, sp.circleRadius, color);
-
-  canvas.drawText(textPosition, item.title, fontSize, color);
-
-  if (view.childrenBorder) {
-    const b = view.childrenBorder;
-    const endY = position.y + b.height;
-    canvas.drawLine(
-      add(position, { x: 0, y: sp.circleRadius }),
-      { x: position.x, y: endY },
-      2,
-      b.color
-    );
-  }
-};
-
 const render = () => {
   canvas.clear();
-  list.visibleItems.forEach(viewItem);
+  list.visibleItems.forEach((item) => drawItem(item, canvas));
 };
 
 canvas.onResize = render;
