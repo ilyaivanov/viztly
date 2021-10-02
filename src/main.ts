@@ -1,7 +1,7 @@
 import { engine } from "./infra/animationEngine";
 import { Canvas } from "./infra/canvas";
-import { drawItem } from "./specs/drawItem";
-import { FlatednedList } from "./specs/itemsLayout";
+import { drawItem } from "./flatlist/drawItem";
+import { FlatednedList } from "./flatlist/FlatednedList";
 import { root } from "./store";
 
 const canvas = new Canvas();
