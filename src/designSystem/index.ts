@@ -14,6 +14,8 @@ export const c = {
   selectedItem: "#ACE854",
   line: "#3C413D",
   lineSelected: "#638038",
+
+  scrollbar: "#424242",
 };
 
 export const spacings = {
@@ -27,6 +29,8 @@ export const spacings = {
   extendChildrenBorderBy: 2,
   itemHeight: 22,
   level1ItemHeight: 28,
+
+  scrollWidth: 10,
 };
 
 export type Spacings = typeof spacings;

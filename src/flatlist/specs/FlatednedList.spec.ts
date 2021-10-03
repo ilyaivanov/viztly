@@ -1,6 +1,6 @@
-import { c, spacings as sp } from "../designSystem";
-import { createItem } from "../store";
-import { ChildrenBorder, FlatednedList } from "./FlatednedList";
+import { c, spacings as sp } from "../../designSystem";
+import { createItem } from "../../store";
+import { ChildrenBorder, FlatednedList } from "../FlatednedList";
 
 const createFlatList = (children: Item[]) =>
   new FlatednedList(createItem("Home", children));

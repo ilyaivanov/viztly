@@ -1,6 +1,9 @@
 export class Canvas {
   el: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
+  width: number = 0;
+  height: number = 0;
+
   constructor() {
     this.el = document.createElement("canvas");
     this.ctx = this.el.getContext("2d")!;
@@ -17,6 +20,17 @@ export class Canvas {
     this.ctx.beginPath();
     this.ctx.arc(center.x, center.y, r, 0, 2 * Math.PI);
     this.ctx.fill();
+  };
+
+  drawRect = (
+    topLeft: Vector,
+    width: number,
+    height: number,
+    color: string
+  ) => {
+    this.ctx.fillStyle = color;
+
+    this.ctx.fillRect(topLeft.x, topLeft.y, width, height);
   };
 
   drawLine = (p1: Vector, p2: Vector, stroke: number, color: string) => {
@@ -40,7 +54,9 @@ export class Canvas {
   onResize?: () => void;
 
   updateHeight = () => {
-    this.el.setAttribute("width", window.innerWidth + "");
-    this.el.setAttribute("height", window.innerHeight + "");
+    this.width = window.innerWidth;
+    this.height = window.innerHeight;
+    this.el.setAttribute("width", this.width + "");
+    this.el.setAttribute("height", this.height + "");
   };
 }

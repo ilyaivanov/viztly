@@ -15,8 +15,8 @@ export const root: Item = createItem("Home", [
     createItem("Back-End", listIfItems("Item ", 2)),
   ]),
   createItem("Item 1", [
-    createItem("Item 1.1", listIfItems("Item 1.1.", 12)),
-    createItem("Item 1.2", listIfItems("Item 1.2.", 10)),
-    createItem("Item 1.3", listIfItems("Item 1.3.", 6)),
+    createItem("Item 1.1", listIfItems("Item 1.1.", 32)),
+    createItem("Item 1.2", listIfItems("Item 1.2.", 30)),
+    createItem("Item 1.3", listIfItems("Item 1.3.", 36)),
   ]),
 ]);

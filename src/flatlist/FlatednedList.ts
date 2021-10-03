@@ -1,4 +1,5 @@
-import { c, spacings as sp } from "../designSystem";
+import { c, spacings as sp, spacings } from "../designSystem";
+import { Canvas } from "../infra/canvas";
 import * as tree from "./itemTree";
 
 export type FlatItemView = {
@@ -141,6 +142,10 @@ export class FlatednedList {
     return parentIndex;
   };
   getSelectedItem = (): Item => this.visibleItems[this.selectedItemIndex].item;
+
+  getContentHeight = () =>
+    this.visibleItems.reduce((sum, i) => sum + i.itemHeight, 0) +
+    spacings.yBase * 2;
 }
 
 const createBorder = (item: FlatItemView): ChildrenBorder => {
