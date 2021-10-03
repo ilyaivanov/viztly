@@ -1,6 +1,6 @@
 import { c, spacings as sp } from "../../designSystem";
 import { createItem } from "../../store";
-import { ChildrenBorder, FlatednedList } from "../FlatednedList";
+import { ChildrenBorder, FlatednedList, FlatItemView } from "../FlatednedList";
 
 const createFlatList = (children: Item[]) =>
   new FlatednedList(createItem("Home", children));
@@ -139,5 +139,75 @@ describe("viewing one item with a child", () => {
             sp.level1ItemHeight / 2
         ));
     });
+  });
+});
+
+describe("Having two parent items first having two childs", () => {
+  let list: FlatednedList;
+  beforeEach(() => {
+    list = createFlatList([
+      createItem("First", [createItem("First.1"), createItem("First.2")]),
+      createItem("Second"),
+    ]);
+  });
+
+  describe("selecting First.1", () => {
+    beforeEach(() => list.selectNextItem());
+
+    it("selects First.1", () => {
+      expect(list.getSelectedItem().title).toBe("First.1");
+    });
+
+    describe("removing First.1", () => {
+      beforeEach(() => list.removeSelected());
+
+      it("removes First.1 from visible items", () =>
+        expect(list.visibleItems.map((i) => i.item.title)).toEqual([
+          "First",
+          "First.2",
+          "Second",
+        ]));
+
+      it("removes First.1 from First item", () =>
+        expect(list.root.children[0].children.map((i) => i.title)).toEqual([
+          "First.2",
+        ]));
+
+      it("selects First", () =>
+        expect(list.visibleItems[0].textColor).toBe(c.selectedItem));
+
+      it("updates position of a Second.2 item", () =>
+        expect(list.visibleItems[1].position.y).toEqual(
+          sp.level1ItemHeight + sp.itemHeight / 2 + sp.yBase
+        ));
+
+      it("updates position of a Second item", () =>
+        expect(list.visibleItems[2].position.y).toEqual(
+          sp.level1ItemHeight +
+            sp.itemHeight +
+            sp.level1ItemHeight / 2 +
+            sp.yBase
+        ));
+
+      it("updates borderHeight of First itemView", () =>
+        expect(list.visibleItems[0].childrenBorder!.height).toEqual(
+          sp.itemHeight * 2
+        ));
+    });
+  });
+
+  describe("removing First", () => {
+    beforeEach(() => list.removeSelected());
+
+    it("has only Second visible item", () =>
+      expect(list.visibleItems.map((i) => i.item.title)).toEqual(["Second"]));
+
+    it("selects Second", () =>
+      expect(list.visibleItems[0].textColor).toBe(c.selectedItem));
+
+    it("udpates Second item position", () =>
+      expect(list.visibleItems[0].position.y).toEqual(
+        sp.level1ItemHeight / 2 + sp.yBase
+      ));
   });
 });

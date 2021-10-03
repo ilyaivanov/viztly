@@ -63,6 +63,11 @@ document.addEventListener("keydown", (e) => {
     centerOnSelectedItemIfOutsideWindow();
     render();
   }
+
+  if (e.code === "Backspace" && e.ctrlKey && e.shiftKey) {
+    list.removeSelected();
+    render();
+  }
 });
 
 document.addEventListener("wheel", (e) => {

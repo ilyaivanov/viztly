@@ -1,5 +1,4 @@
 import { c, spacings as sp, spacings } from "../designSystem";
-import { Canvas } from "../infra/canvas";
 import * as tree from "./itemTree";
 
 export type FlatItemView = {
@@ -23,7 +22,7 @@ export class FlatednedList {
 
   visibleItems: FlatItemView[] = [];
 
-  constructor(root: Item) {
+  constructor(public root: Item) {
     this.visibleItems = this.createItemViews(root, 0, sp.yBase);
     this.selectItemAtIndex(this.selectedItemIndex);
   }
@@ -83,19 +82,10 @@ export class FlatednedList {
   closeSelected = () => {
     const view = this.visibleItems[this.selectedItemIndex];
 
-    const childrenCount = tree.visibleChildrenCount(view.item);
-
-    //asumes items are of level2+
-    const offset = childrenCount * sp.itemHeight;
-
-    this.visibleItems.splice(this.selectedItemIndex + 1, childrenCount);
-
+    const chilrenCount = tree.visibleChildrenCount(view.item);
     view.item.isOpen = false;
 
-    view.childrenBorder = undefined;
-    this.visibleItems
-      .slice(this.selectedItemIndex + 1)
-      .forEach((item) => (item.position.y -= offset));
+    this.removeVisibleItems(this.selectedItemIndex + 1, chilrenCount);
 
     this.updateBorders(this.selectedItemIndex);
   };
@@ -109,6 +99,39 @@ export class FlatednedList {
       itemView.level + 1,
       itemView.position.y + itemView.itemHeight / 2
     );
+    this.appendToVisibleItems(index, views);
+  };
+
+  removeSelected = () => {
+    const view = this.visibleItems[this.selectedItemIndex];
+
+    const childrenCount = tree.visibleChildrenCount(view.item);
+
+    tree.removeItem(this.root, view.item);
+    this.removeVisibleItems(this.selectedItemIndex, childrenCount + 1);
+    if (this.selectedItemIndex > 0)
+      this.selectItemAtIndex(this.selectedItemIndex - 1);
+    else if (this.visibleItems.length > 0) this.selectItemAtIndex(0);
+
+    if (this.visibleItems[this.selectedItemIndex])
+      //asumes items are of level2+
+      this.updateBorders(this.selectedItemIndex);
+  };
+
+  private removeVisibleItems = (index: number, childrenCount: number) => {
+    let offset = 0;
+    for (var i = 0; i < childrenCount; i++) {
+      offset += this.visibleItems[index + i].itemHeight;
+    }
+
+    this.visibleItems.splice(index, childrenCount);
+
+    this.visibleItems
+      .slice(index)
+      .forEach((item) => (item.position.y -= offset));
+  };
+
+  private appendToVisibleItems = (index: number, views: FlatItemView[]) => {
     this.visibleItems.splice(index, 0, ...views);
 
     //asumes items are of level2+
@@ -125,11 +148,11 @@ export class FlatednedList {
 
     //TODO: should do this for closing item as well
     while (updateBorderAt !== -1) {
-      if (tree.hasVisibleChildren(this.visibleItems[updateBorderAt].item)) {
-        this.visibleItems[updateBorderAt].childrenBorder = createBorder(
-          this.visibleItems[updateBorderAt]
-        );
-      }
+      const view = this.visibleItems[updateBorderAt];
+      view.childrenBorder = tree.hasVisibleChildren(view.item)
+        ? createBorder(view)
+        : undefined;
+
       updateBorderAt = this.getParentIndex(updateBorderAt);
     }
   };
