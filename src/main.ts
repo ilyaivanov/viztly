@@ -76,6 +76,12 @@ document.addEventListener("keydown", (e) => {
     showRenamingInput(list.getSelectedItemView(), render);
     render();
   }
+  if (e.code === "Enter") {
+    e.preventDefault();
+    const itemView = list.createNewItemAfterSelected();
+    showRenamingInput(itemView, render);
+    render();
+  }
 });
 
 document.addEventListener("wheel", (e) => {

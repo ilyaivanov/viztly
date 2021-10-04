@@ -30,7 +30,8 @@ export class FlatednedList {
   private createItemViews = (
     item: Item,
     level: number,
-    startingOffset: number
+    startingOffset: number,
+    shouldIncludeParent: boolean = false
   ) => {
     let offset = startingOffset;
     let views: FlatItemView[] = [];
@@ -41,7 +42,6 @@ export class FlatednedList {
       const itemView: FlatItemView = {
         item,
         level,
-
         itemHeight,
         textColor: c.text,
         position: {
@@ -60,7 +60,8 @@ export class FlatednedList {
     const traverseChildren = (item: Item, level: number) =>
       item.isOpen && item.children.forEach((c) => viewItem(c, level));
 
-    traverseChildren(item, level);
+    if (shouldIncludeParent) viewItem(item, level);
+    else traverseChildren(item, level);
     return views;
   };
 
@@ -118,6 +119,39 @@ export class FlatednedList {
       this.updateBorders(this.selectedItemIndex);
   };
 
+  createNewItemAfterSelected(): FlatItemView {
+    const view = this.getSelectedItemView();
+
+    const newItem: Item = {
+      isOpen: true,
+      title: "",
+      children: [],
+    };
+    let newItemView: FlatItemView;
+
+    if (tree.hasVisibleChildren(view.item)) {
+      tree.addItemInside(view.item, newItem);
+      newItemView = this.createItemViews(
+        newItem,
+        view.level + 1,
+        view.position.y + view.itemHeight / 2,
+        true
+      )[0];
+    } else {
+      tree.addItemAfter(this.root, view.item, newItem);
+      newItemView = this.createItemViews(
+        newItem,
+        view.level,
+        view.position.y + view.itemHeight / 2,
+        true
+      )[0];
+    }
+    this.visibleItems.splice(this.selectedItemIndex + 1, 0, newItemView);
+    this.selectItemAtIndex(this.selectedItemIndex + 1);
+    this.moveAllItemsBy(this.selectedItemIndex + 1, newItemView.itemHeight);
+    return newItemView;
+  }
+
   private removeVisibleItems = (index: number, childrenCount: number) => {
     let offset = 0;
     for (var i = 0; i < childrenCount; i++) {
@@ -125,10 +159,13 @@ export class FlatednedList {
     }
 
     this.visibleItems.splice(index, childrenCount);
+    this.moveAllItemsBy(index, -offset);
+  };
 
+  private moveAllItemsBy = (index: number, offset: number) => {
     this.visibleItems
       .slice(index)
-      .forEach((item) => (item.position.y -= offset));
+      .forEach((item) => (item.position.y += offset));
   };
 
   private appendToVisibleItems = (index: number, views: FlatItemView[]) => {
