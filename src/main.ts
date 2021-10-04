@@ -1,9 +1,11 @@
 import { engine } from "./infra/animationEngine";
 import { Canvas } from "./infra/canvas";
+import { clamp } from "./infra/numbers";
 import { drawItem } from "./flatlist/drawItem";
 import { FlatednedList } from "./flatlist/FlatednedList";
 import { root } from "./store";
 import { c, spacings } from "./designSystem";
+import { inRenamingAnything, showRenamingInput } from "./titleInput";
 
 const canvas = new Canvas();
 const list = new FlatednedList(root);
@@ -68,6 +70,12 @@ document.addEventListener("keydown", (e) => {
     list.removeSelected();
     render();
   }
+
+  if (!inRenamingAnything() && e.code === "KeyE") {
+    e.preventDefault();
+    showRenamingInput(list.getSelectedItemView(), render);
+    render();
+  }
 });
 
 document.addEventListener("wheel", (e) => {
@@ -97,16 +105,11 @@ const getScrollbarHeight = (contentHeight: number, windowHeight: number) =>
 const getScrollbarOffset = (contentHeight: number, windowHeight: number) =>
   contentOffset * (windowHeight / contentHeight);
 
-render();
-
 const clampContentOffset = (newOffset: number) => {
   const maxOffset = list.getContentHeight() - canvas.height;
   return clamp(newOffset, -maxOffset, 0);
 };
 
 //utils
-const clamp = (val: number, min: number, max: number) => {
-  if (val < min) return min;
-  else if (val > max) return max;
-  else return val;
-};
+
+render();

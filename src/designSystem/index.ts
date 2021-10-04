@@ -1,6 +1,6 @@
 export const fontSizes = {
-  regular: 13,
-  big: 16,
+  regular: 14,
+  big: 20,
 };
 
 export const c = {
@@ -31,6 +31,8 @@ export const spacings = {
   level1ItemHeight: 28,
 
   scrollWidth: 10,
+
+  textToCircleCenter: 10,
 };
 
 export type Spacings = typeof spacings;

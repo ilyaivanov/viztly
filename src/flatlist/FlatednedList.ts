@@ -164,6 +164,10 @@ export class FlatednedList {
     );
     return parentIndex;
   };
+
+  getSelectedItemView = (): FlatItemView =>
+    this.visibleItems[this.selectedItemIndex];
+
   getSelectedItem = (): Item => this.visibleItems[this.selectedItemIndex].item;
 
   getContentHeight = () =>
