@@ -1,4 +1,5 @@
 import { spacings } from "../designSystem";
+import { flattenItemChildren } from "./domain";
 
 //VIEW
 export type ItemRow = {
@@ -27,18 +28,3 @@ export class List {
     return flattenItemChildren(parent, createRow);
   };
 }
-
-//DOMAIN
-const flattenItemChildren = <T>(
-  item: Item,
-  mapper: (item: Item, level: number) => T
-): T[] => {
-  const res: T[] = [];
-
-  const traverseChildren = (item: Item, level: number) =>
-    item.isOpen && item.children.forEach((c) => res.push(mapper(c, level)));
-
-  traverseChildren(item, 0);
-
-  return res;
-};
