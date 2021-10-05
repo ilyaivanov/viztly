@@ -36,7 +36,7 @@ export class FlatednedList {
     let offset = startingOffset;
     let views: FlatItemView[] = [];
     const viewItem = (item: Item, level: number) => {
-      const itemHeight = level === 0 ? sp.level1ItemHeight : sp.itemHeight;
+      const itemHeight = level === 0 ? sp.zeroLevelItemHeight : sp.itemHeight;
       offset += itemHeight / 2;
 
       const itemView: FlatItemView = {

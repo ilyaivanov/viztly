@@ -9,8 +9,8 @@ it("viewing two children without any children returns two item one below another
   let list = createFlatList([createItem("First"), createItem("Second")]);
 
   expect(list.visibleItems.map((v) => v.position.y)).toEqual([
-    sp.yBase + sp.level1ItemHeight / 2,
-    sp.yBase + sp.level1ItemHeight / 2 + sp.level1ItemHeight,
+    sp.yBase + sp.zeroLevelItemHeight / 2,
+    sp.yBase + sp.zeroLevelItemHeight / 2 + sp.zeroLevelItemHeight,
   ]);
 });
 
@@ -26,9 +26,12 @@ describe("viewing one item with a child", () => {
 
   it("offsets child by a xStep", () => {
     expect(list.visibleItems.map((v) => v.position.y)).toEqual([
-      sp.yBase + sp.level1ItemHeight / 2,
-      sp.yBase + sp.level1ItemHeight + sp.itemHeight / 2,
-      sp.yBase + sp.level1ItemHeight + sp.itemHeight + sp.level1ItemHeight / 2,
+      sp.yBase + sp.zeroLevelItemHeight / 2,
+      sp.yBase + sp.zeroLevelItemHeight + sp.itemHeight / 2,
+      sp.yBase +
+        sp.zeroLevelItemHeight +
+        sp.itemHeight +
+        sp.zeroLevelItemHeight / 2,
     ]);
   });
 
@@ -91,12 +94,12 @@ describe("viewing one item with a child", () => {
 
     it("doesn't change position of the first item", () =>
       expect(list.visibleItems[0].position.y).toBe(
-        sp.yBase + sp.level1ItemHeight / 2
+        sp.yBase + sp.zeroLevelItemHeight / 2
       ));
 
     it("udates position of the Second item", () =>
       expect(list.visibleItems[1].position.y).toBe(
-        sp.yBase + sp.level1ItemHeight + sp.level1ItemHeight / 2
+        sp.yBase + sp.zeroLevelItemHeight + sp.zeroLevelItemHeight / 2
       ));
 
     describe("opening first item", () => {
@@ -123,20 +126,20 @@ describe("viewing one item with a child", () => {
 
       it("doesn't change position of the first item", () =>
         expect(list.visibleItems[0].position.y).toBe(
-          sp.yBase + sp.level1ItemHeight / 2
+          sp.yBase + sp.zeroLevelItemHeight / 2
         ));
 
       it("udates position of the First child item", () =>
         expect(list.visibleItems[1].position.y).toBe(
-          sp.yBase + sp.level1ItemHeight + sp.itemHeight / 2
+          sp.yBase + sp.zeroLevelItemHeight + sp.itemHeight / 2
         ));
 
       it("udates position of the Second child item", () =>
         expect(list.visibleItems[2].position.y).toBe(
           sp.yBase +
-            sp.level1ItemHeight +
+            sp.zeroLevelItemHeight +
             sp.itemHeight +
-            sp.level1ItemHeight / 2
+            sp.zeroLevelItemHeight / 2
         ));
     });
   });
@@ -178,14 +181,14 @@ describe("Having two parent items first having two childs", () => {
 
       it("updates position of a Second.2 item", () =>
         expect(list.visibleItems[1].position.y).toEqual(
-          sp.level1ItemHeight + sp.itemHeight / 2 + sp.yBase
+          sp.zeroLevelItemHeight + sp.itemHeight / 2 + sp.yBase
         ));
 
       it("updates position of a Second item", () =>
         expect(list.visibleItems[2].position.y).toEqual(
-          sp.level1ItemHeight +
+          sp.zeroLevelItemHeight +
             sp.itemHeight +
-            sp.level1ItemHeight / 2 +
+            sp.zeroLevelItemHeight / 2 +
             sp.yBase
         ));
 
@@ -207,7 +210,7 @@ describe("Having two parent items first having two childs", () => {
 
     it("udpates Second item position", () =>
       expect(list.visibleItems[0].position.y).toEqual(
-        sp.level1ItemHeight / 2 + sp.yBase
+        sp.zeroLevelItemHeight / 2 + sp.yBase
       ));
   });
 });

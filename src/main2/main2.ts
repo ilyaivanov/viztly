@@ -1,4 +1,4 @@
-import { fontSizes, spacings } from "../designSystem";
+import { c, fontSizes, spacings as sp } from "../designSystem";
 import { Canvas } from "../infra/canvas";
 import { add } from "../infra/vector";
 import { createItem, createRoot } from "./domain";
@@ -18,8 +18,6 @@ const list = new List(
         createItem("Second.2.2"),
         createItem("Second.3.3"),
       ]),
-      createItem("Second.2"),
-      createItem("Second.3"),
     ]),
     createItem("Third"),
     createItem("Fourth"),
@@ -35,7 +33,7 @@ const render = () => {
 };
 
 const drawItemRow = (itemRow: ItemRow) => {
-  canvas.drawCircle(itemRow.position, spacings.circleRadius, "white");
+  canvas.drawCircle(itemRow.position, sp.circleRadius, "white");
 
   const font = itemRow.level === 0 ? fontSizes.big : fontSizes.regular;
   canvas.drawText(
@@ -44,6 +42,14 @@ const drawItemRow = (itemRow: ItemRow) => {
     font,
     "white"
   );
+
+  if (itemRow.childrenHeight) {
+    const itemHeight =
+      itemRow.level === 0 ? sp.zeroLevelItemHeight : sp.itemHeight;
+    const start = add(itemRow.position, { x: 0, y: itemHeight / 2 });
+    const end = add(start, { x: 0, y: itemRow.childrenHeight });
+    canvas.drawLine(start, end, 2, c.line);
+  }
 };
 
 render();

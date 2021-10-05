@@ -6,7 +6,7 @@ export type ItemRow = {
   item: Item;
   level: number;
   position: Vector;
-  //   childrenHeight: number;
+  childrenHeight: number;
 };
 
 export class List {
@@ -19,7 +19,9 @@ export class List {
     let offset = spacings.yBase;
     const createRow = (item: Item, level: number): ItemRow => {
       const halfOfHeight =
-        level === 0 ? spacings.level1ItemHeight / 2 : spacings.itemHeight / 2;
+        level === 0
+          ? spacings.zeroLevelItemHeight / 2
+          : spacings.itemHeight / 2;
 
       //not changing on first iteration
       offset = offset === spacings.yBase ? offset : offset + halfOfHeight;
@@ -27,7 +29,7 @@ export class List {
       const res: ItemRow = {
         item,
         level,
-        // childrenHeight: flattenItemChildren(parent, c => ),
+        childrenHeight: this.getChildrenHeight(item),
         position: { x: spacings.xBase + level * spacings.xStep, y: offset },
       };
       offset += halfOfHeight;
@@ -35,4 +37,11 @@ export class List {
     };
     return flattenItemChildren(parent, createRow);
   };
+
+  // assumes all children are below level 0
+  private getChildrenHeight = (item: Item): number =>
+    flattenItemChildren(item, () => spacings.itemHeight).reduce(
+      (sum, val) => sum + val,
+      0
+    );
 }
