@@ -33,14 +33,21 @@ const render = () => {
 };
 
 const drawItemRow = (itemRow: ItemRow) => {
-  canvas.drawCircle(itemRow.position, sp.circleRadius, "white");
+  canvas.drawCircle(itemRow.position, sp.circleRadius, c.text);
 
-  const font = itemRow.level === 0 ? fontSizes.big : fontSizes.regular;
+  const fontSize = itemRow.level === 0 ? fontSizes.big : fontSizes.regular;
+
   canvas.drawText(
-    add(itemRow.position, { x: 10, y: font * 0.32 }),
+    add(itemRow.position, {
+      x:
+        itemRow.level == 0
+          ? sp.zeroLevelCircleToTextDistance
+          : sp.circleToTextDistance,
+      y: fontSize * 0.32,
+    }),
     itemRow.item.title,
-    font,
-    "white"
+    fontSize,
+    c.text
   );
 
   if (itemRow.childrenHeight) {

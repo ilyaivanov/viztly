@@ -23,7 +23,9 @@ export const spacings = {
   yBase: 40,
   xStep: 20,
 
-  circleRadius: 3.5,
+  circleRadius: 3,
+  circleToTextDistance: 8,
+  zeroLevelCircleToTextDistance: 10,
 
   itemHeight: 22,
   zeroLevelItemHeight: 28,

@@ -15,7 +15,7 @@ export class List {
     this.rows = this.createRows(root);
   }
 
-  createRows = (parent: Item) => {
+  private createRows = (parent: Item) => {
     let offset = spacings.yBase;
     const createRow = (item: Item, level: number): ItemRow => {
       const halfOfHeight =
