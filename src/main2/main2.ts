@@ -32,6 +32,8 @@ const render = () => {
   list.rows.forEach(drawItemRow);
 };
 
+// this is called 60FPS,
+// thus making this code faster will improve animation perfomance
 const drawItemRow = (itemRow: ItemRow) => {
   canvas.drawCircle(itemRow.position, sp.circleRadius, c.text);
 
