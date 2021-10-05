@@ -19,11 +19,9 @@ export const c = {
 };
 
 export const spacings = {
-  fontSize: 15,
-  level1FontSize: 20,
   xBase: 40,
   yBase: 40,
-  xStep: 23,
+  xStep: 20,
 
   circleRadius: 3.5,
   extendChildrenBorderBy: 2,

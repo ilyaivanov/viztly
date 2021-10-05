@@ -1,4 +1,4 @@
-import { spacings } from "../designSystem";
+import { fontSizes, spacings } from "../designSystem";
 import { Canvas } from "../infra/canvas";
 import { add } from "../infra/vector";
 import { createItem, createRoot } from "./domain";
@@ -36,10 +36,12 @@ const render = () => {
 
 const drawItemRow = (itemRow: ItemRow) => {
   canvas.drawCircle(itemRow.position, spacings.circleRadius, "white");
+
+  const font = itemRow.level === 0 ? fontSizes.big : fontSizes.regular;
   canvas.drawText(
-    add(itemRow.position, { x: 10, y: 16 * 0.32 }),
+    add(itemRow.position, { x: 10, y: font * 0.32 }),
     itemRow.item.title,
-    16,
+    font,
     "white"
   );
 };
