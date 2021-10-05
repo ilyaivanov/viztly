@@ -2,7 +2,7 @@ import { spacings } from "../designSystem";
 import { createItem, createRoot } from "./domain";
 import { List } from "./list";
 
-const { yBase, level1ItemHeight } = spacings;
+const { yBase, xBase, xStep, level1ItemHeight } = spacings;
 
 it("Having three items at level 1 should have proper y coordinates", () => {
   const list = new List(
@@ -12,4 +12,15 @@ it("Having three items at level 1 should have proper y coordinates", () => {
   expect(list.rows[0].position.y).toBe(yBase);
   expect(list.rows[1].position.y).toBe(yBase + level1ItemHeight);
   expect(list.rows[2].position.y).toBe(yBase + level1ItemHeight * 2);
+});
+
+describe("Having one item with a child", () => {
+  let list: List;
+  beforeEach(() => {
+    list = new List(createRoot([createItem("First", [createItem("First.1")])]));
+  });
+
+  it("offsets second item by xStep", () => {
+    expect(list.rows[1].position.x).toBe(xBase + xStep);
+  });
 });

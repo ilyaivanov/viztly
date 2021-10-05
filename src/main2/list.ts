@@ -20,7 +20,7 @@ export class List {
       const res: ItemRow = {
         item,
         level,
-        position: { x: spacings.xBase, y: offset },
+        position: { x: spacings.xBase + level * spacings.xStep, y: offset },
       };
       offset += spacings.level1ItemHeight;
       return res;

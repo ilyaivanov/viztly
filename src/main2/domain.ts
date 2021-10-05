@@ -13,8 +13,13 @@ export const flattenItemChildren = <T>(
 ): T[] => {
   const res: T[] = [];
 
-  const traverseChildren = (item: Item, level: number) =>
-    item.isOpen && item.children.forEach((c) => res.push(mapper(c, level)));
+  const traverseChildren = (item: Item, level: number) => {
+    item.isOpen &&
+      item.children.forEach((c) => {
+        res.push(mapper(c, level));
+        traverseChildren(c, level + 1);
+      });
+  };
 
   traverseChildren(item, 0);
 
