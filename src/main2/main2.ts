@@ -1,6 +1,8 @@
 import { c, fontSizes, spacings as sp } from "../designSystem";
+import { AnimationEngine, engine } from "../infra/animationEngine";
 import { Canvas } from "../infra/canvas";
 import { add } from "../infra/vector";
+import { AnimatedNumber2 } from "./animatedNumber";
 import { createItem, createRoot } from "./domain";
 import { ItemRow, List } from "./list";
 
@@ -29,6 +31,8 @@ canvas.onResize = () => {
 };
 
 const render = () => {
+  canvas.clear();
+  canvas.drawRect({ y: 20, x: squarePositionX }, 20, 20, "white");
   list.rows.forEach(drawItemRow);
 };
 
@@ -61,5 +65,29 @@ const drawItemRow = (itemRow: ItemRow) => {
   }
 };
 
+let squarePositionX = 20;
+document.addEventListener("keydown", (e) => {
+  if (e.code === "Space") {
+    animate(
+      squarePositionX,
+      squarePositionX + 200,
+      (v) => (squarePositionX = v)
+    );
+    console.log("BOOOOM!!!");
+  }
+});
+
 render();
 document.body.appendChild(canvas.el);
+
+engine.onTick = render;
+
+const animate = (
+  from: number,
+  to: number,
+  onTick: (currentVal: number) => void
+) => {
+  const anim = new AnimatedNumber2(from);
+  anim.onTick = onTick;
+  anim.animateTo(to);
+};
