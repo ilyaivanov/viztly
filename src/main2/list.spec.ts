@@ -2,6 +2,12 @@ import { c, spacings } from "../designSystem";
 import { createItem, createRoot } from "./domain";
 import { List } from "./list";
 
+jest.mock("./animations", () => ({
+  animateColor: (from: string, to: string, onTick: (val: string) => void) => {
+    onTick(to);
+  },
+}));
+
 const { yBase, xBase, xStep, zeroLevelItemHeight, itemHeight } = spacings;
 
 it("Having three items at level 1 should have proper y coordinates", () => {
@@ -78,4 +84,46 @@ describe("Having one item with a child", () => {
     list.selectParentItem();
     expect(list.rows[0].color).toBe(c.selectedItem);
   });
+});
+
+//open close tests
+
+it("having one child closing item removes rows and marks it as closed", () => {
+  const list = new List(
+    createRoot([
+      createItem("First", [createItem("First.1")]),
+      createItem("Second"),
+    ])
+  );
+
+  list.closeSelectedItem();
+
+  expect(list.rows.map((r) => r.item.title)).toEqual(["First", "Second"]);
+  expect(list.rows[0].position.y).toBe(yBase);
+  expect(list.rows[0].childrenHeight).toBe(0);
+
+  expect(list.rows[1].position.y).toBe(yBase + zeroLevelItemHeight);
+});
+
+it("closing item with parents updates childrenHeight for that parents", () => {
+  const list = new List(
+    createRoot([
+      createItem("First", [
+        createItem("First.1", [
+          createItem("First.1.1"),
+          createItem("First.1.1"),
+        ]),
+        createItem("First.2"),
+      ]),
+      createItem("Second"),
+    ])
+  );
+
+  list.selectNextItem();
+
+  expect(list.getSelectedItemRow().item.title).toBe("First.1");
+
+  list.closeSelectedItem();
+
+  expect(list.rows[0].childrenHeight).toBe(spacings.itemHeight * 2);
 });

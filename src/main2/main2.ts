@@ -1,4 +1,5 @@
 import { c, fontSizes, spacings as sp } from "../designSystem";
+import { engine } from "../infra/animationEngine";
 import { Canvas } from "../infra/canvas";
 import { add } from "../infra/vector";
 import { createItem, createRoot } from "./domain";
@@ -65,7 +66,10 @@ const drawItemRow = (itemRow: ItemRow) => {
 document.addEventListener("keydown", (e) => {
   if (e.code === "ArrowDown") list.selectNextItem();
   if (e.code === "ArrowUp") list.selectPreviousItem();
-  if (e.code === "ArrowLeft") list.selectParentItem();
+  if (e.code === "ArrowLeft") {
+    if (list.getSelectedItemRow().item.isOpen) list.closeSelectedItem();
+    else list.selectParentItem();
+  }
   if (e.code === "ArrowRight") list.selectNextItem();
 
   render();
@@ -73,3 +77,5 @@ document.addEventListener("keydown", (e) => {
 
 render();
 document.body.appendChild(canvas.el);
+
+engine.onTick = render;

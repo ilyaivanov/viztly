@@ -1,6 +1,6 @@
 export const createItem = (title: string, children: Item[] = []): Item => ({
   title,
-  isOpen: true,
+  isOpen: children.length > 0,
   children,
 });
 

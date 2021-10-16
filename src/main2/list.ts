@@ -1,4 +1,6 @@
 import { c, spacings } from "../designSystem";
+import { getVisibleChildren, visibleChildrenCount } from "../flatlist/itemTree";
+import { animateColor } from "./animations";
 import { flattenItemChildren } from "./domain";
 
 //VIEW
@@ -30,6 +32,28 @@ export class List {
       this.changeItemSelection(this.selectedItemIndex - 1);
   }
 
+  public closeSelectedItem() {
+    const childs = visibleChildrenCount(this.getSelectedItemRow().item);
+    this.rows.splice(this.selectedItemIndex + 1, childs);
+
+    const height = this.getSelectedItemRow().childrenHeight;
+    this.rows[this.selectedItemIndex].childrenHeight = 0;
+    this.rows[this.selectedItemIndex].item.isOpen = false;
+
+    this.rows.slice(this.selectedItemIndex + 1).forEach((row) => {
+      row.position.y -= height;
+    });
+
+    let parentIndex = this.getParentIndex(this.selectedItemIndex);
+
+    while (parentIndex !== -1) {
+      this.rows[parentIndex].childrenHeight =
+        visibleChildrenCount(this.rows[parentIndex].item) * spacings.itemHeight;
+
+      parentIndex = this.getParentIndex(parentIndex);
+    }
+  }
+
   public selectParentItem() {
     const parentIndex = this.getParentIndex(this.selectedItemIndex);
     if (typeof parentIndex !== "undefined")
@@ -47,8 +71,16 @@ export class List {
     const nextParent = this.getParentItemView(this.rows[index].item);
 
     if (currentParent !== nextParent) {
-      if (currentParent) currentParent.childrenColor = c.line;
-      if (nextParent) nextParent.childrenColor = c.lineSelected;
+      if (currentParent) {
+        animateColor(currentParent.childrenColor, c.line, (val) => {
+          currentParent.childrenColor = val;
+        });
+      }
+      if (nextParent) {
+        animateColor(nextParent.childrenColor, c.lineSelected, (val) => {
+          nextParent.childrenColor = val;
+        });
+      }
     }
     this.rows[this.selectedItemIndex].color = c.text;
     this.selectedItemIndex = index;
