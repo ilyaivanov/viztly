@@ -1,4 +1,4 @@
-import { spacings } from "../designSystem";
+import { c, spacings } from "../designSystem";
 import { flattenItemChildren } from "./domain";
 
 //VIEW
@@ -7,12 +7,52 @@ export type ItemRow = {
   level: number;
   position: Vector;
   childrenHeight: number;
+  childrenColor: string;
+  color: string;
 };
 
 export class List {
   rows: ItemRow[];
+
+  selectedItemIndex = 0;
+
   constructor(public root: Item) {
     this.rows = this.createRows(root);
+    this.rows[this.selectedItemIndex].color = c.selectedItem;
+  }
+
+  public selectNextItem() {
+    if (this.selectedItemIndex < this.rows.length - 1)
+      this.changeItemSelection(this.selectedItemIndex + 1);
+  }
+  public selectPreviousItem() {
+    if (this.selectedItemIndex > 0)
+      this.changeItemSelection(this.selectedItemIndex - 1);
+  }
+
+  public selectParentItem() {
+    const parentIndex = this.getParentIndex(this.selectedItemIndex);
+    if (typeof parentIndex !== "undefined")
+      this.changeItemSelection(parentIndex);
+  }
+
+  public getSelectedItemRow() {
+    return this.rows[this.selectedItemIndex];
+  }
+
+  private changeItemSelection(index: number) {
+    const currentParent = this.getParentItemView(
+      this.rows[this.selectedItemIndex].item
+    );
+    const nextParent = this.getParentItemView(this.rows[index].item);
+
+    if (currentParent !== nextParent) {
+      if (currentParent) currentParent.childrenColor = c.line;
+      if (nextParent) nextParent.childrenColor = c.lineSelected;
+    }
+    this.rows[this.selectedItemIndex].color = c.text;
+    this.selectedItemIndex = index;
+    this.rows[this.selectedItemIndex].color = c.selectedItem;
   }
 
   private createRows = (parent: Item) => {
@@ -31,6 +71,8 @@ export class List {
         level,
         childrenHeight: this.getChildrenHeight(item),
         position: { x: spacings.xBase + level * spacings.xStep, y: offset },
+        color: c.text,
+        childrenColor: c.line,
       };
       offset += halfOfHeight;
       return res;
@@ -44,4 +86,12 @@ export class List {
       (sum, val) => sum + val,
       0
     );
+
+  private getParentItemView(item: Item) {
+    return this.rows.find((r) => r.item.children.indexOf(item) >= 0);
+  }
+  private getParentIndex(currentIndex: number) {
+    const item = this.rows[currentIndex].item;
+    return this.rows.findIndex((r) => r.item.children.indexOf(item) >= 0);
+  }
 }

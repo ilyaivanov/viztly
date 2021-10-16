@@ -1,4 +1,4 @@
-import { spacings } from "../designSystem";
+import { c, spacings } from "../designSystem";
 import { createItem, createRoot } from "./domain";
 import { List } from "./list";
 
@@ -32,5 +32,50 @@ describe("Having one item with a child", () => {
 
   it("sets children height for First item", () => {
     expect(list.rows[0].childrenHeight).toBe(itemHeight);
+  });
+
+  it("first item is selected", () => {
+    expect(list.rows[0].color).toBe(c.selectedItem);
+  });
+
+  describe("pressing down", () => {
+    beforeEach(() => list.selectNextItem());
+
+    it("selects second item and unselects first", () => {
+      expect(list.rows[0].color).toBe(c.text);
+      expect(list.rows[1].color).toBe(c.selectedItem);
+    });
+
+    describe("pressing up", () => {
+      beforeEach(() => list.selectPreviousItem());
+
+      it("selects first item and unselects first", () => {
+        expect(list.rows[0].color).toBe(c.selectedItem);
+        expect(list.rows[1].color).toBe(c.text);
+      });
+    });
+  });
+
+  it("pressing up doesnt change selection", () => {
+    list.selectPreviousItem();
+    expect(list.rows[0].color).toBe(c.selectedItem);
+  });
+
+  it("pressing down 2 times selects last item", () => {
+    list.selectNextItem();
+    list.selectNextItem();
+    expect(list.getSelectedItemRow().item.title).toBe("First.1");
+  });
+
+  it("selecting First.1 highlights children border for a parent item", () => {
+    list.selectNextItem();
+    expect(list.rows[0].childrenColor).toBe(c.lineSelected);
+  });
+
+  it("selecting parent child selects second item", () => {
+    list.selectNextItem();
+    expect(list.rows[1].color).toBe(c.selectedItem);
+    list.selectParentItem();
+    expect(list.rows[0].color).toBe(c.selectedItem);
   });
 });

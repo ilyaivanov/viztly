@@ -43,7 +43,8 @@ export class Canvas {
     this.ctx.stroke();
   };
 
-  clear = () => this.ctx.clearRect(0, 0, Number.MAX_VALUE, Number.MAX_VALUE);
+  clear = () =>
+    this.ctx.clearRect(-2000, -2000, Number.MAX_VALUE, Number.MAX_VALUE);
 
   drawText = (at: Vector, text: string, fontSize: number, color: string) => {
     this.ctx.font = `${fontSize}px Segoe UI`;

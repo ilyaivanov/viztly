@@ -1,8 +1,6 @@
 import { c, fontSizes, spacings as sp } from "../designSystem";
-import { AnimationEngine, engine } from "../infra/animationEngine";
 import { Canvas } from "../infra/canvas";
 import { add } from "../infra/vector";
-import { AnimatedNumber2 } from "./animatedNumber";
 import { createItem, createRoot } from "./domain";
 import { ItemRow, List } from "./list";
 
@@ -32,14 +30,13 @@ canvas.onResize = () => {
 
 const render = () => {
   canvas.clear();
-  canvas.drawRect({ y: 20, x: squarePositionX }, 20, 20, "white");
   list.rows.forEach(drawItemRow);
 };
 
 // this is called 60FPS,
 // thus making this code faster will improve animation perfomance
 const drawItemRow = (itemRow: ItemRow) => {
-  canvas.drawCircle(itemRow.position, sp.circleRadius, c.text);
+  canvas.drawCircle(itemRow.position, sp.circleRadius, itemRow.color);
 
   const fontSize = itemRow.level === 0 ? fontSizes.big : fontSizes.regular;
 
@@ -53,7 +50,7 @@ const drawItemRow = (itemRow: ItemRow) => {
     }),
     itemRow.item.title,
     fontSize,
-    c.text
+    itemRow.color
   );
 
   if (itemRow.childrenHeight) {
@@ -61,33 +58,18 @@ const drawItemRow = (itemRow: ItemRow) => {
       itemRow.level === 0 ? sp.zeroLevelItemHeight : sp.itemHeight;
     const start = add(itemRow.position, { x: 0, y: itemHeight / 2 });
     const end = add(start, { x: 0, y: itemRow.childrenHeight });
-    canvas.drawLine(start, end, 2, c.line);
+    canvas.drawLine(start, end, 2, itemRow.childrenColor);
   }
 };
 
-let squarePositionX = 20;
 document.addEventListener("keydown", (e) => {
-  if (e.code === "Space") {
-    animate(
-      squarePositionX,
-      squarePositionX + 200,
-      (v) => (squarePositionX = v)
-    );
-    console.log("BOOOOM!!!");
-  }
+  if (e.code === "ArrowDown") list.selectNextItem();
+  if (e.code === "ArrowUp") list.selectPreviousItem();
+  if (e.code === "ArrowLeft") list.selectParentItem();
+  if (e.code === "ArrowRight") list.selectNextItem();
+
+  render();
 });
 
 render();
 document.body.appendChild(canvas.el);
-
-engine.onTick = render;
-
-const animate = (
-  from: number,
-  to: number,
-  onTick: (currentVal: number) => void
-) => {
-  const anim = new AnimatedNumber2(from);
-  anim.onTick = onTick;
-  anim.animateTo(to);
-};
