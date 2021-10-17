@@ -53,11 +53,8 @@ describe("having four items", () => {
     });
 
     it("removes last item list ", () => {
-      expect(list.rows.map((r) => r.item.title)).toEqual([
-        "First",
-        "Second",
-        "sub",
-      ]);
+      const items = ["First", "Second", "sub"];
+      expect(list.rows.map((r) => r.item.title)).toEqual(items);
     });
   });
 });
