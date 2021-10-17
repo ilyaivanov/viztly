@@ -19,16 +19,16 @@ export const c = {
 };
 
 export const spacings = {
-  fontSize: 15,
-  level1FontSize: 20,
   xBase: 40,
   yBase: 40,
-  xStep: 23,
+  xStep: 20,
 
-  circleRadius: 3.5,
-  extendChildrenBorderBy: 2,
+  circleRadius: 3,
+  circleToTextDistance: 8,
+  zeroLevelCircleToTextDistance: 10,
+
   itemHeight: 22,
-  level1ItemHeight: 28,
+  zeroLevelItemHeight: 28,
 
   scrollWidth: 10,
 

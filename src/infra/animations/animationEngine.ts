@@ -33,5 +33,3 @@ export class AnimationEngine {
 
   onTick?: () => void;
 }
-
-export const engine = new AnimationEngine();

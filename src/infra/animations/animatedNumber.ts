@@ -1,14 +1,16 @@
-import { engine, Animated } from "./animationEngine";
+import { Animated } from "./animationEngine";
+import { engine } from "./index";
 
 //constant speed animation
-export class AnimatedNumber implements Animated {
-  private speed = 100; //pixels per second
+export class AnimatedNumber2 implements Animated {
+  private speed = 300; //pixels per second
   private targetValue = 0;
   isAnimating: boolean = false;
   private animationDirection: "increating" | "decreasing" = "decreasing";
 
   constructor(public value = 0) {}
 
+  onTick?: (val: number) => void;
   tick(deltaTimeMs: number) {
     const deltaTimeSeconds = deltaTimeMs / 1000;
     const direction = this.animationDirection === "decreasing" ? -1 : 1;
@@ -27,6 +29,7 @@ export class AnimatedNumber implements Animated {
     } else {
       this.value = nextValue;
     }
+    this.onTick && this.onTick(this.value);
   }
 
   animateToDelta(delta: number) {

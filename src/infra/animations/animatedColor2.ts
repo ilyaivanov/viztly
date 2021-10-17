@@ -1,7 +1,8 @@
-import { engine, Animated } from "./animationEngine";
+import { engine } from "./index";
 import { lerpColor } from "./lerpColor";
+import { Animated } from "./animationEngine";
 
-export class AnimatedColor implements Animated {
+export class AnimatedColor2 implements Animated {
   private transitionTimeMs = 200;
   private millisecondsEllapsed = 0;
   private targetColor = 0;
@@ -12,7 +13,7 @@ export class AnimatedColor implements Animated {
   constructor(hexColor: string) {
     this.currentValue = this.parseHex(hexColor);
   }
-
+  onTick?: (val: string) => void;
   tick(deltaTimeMs: number) {
     this.millisecondsEllapsed += deltaTimeMs;
     if (this.millisecondsEllapsed > this.transitionTimeMs) {
@@ -25,6 +26,7 @@ export class AnimatedColor implements Animated {
         fraction
       );
     }
+    this.onTick && this.onTick(this.getHexColor());
   }
 
   animateTo(hexColor: string) {
