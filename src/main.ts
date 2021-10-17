@@ -33,6 +33,8 @@ document.addEventListener("keydown", (e) => {
     if (list.getSelectedItemRow().item.isOpen) list.selectNextItem();
     else list.openSelectedItem();
   }
+  if (e.code === "Backspace" && e.altKey && e.shiftKey)
+    list.removeSelectedItem();
 
   if (!scrollbar.isYPointOnScreen(list.getSelectedItemRow().position.y))
     scrollbar.centerScrollOn(list.getSelectedItemRow().position.y);

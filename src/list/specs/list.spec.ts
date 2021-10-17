@@ -1,15 +1,6 @@
-import { c, spacings } from "../designSystem";
-import { createItem, createRoot } from "../itemTree";
-import { List } from "./list";
-
-jest.mock("../infra/animations", () => ({
-  animateColor: (from: string, to: string, onTick: (val: string) => void) => {
-    onTick(to);
-  },
-  animate: (from: number, to: number, onTick: (val: number) => void) => {
-    onTick(to);
-  },
-}));
+import { c, spacings } from "../../designSystem";
+import { createItem, createRoot } from "../../itemTree";
+import { List } from "../list";
 
 const { yBase, xBase, xStep, zeroLevelItemHeight, itemHeight } = spacings;
 

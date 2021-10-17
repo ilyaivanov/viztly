@@ -1,5 +1,9 @@
 import { c, spacings } from "../designSystem";
-import { flattenItemChildren, visibleChildrenCount } from "../itemTree";
+import {
+  flattenItemChildren,
+  removeItem,
+  visibleChildrenCount,
+} from "../itemTree";
 import { animate, animateColor } from "../infra/animations";
 
 //VIEW
@@ -31,6 +35,28 @@ export class List {
       this.changeItemSelection(this.selectedItemIndex - 1);
   }
 
+  public removeSelectedItem() {
+    const itemToRemoveAt = this.selectedItemIndex;
+    const view = this.getSelectedItemRow();
+
+    if (this.selectedItemIndex > 0)
+      this.changeItemSelection(this.selectedItemIndex - 1);
+    else if (this.selectedItemIndex === 0)
+      this.changeItemSelection(this.selectedItemIndex + 1);
+
+    removeItem(this.root, view.item);
+
+    const itemsToRemove = visibleChildrenCount(view.item) + 1;
+    this.rows.splice(itemToRemoveAt, itemsToRemove);
+
+    const heightToMove = this.getItemHeight(view) + view.childrenHeight;
+    this.rows.slice(itemToRemoveAt).forEach((row) => {
+      row.position.y -= heightToMove;
+    });
+
+    this.updateChildrenHeightForSelectedItemAndParents();
+  }
+
   public closeSelectedItem() {
     const childs = visibleChildrenCount(this.getSelectedItemRow().item);
     this.rows.splice(this.selectedItemIndex + 1, childs);
@@ -43,7 +69,7 @@ export class List {
       row.position.y -= height;
     });
 
-    this.updateAllParents();
+    this.updateChildrenHeightForSelectedItemAndParents();
   }
 
   public openSelectedItem() {
@@ -68,12 +94,12 @@ export class List {
       row.position.y += view.childrenHeight;
     });
 
-    this.updateAllParents();
+    this.updateChildrenHeightForSelectedItemAndParents();
   }
 
   //hugely inefficient
-  private updateAllParents() {
-    let parentIndex = this.getParentIndex(this.selectedItemIndex);
+  private updateChildrenHeightForSelectedItemAndParents() {
+    let parentIndex = this.selectedItemIndex;
 
     while (parentIndex !== -1) {
       this.rows[parentIndex].childrenHeight =
@@ -85,8 +111,7 @@ export class List {
 
   public selectParentItem() {
     const parentIndex = this.getParentIndex(this.selectedItemIndex);
-    if (typeof parentIndex !== "undefined")
-      this.changeItemSelection(parentIndex);
+    if (parentIndex != -1) this.changeItemSelection(parentIndex);
   }
 
   public getSelectedItemRow() {
@@ -101,6 +126,7 @@ export class List {
   }
 
   private changeItemSelection(index: number) {
+    this.rows[this.selectedItemIndex];
     const currentParent = this.getParentItemView(
       this.rows[this.selectedItemIndex].item
     );
@@ -169,4 +195,10 @@ export class List {
     const item = this.rows[currentIndex].item;
     return this.rows.findIndex((r) => r.item.children.indexOf(item) >= 0);
   }
+
+  private getItemHeight = (item: ItemRow) => {
+    return item.level === 0
+      ? spacings.zeroLevelItemHeight
+      : spacings.itemHeight;
+  };
 }

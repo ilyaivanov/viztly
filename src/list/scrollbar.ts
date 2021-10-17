@@ -29,8 +29,12 @@ class Scrollbar {
 
   draw = () => {
     const { canvas, list, transformY } = this;
-    const width = 10;
     const contentHeight = list.getContentHeight();
+    if (canvas.height > contentHeight) {
+      return;
+    }
+
+    const width = 10;
     const coef = canvas.height / contentHeight;
     const scrollbarHeight = (canvas.height * canvas.height) / contentHeight;
     const position = {
