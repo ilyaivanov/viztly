@@ -34,6 +34,9 @@ document.addEventListener("keydown", (e) => {
     else list.openSelectedItem();
   }
 
+  if (!scrollbar.isYPointOnScreen(list.getSelectedItemRow().position.y))
+    scrollbar.centerScrollOn(list.getSelectedItemRow().position.y);
+
   render();
 });
 

@@ -1,3 +1,4 @@
+import { animate } from "../infra/animations";
 import { Canvas } from "../infra/canvas";
 import { List } from "./list";
 
@@ -14,6 +15,16 @@ class Scrollbar {
     this.clampTransform();
     this.canvas.ctx.resetTransform();
     this.canvas.ctx.translate(0, -this.transformY);
+  };
+
+  isYPointOnScreen = (y: number) =>
+    y >= this.transformY && y <= this.transformY + this.canvas.height;
+
+  centerScrollOn = (y: number) => {
+    animate(this.transformY, y - this.canvas.height / 2, (val) => {
+      this.transformY = val;
+      this.translateCanvas();
+    });
   };
 
   draw = () => {

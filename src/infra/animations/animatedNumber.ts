@@ -3,7 +3,7 @@ import { engine } from "./index";
 
 //constant speed animation
 export class AnimatedNumber2 implements Animated {
-  private speed = 300; //pixels per second
+  private speed = 1000; //pixels per second
   private targetValue = 0;
   isAnimating: boolean = false;
   private animationDirection: "increating" | "decreasing" = "decreasing";
