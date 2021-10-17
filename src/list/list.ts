@@ -1,6 +1,6 @@
 import { c, spacings } from "../designSystem";
 import { flattenItemChildren, visibleChildrenCount } from "../itemTree";
-import { animateColor } from "../infra/animations";
+import { animate, animateColor } from "../infra/animations";
 
 //VIEW
 export type ItemRow = {
@@ -18,7 +18,7 @@ export class List {
   selectedItemIndex = 0;
 
   constructor(public root: Item) {
-    this.rows = this.createRows(root);
+    this.rows = this.createRows(root, spacings.yBase, 0);
     this.rows[this.selectedItemIndex].color = c.selectedItem;
   }
 
@@ -43,6 +43,35 @@ export class List {
       row.position.y -= height;
     });
 
+    this.updateAllParents();
+  }
+
+  public openSelectedItem() {
+    const view = this.rows[this.selectedItemIndex];
+    const { item } = view;
+    item.isOpen = true;
+    const rows = this.createRows(
+      item,
+      view.position.y +
+        (view.level === 0
+          ? spacings.zeroLevelItemHeight / 2
+          : spacings.itemHeight / 2) +
+        spacings.itemHeight / 2,
+      view.level + 1
+    );
+    this.rows.splice(this.selectedItemIndex + 1, 0, ...rows);
+
+    const count = visibleChildrenCount(item);
+    view.childrenHeight = count * spacings.itemHeight;
+
+    this.rows.slice(this.selectedItemIndex + count + 1).forEach((row) => {
+      row.position.y += view.childrenHeight;
+    });
+
+    this.updateAllParents();
+  }
+
+  private updateAllParents() {
     let parentIndex = this.getParentIndex(this.selectedItemIndex);
 
     while (parentIndex !== -1) {
@@ -86,16 +115,23 @@ export class List {
     this.rows[this.selectedItemIndex].color = c.selectedItem;
   }
 
-  private createRows = (parent: Item) => {
-    let offset = spacings.yBase;
-    const createRow = (item: Item, level: number): ItemRow => {
+  private createRows = (
+    parent: Item,
+    startingOffset: number,
+    startingLevel: number
+  ) => {
+    let offset = startingOffset;
+    let isFirstItem = true;
+    const createRow = (item: Item, lvl: number): ItemRow => {
+      const level = lvl + startingLevel;
       const halfOfHeight =
         level === 0
           ? spacings.zeroLevelItemHeight / 2
           : spacings.itemHeight / 2;
 
-      //not changing on first iteration
-      offset = offset === spacings.yBase ? offset : offset + halfOfHeight;
+      if (!isFirstItem) offset += halfOfHeight;
+
+      isFirstItem = false;
 
       const res: ItemRow = {
         item,

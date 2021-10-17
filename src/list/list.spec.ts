@@ -6,6 +6,9 @@ jest.mock("../infra/animations", () => ({
   animateColor: (from: string, to: string, onTick: (val: string) => void) => {
     onTick(to);
   },
+  animate: (from: number, to: number, onTick: (val: number) => void) => {
+    onTick(to);
+  },
 }));
 
 const { yBase, xBase, xStep, zeroLevelItemHeight, itemHeight } = spacings;
@@ -105,25 +108,58 @@ it("having one child closing item removes rows and marks it as closed", () => {
   expect(list.rows[1].position.y).toBe(yBase + zeroLevelItemHeight);
 });
 
-it("closing item with parents updates childrenHeight for that parents", () => {
-  const list = new List(
-    createRoot([
-      createItem("First", [
-        createItem("First.1", [
-          createItem("First.1.1"),
-          createItem("First.1.1"),
+describe("having a nested items", () => {
+  let list: List;
+  beforeEach(() => {
+    list = new List(
+      createRoot([
+        createItem("First", [
+          createItem("First.1", [
+            createItem("First.1.1"),
+            createItem("First.1.2"),
+          ]),
+          createItem("First.2"),
         ]),
-        createItem("First.2"),
-      ]),
-      createItem("Second"),
-    ])
-  );
+        createItem("Second"),
+      ])
+    );
+  });
 
-  list.selectNextItem();
+  describe("closing First.1 item", () => {
+    beforeEach(() => {
+      list.selectNextItem();
+      list.closeSelectedItem();
+    });
 
-  expect(list.getSelectedItemRow().item.title).toBe("First.1");
+    it("childrenHeight for that parent", () => {
+      expect(list.rows[0].childrenHeight).toBe(spacings.itemHeight * 2);
+    });
 
-  list.closeSelectedItem();
+    describe("opening First.1 item", () => {
+      beforeEach(() => list.openSelectedItem());
 
-  expect(list.rows[0].childrenHeight).toBe(spacings.itemHeight * 2);
+      it("adds items to the flatlist", () => {
+        const expectedItems = [
+          "First",
+          "First.1",
+          "First.1.1",
+          "First.1.2",
+          "First.2",
+          "Second",
+        ];
+        expect(list.rows.map((r) => r.item.title)).toEqual(expectedItems);
+      });
+
+      it("places them in a correct position", () => {
+        // todo: figure out better positioning system for testing
+        expect(list.rows[2].position.y).toBe(87);
+        expect(list.rows[3].position.y).toBe(109);
+        expect(list.rows[4].position.y).toBe(131);
+      });
+
+      it("updates First item children height", () => {
+        expect(list.rows[0].childrenHeight).toBe(spacings.itemHeight * 4);
+      });
+    });
+  });
 });

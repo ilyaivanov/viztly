@@ -70,7 +70,10 @@ document.addEventListener("keydown", (e) => {
     if (list.getSelectedItemRow().item.isOpen) list.closeSelectedItem();
     else list.selectParentItem();
   }
-  if (e.code === "ArrowRight") list.selectNextItem();
+  if (e.code === "ArrowRight") {
+    if (list.getSelectedItemRow().item.isOpen) list.selectNextItem();
+    else list.openSelectedItem();
+  }
 
   render();
 });
