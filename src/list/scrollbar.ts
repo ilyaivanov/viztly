@@ -46,7 +46,10 @@ class Scrollbar {
 
   private clampTransform = () => {
     const { list } = this;
-    if (this.transformY < 0) this.transformY = 0;
+    if (this.transformY <= 0) {
+      this.transformY = 0;
+      return;
+    }
 
     const contentHeight = list.getContentHeight();
     if (this.transformY + this.canvas.height > contentHeight) {

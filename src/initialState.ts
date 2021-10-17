@@ -1,6 +1,15 @@
 import { createItem, createRoot } from "./itemTree";
 
-export default createRoot([
+const small = createRoot([
+  createItem("First", [
+    createItem("First.1"),
+    createItem("First.2"),
+    createItem("First.3"),
+  ]),
+  createItem("Second"),
+]);
+
+const big = createRoot([
   createItem("First", [
     createItem("First.1"),
     createItem("First.2"),
@@ -74,3 +83,4 @@ export default createRoot([
     ]),
   ]),
 ]);
+export default small;

@@ -4,7 +4,7 @@ import {
   removeItem,
   visibleChildrenCount,
 } from "../itemTree";
-import { animate, animateColor } from "../infra/animations";
+import { animateColor } from "../infra/animations";
 
 //VIEW
 export type ItemRow = {
