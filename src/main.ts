@@ -1,123 +1,21 @@
-import { c, fontSizes, spacings as sp } from "./designSystem";
 import { engine } from "./infra/animations";
 import { Canvas } from "./infra/canvas";
-import { add } from "./infra/vector";
-import { createItem, createRoot } from "./itemTree";
-import { ItemRow, List } from "./list/list";
+import initialState from "./initialState";
+import drawItemRow from "./list/drawItem";
+import { List } from "./list/list";
 
 const canvas = new Canvas();
-const list = new List(
-  createRoot([
-    createItem("First", [
-      createItem("First.1"),
-      createItem("First.2"),
-      createItem("First.3"),
-    ]),
-    createItem("Second", [
-      createItem("Second.1", [
-        createItem("Second.1.1"),
-        createItem("Second.2.2"),
-        createItem("Second.3.3"),
-      ]),
-    ]),
-    createItem("Music", [
-      createItem("Music.1", [
-        createItem("Music.1.1"),
-        createItem("Music.2.2"),
-        createItem("Music.3.3"),
-        createItem("M.Second", [
-          createItem("M.Second.1", [
-            createItem("M.Second.1.1"),
-            createItem("M.Second.2.2"),
-            createItem("M.Second.3.3"),
-          ]),
-        ]),
-      ]),
-      createItem("Music", [
-        createItem("Music.1", [
-          createItem("Music.1.1"),
-          createItem("Music.2.2"),
-          createItem("Music.3.3"),
-          createItem("M.Second", [
-            createItem("M.Second.1", [
-              createItem("M.Second.1.1"),
-              createItem("M.Second.2.2"),
-              createItem("M.Second.3.3"),
-            ]),
-          ]),
-        ]),
-      ]),
-    ]),
-    createItem("Third"),
-    createItem("Fourth"),
-    createItem("Fifth", [
-      createItem("Music", [
-        createItem("Music.1", [
-          createItem("Music.1.1"),
-          createItem("Music.2.2"),
-          createItem("Music.3.3"),
-          createItem("M.Second", [
-            createItem("M.Second.1", [
-              createItem("M.Second.1.1"),
-              createItem("M.Second.2.2"),
-              createItem("M.Second.3.3"),
-            ]),
-          ]),
-        ]),
-      ]),
-      createItem("Music", [
-        createItem("Music.1", [
-          createItem("Music.1.1"),
-          createItem("Music.2.2"),
-          createItem("Music.3.3"),
-          createItem("M.Second", [
-            createItem("M.Second.1", [
-              createItem("M.Second.1.1"),
-              createItem("M.Second.2.2"),
-              createItem("M.Second.3.3"),
-            ]),
-          ]),
-        ]),
-      ]),
-    ]),
-  ])
-);
+
+const list = new List(initialState);
+
 canvas.onResize = () => {
+  canvas.ctx.translate(0, targetDelta);
   render();
 };
 
 const render = () => {
   canvas.clear();
-  list.rows.forEach(drawItemRow);
-};
-
-// this is called 60FPS,
-// thus making this code faster will improve animation perfomance
-const drawItemRow = (itemRow: ItemRow) => {
-  canvas.drawCircle(itemRow.position, sp.circleRadius, itemRow.color);
-
-  const fontSize = itemRow.level === 0 ? fontSizes.big : fontSizes.regular;
-
-  canvas.drawText(
-    add(itemRow.position, {
-      x:
-        itemRow.level == 0
-          ? sp.zeroLevelCircleToTextDistance
-          : sp.circleToTextDistance,
-      y: fontSize * 0.32,
-    }),
-    itemRow.item.title,
-    fontSize,
-    itemRow.color
-  );
-
-  if (itemRow.childrenHeight) {
-    const itemHeight =
-      itemRow.level === 0 ? sp.zeroLevelItemHeight : sp.itemHeight;
-    const start = add(itemRow.position, { x: 0, y: itemHeight / 2 });
-    const end = add(start, { x: 0, y: itemRow.childrenHeight });
-    canvas.drawLine(start, end, 2, itemRow.childrenColor);
-  }
+  list.rows.forEach((view) => drawItemRow(view, canvas));
 };
 
 document.addEventListener("keydown", (e) => {
@@ -132,6 +30,14 @@ document.addEventListener("keydown", (e) => {
     else list.openSelectedItem();
   }
 
+  render();
+});
+
+let targetDelta = 0;
+document.addEventListener("wheel", (e) => {
+  targetDelta -= e.deltaY;
+  canvas.ctx.resetTransform();
+  canvas.ctx.translate(0, targetDelta);
   render();
 });
 
