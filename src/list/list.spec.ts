@@ -1,8 +1,8 @@
 import { c, spacings } from "../designSystem";
-import { createItem, createRoot } from "./domain";
+import { createItem, createRoot } from "../itemTree";
 import { List } from "./list";
 
-jest.mock("./animations", () => ({
+jest.mock("../infra/animations", () => ({
   animateColor: (from: string, to: string, onTick: (val: string) => void) => {
     onTick(to);
   },

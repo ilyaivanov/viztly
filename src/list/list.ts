@@ -1,7 +1,6 @@
 import { c, spacings } from "../designSystem";
-import { getVisibleChildren, visibleChildrenCount } from "../flatlist/itemTree";
-import { animateColor } from "./animations";
-import { flattenItemChildren } from "./domain";
+import { flattenItemChildren, visibleChildrenCount } from "../itemTree";
+import { animateColor } from "../infra/animations";
 
 //VIEW
 export type ItemRow = {

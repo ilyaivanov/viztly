@@ -1,121 +1,81 @@
-import { engine } from "./infra/animationEngine";
+import { c, fontSizes, spacings as sp } from "./designSystem";
+import { engine } from "./infra/animations";
 import { Canvas } from "./infra/canvas";
-import { clamp } from "./infra/numbers";
-import { drawItem } from "./flatlist/drawItem";
-import { FlatednedList } from "./flatlist/FlatednedList";
-import { root } from "./store";
-import { c, spacings } from "./designSystem";
-import { inRenamingAnything, showRenamingInput } from "./titleInput";
+import { add } from "./infra/vector";
+import { createItem, createRoot } from "./itemTree";
+import { ItemRow, List } from "./list/list";
 
 const canvas = new Canvas();
-const list = new FlatednedList(root);
-
-const render = () => {
-  canvas.clear();
-  const scrollHeight = getScrollbarHeight(
-    list.getContentHeight(),
-    canvas.height
-  );
-  if (scrollHeight) canvas.ctx.translate(0, contentOffset);
-
-  list.visibleItems.forEach((item) => drawItem(item, canvas));
-  canvas.ctx.resetTransform();
-
-  const scrollWidth = spacings.scrollWidth;
-
-  if (scrollHeight) {
-    const scrollbarPosition = {
-      x: canvas.width - scrollWidth,
-      y: -getScrollbarOffset(list.getContentHeight(), canvas.height),
-    };
-    canvas.drawRect(scrollbarPosition, scrollWidth, scrollHeight, c.scrollbar);
-  }
-};
-
+const list = new List(
+  createRoot([
+    createItem("First", [
+      createItem("First.1"),
+      createItem("First.2"),
+      createItem("First.3"),
+    ]),
+    createItem("Second", [
+      createItem("Second.1", [
+        createItem("Second.1.1"),
+        createItem("Second.2.2"),
+        createItem("Second.3.3"),
+      ]),
+    ]),
+    createItem("Third"),
+    createItem("Fourth"),
+    createItem("Fifth"),
+  ])
+);
 canvas.onResize = () => {
   render();
 };
 
-engine.onTick = render;
+const render = () => {
+  canvas.clear();
+  list.rows.forEach(drawItemRow);
+};
 
-document.body.appendChild(canvas.el);
+// this is called 60FPS,
+// thus making this code faster will improve animation perfomance
+const drawItemRow = (itemRow: ItemRow) => {
+  canvas.drawCircle(itemRow.position, sp.circleRadius, itemRow.color);
+
+  const fontSize = itemRow.level === 0 ? fontSizes.big : fontSizes.regular;
+
+  canvas.drawText(
+    add(itemRow.position, {
+      x:
+        itemRow.level == 0
+          ? sp.zeroLevelCircleToTextDistance
+          : sp.circleToTextDistance,
+      y: fontSize * 0.32,
+    }),
+    itemRow.item.title,
+    fontSize,
+    itemRow.color
+  );
+
+  if (itemRow.childrenHeight) {
+    const itemHeight =
+      itemRow.level === 0 ? sp.zeroLevelItemHeight : sp.itemHeight;
+    const start = add(itemRow.position, { x: 0, y: itemHeight / 2 });
+    const end = add(start, { x: 0, y: itemRow.childrenHeight });
+    canvas.drawLine(start, end, 2, itemRow.childrenColor);
+  }
+};
 
 document.addEventListener("keydown", (e) => {
-  if (e.code === "ArrowDown") {
-    list.selectNextItem();
-    centerOnSelectedItemIfOutsideWindow();
-    render();
-  }
-  if (e.code === "ArrowUp") {
-    list.selectPreviousItem();
-    centerOnSelectedItemIfOutsideWindow();
-    render();
-  }
+  if (e.code === "ArrowDown") list.selectNextItem();
+  if (e.code === "ArrowUp") list.selectPreviousItem();
   if (e.code === "ArrowLeft") {
-    const item = list.getSelectedItem();
-    if (item.isOpen && item.children.length > 0) list.closeSelected();
-    else list.selectParent();
-    centerOnSelectedItemIfOutsideWindow();
-    render();
+    if (list.getSelectedItemRow().item.isOpen) list.closeSelectedItem();
+    else list.selectParentItem();
   }
-  if (e.code === "ArrowRight") {
-    const item = list.getSelectedItem();
-    if (!item.isOpen && item.children.length > 0) list.openSelected();
-    else list.selectNextItem();
-    centerOnSelectedItemIfOutsideWindow();
-    render();
-  }
+  if (e.code === "ArrowRight") list.selectNextItem();
 
-  if (e.code === "Backspace" && e.ctrlKey && e.shiftKey) {
-    list.removeSelected();
-    render();
-  }
-
-  if (!inRenamingAnything() && e.code === "KeyE") {
-    e.preventDefault();
-    showRenamingInput(list.getSelectedItemView(), render);
-    render();
-  }
-  if (e.code === "Enter") {
-    e.preventDefault();
-    const itemView = list.createNewItemAfterSelected();
-    showRenamingInput(itemView, render);
-    render();
-  }
+  render();
 });
-
-document.addEventListener("wheel", (e) => {
-  const contentHeight = list.getContentHeight();
-  if (contentHeight > canvas.height) {
-    contentOffset = clampContentOffset(contentOffset - e.deltaY);
-    render();
-  }
-});
-
-const centerOnSelectedItemIfOutsideWindow = () => {
-  const itemPosition = list.visibleItems[list.selectedItemIndex].position;
-  if (
-    itemPosition.y > -contentOffset + canvas.height ||
-    itemPosition.y < -contentOffset
-  ) {
-    contentOffset = clampContentOffset(-(itemPosition.y - canvas.height / 2));
-  }
-};
-
-let contentOffset = 0;
-const getScrollbarHeight = (contentHeight: number, windowHeight: number) =>
-  windowHeight < contentHeight
-    ? (windowHeight * windowHeight) / contentHeight
-    : undefined;
-
-const getScrollbarOffset = (contentHeight: number, windowHeight: number) =>
-  contentOffset * (windowHeight / contentHeight);
-
-const clampContentOffset = (newOffset: number) => {
-  const maxOffset = list.getContentHeight() - canvas.height;
-  return clamp(newOffset, -maxOffset, 0);
-};
-
-//utils
 
 render();
+document.body.appendChild(canvas.el);
+
+engine.onTick = render;

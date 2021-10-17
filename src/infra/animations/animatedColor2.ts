@@ -1,5 +1,6 @@
-import { engine, Animated } from "../infra/animationEngine";
-import { lerpColor } from "../infra/lerpColor";
+import { engine } from "./index";
+import { lerpColor } from "./lerpColor";
+import { Animated } from "./animationEngine";
 
 export class AnimatedColor2 implements Animated {
   private transitionTimeMs = 200;

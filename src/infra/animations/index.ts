@@ -1,5 +1,6 @@
 import { AnimatedColor2 } from "./animatedColor2";
 import { AnimatedNumber2 } from "./animatedNumber";
+import { AnimationEngine } from "./animationEngine";
 
 export const animate = (
   from: number,
@@ -20,3 +21,5 @@ export const animateColor = (
   anim.onTick = onTick;
   anim.animateTo(to);
 };
+
+export const engine = new AnimationEngine();
