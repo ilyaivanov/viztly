@@ -71,6 +71,7 @@ export class List {
     this.updateAllParents();
   }
 
+  //hugely inefficient
   private updateAllParents() {
     let parentIndex = this.getParentIndex(this.selectedItemIndex);
 
