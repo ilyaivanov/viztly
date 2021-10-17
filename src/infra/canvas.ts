@@ -22,6 +22,15 @@ export class Canvas {
     this.ctx.fill();
   };
 
+  drawCirclePath = (center: Vector, r: number, color: string) => {
+    this.ctx.strokeStyle = color;
+    this.ctx.lineWidth = 1.3;
+
+    this.ctx.beginPath();
+    this.ctx.arc(center.x, center.y, r, 0, 2 * Math.PI);
+    this.ctx.stroke();
+  };
+
   drawRect = (
     topLeft: Vector,
     width: number,

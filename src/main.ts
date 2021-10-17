@@ -3,19 +3,23 @@ import { Canvas } from "./infra/canvas";
 import initialState from "./initialState";
 import drawItemRow from "./list/drawItem";
 import { List } from "./list/list";
+import Scrollbar from "./list/scrollbar";
 
 const canvas = new Canvas();
 
 const list = new List(initialState);
 
+const scrollbar = new Scrollbar(canvas, list);
+
 canvas.onResize = () => {
-  canvas.ctx.translate(0, targetDelta);
+  scrollbar.translateCanvas();
   render();
 };
 
 const render = () => {
   canvas.clear();
   list.rows.forEach((view) => drawItemRow(view, canvas));
+  scrollbar.draw();
 };
 
 document.addEventListener("keydown", (e) => {
@@ -33,11 +37,8 @@ document.addEventListener("keydown", (e) => {
   render();
 });
 
-let targetDelta = 0;
 document.addEventListener("wheel", (e) => {
-  targetDelta -= e.deltaY;
-  canvas.ctx.resetTransform();
-  canvas.ctx.translate(0, targetDelta);
+  scrollbar.translateBy(e.deltaY);
   render();
 });
 

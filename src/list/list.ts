@@ -93,6 +93,13 @@ export class List {
     return this.rows[this.selectedItemIndex];
   }
 
+  public getContentHeight() {
+    const lastItem = this.rows[this.rows.length - 1];
+    const lastITemHeight =
+      lastItem.level === 0 ? spacings.zeroLevelItemHeight : spacings.itemHeight;
+    return lastItem.position.y + lastITemHeight + spacings.yBase;
+  }
+
   private changeItemSelection(index: number) {
     const currentParent = this.getParentItemView(
       this.rows[this.selectedItemIndex].item

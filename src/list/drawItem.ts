@@ -6,7 +6,9 @@ import { ItemRow } from "./list";
 // this is called 60FPS,
 // thus making this code faster will improve animation perfomance
 const drawItemRow = (itemRow: ItemRow, canvas: Canvas) => {
-  canvas.drawCircle(itemRow.position, sp.circleRadius, itemRow.color);
+  if (itemRow.item.children.length > 0)
+    canvas.drawCircle(itemRow.position, sp.circleRadius, itemRow.color);
+  else canvas.drawCirclePath(itemRow.position, sp.circleRadius, itemRow.color);
 
   const fontSize = itemRow.level === 0 ? fontSizes.big : fontSizes.regular;
 
