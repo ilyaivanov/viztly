@@ -5,6 +5,7 @@ import {
   visibleChildrenCount,
 } from "../itemTree";
 import { animateColor } from "../infra/animations";
+import { drawInputFor } from "./itemInput";
 
 //VIEW
 export type ItemRow = {

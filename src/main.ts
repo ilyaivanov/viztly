@@ -2,6 +2,7 @@ import { engine } from "./infra/animations";
 import { Canvas } from "./infra/canvas";
 import initialState from "./initialState";
 import drawItemRow from "./list/drawItem";
+import { drawInputFor } from "./list/itemInput";
 import { List } from "./list/list";
 import Scrollbar from "./list/scrollbar";
 
@@ -32,6 +33,12 @@ document.addEventListener("keydown", (e) => {
   if (e.code === "ArrowRight") {
     if (list.getSelectedItemRow().item.isOpen) list.selectNextItem();
     else list.openSelectedItem();
+  }
+  if (e.code === "KeyE") {
+    drawInputFor(list.getSelectedItemRow(), render);
+
+    //this prevents setting 'e' character as first chart
+    e.preventDefault();
   }
   if (e.code === "Backspace" && e.altKey && e.shiftKey)
     list.removeSelectedItem();
