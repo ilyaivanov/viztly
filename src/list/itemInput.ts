@@ -1,18 +1,24 @@
 import { c, fontSizes, spacings } from "../designSystem";
 import { ItemRow } from "./list";
+import Scrollbar from "./scrollbar";
 
 let input: HTMLInputElement | undefined;
 let itemBeingEdited: ItemRow | undefined;
 let onDone: () => void | undefined;
 
-export const drawInputFor = (itemView: ItemRow, done: () => void) => {
+export const drawInputFor = (
+  itemView: ItemRow,
+  scrollbar: Scrollbar,
+  done: () => void
+) => {
   input = document.createElement("input");
   onDone = done;
   const font = itemView.level == 0 ? fontSizes.big : fontSizes.regular;
 
   itemBeingEdited = itemView;
   input.classList.add("title-input");
-  input.style.top = itemView.position.y - font * 0.32 * 2.5 + "px";
+  input.style.top =
+    itemView.position.y - scrollbar.transformY - font * 0.32 * 2.5 + "px";
 
   const x =
     itemView.position.x +
@@ -28,7 +34,13 @@ export const drawInputFor = (itemView: ItemRow, done: () => void) => {
   itemView.item.title = "";
 
   input.addEventListener("keydown", (e) => {
-    if (e.code === "ArrowUp" || e.code === "ArrowDown" || e.code === "Enter") {
+    if (
+      e.code === "ArrowUp" ||
+      e.code === "ArrowDown" ||
+      e.code === "Enter" ||
+      e.code === "NumpadEnter" ||
+      e.code === "Escape"
+    ) {
       input?.removeEventListener("blur", onBlur);
       finishEdit();
       onDone();

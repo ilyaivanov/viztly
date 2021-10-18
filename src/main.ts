@@ -35,7 +35,7 @@ document.addEventListener("keydown", (e) => {
     else list.openSelectedItem();
   }
   if (e.code === "KeyE") {
-    drawInputFor(list.getSelectedItemRow(), render);
+    drawInputFor(list.getSelectedItemRow(), scrollbar, render);
 
     //this prevents setting 'e' character as first chart
     e.preventDefault();
