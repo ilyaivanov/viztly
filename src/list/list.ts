@@ -1,5 +1,7 @@
 import { c, spacings } from "../designSystem";
 import {
+  addItemAfter,
+  addItemInside,
   flattenItemChildren,
   removeItem,
   visibleChildrenCount,
@@ -98,6 +100,33 @@ export class List {
     this.updateChildrenHeightForSelectedItemAndParents();
   }
 
+  public createNewItemAfterSelected() {
+    const newItem: Item = {
+      children: [],
+      isOpen: false,
+      title: "",
+    };
+    const view = this.getSelectedItemRow();
+    if (view.item.isOpen) {
+      addItemInside(view.item, newItem);
+    } else {
+      addItemAfter(this.root, view.item, newItem);
+    }
+    const row = this.createRowItem(
+      newItem,
+      view.level + (view.item.isOpen ? 1 : 0),
+      view.position.y + this.getItemHeight(view) / 2
+    );
+    const itemHeight = this.getItemHeight(row);
+    row.position.y += itemHeight / 2;
+    this.rows.slice(this.selectedItemIndex + 1).forEach((row) => {
+      row.position.y += itemHeight;
+    });
+    this.rows.splice(this.selectedItemIndex + 1, 0, row);
+    this.selectNextItem();
+    this.updateChildrenHeightForSelectedItemAndParents();
+  }
+
   //hugely inefficient
   private updateChildrenHeightForSelectedItemAndParents() {
     let parentIndex = this.selectedItemIndex;
@@ -168,19 +197,21 @@ export class List {
 
       isFirstItem = false;
 
-      const res: ItemRow = {
-        item,
-        level,
-        childrenHeight: this.getChildrenHeight(item),
-        position: { x: spacings.xBase + level * spacings.xStep, y: offset },
-        color: c.text,
-        childrenColor: c.line,
-      };
+      const res: ItemRow = this.createRowItem(item, level, offset);
       offset += halfOfHeight;
       return res;
     };
     return flattenItemChildren(parent, createRow);
   };
+
+  private createRowItem = (item: Item, level: number, y: number): ItemRow => ({
+    item,
+    level,
+    childrenHeight: this.getChildrenHeight(item),
+    position: { x: spacings.xBase + level * spacings.xStep, y },
+    color: c.text,
+    childrenColor: c.line,
+  });
 
   // assumes all children are below level 0
   private getChildrenHeight = (item: Item): number =>

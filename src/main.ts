@@ -34,6 +34,10 @@ document.addEventListener("keydown", (e) => {
     if (list.getSelectedItemRow().item.isOpen) list.selectNextItem();
     else list.openSelectedItem();
   }
+  if (e.code === "Enter") {
+    list.createNewItemAfterSelected();
+    drawInputFor(list.getSelectedItemRow(), scrollbar, render);
+  }
   if (e.code === "KeyE") {
     drawInputFor(list.getSelectedItemRow(), scrollbar, render);
 

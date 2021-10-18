@@ -22,7 +22,7 @@ describe("having four items", () => {
     });
 
     it("removes two items from list (including subchilds) ", () => {
-      expect(list.rows.map((r) => r.item.title)).toEqual(["First", "Third"]);
+      expect(getTitles(list)).toEqual(["First", "Third"]);
     });
 
     it("moves Third item up", () => {
@@ -54,7 +54,38 @@ describe("having four items", () => {
 
     it("removes last item list ", () => {
       const items = ["First", "Second", "sub"];
-      expect(list.rows.map((r) => r.item.title)).toEqual(items);
+      expect(getTitles(list)).toEqual(items);
     });
   });
 });
+
+describe("Creating new item", () => {
+  it("add another one with the same position as current second item", () => {
+    const list = new List(
+      createRoot([createItem("First"), createItem("Second")])
+    );
+
+    const secondItemPosition = list.rows[1].position.y;
+    list.createNewItemAfterSelected();
+    expect(getTitles(list)).toEqual(["First", "", "Second"]);
+
+    expect(list.rows[1].position.y).toEqual(secondItemPosition);
+  });
+
+  it("when item is open new item is being added as first child", () => {
+    const list = new List(
+      createRoot([
+        createItem("First", [createItem("First.1")]),
+        createItem("Second"),
+      ])
+    );
+
+    const secondItemPosition = { ...list.rows[1].position };
+    list.createNewItemAfterSelected();
+    expect(getTitles(list)).toEqual(["First", "", "First.1", "Second"]);
+
+    expect(list.rows[1].position).toEqual(secondItemPosition);
+  });
+});
+
+const getTitles = (list: List) => list.rows.map((r) => r.item.title);
