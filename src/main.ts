@@ -8,7 +8,9 @@ import Scrollbar from "./list/scrollbar";
 
 const canvas = new Canvas();
 
-const list = new List(initialState);
+const data = localStorage.getItem("items:v1");
+
+const list = new List(data ? JSON.parse(data) : initialState);
 
 const scrollbar = new Scrollbar(canvas, list);
 
@@ -50,6 +52,7 @@ document.addEventListener("keydown", (e) => {
   if (!scrollbar.isYPointOnScreen(list.getSelectedItemRow().position.y))
     scrollbar.centerScrollOn(list.getSelectedItemRow().position.y);
 
+  save();
   render();
 });
 
@@ -61,4 +64,7 @@ document.addEventListener("wheel", (e) => {
 render();
 document.body.appendChild(canvas.el);
 
+const save = () => {
+  localStorage.setItem("items:v1", JSON.stringify(list.root));
+};
 engine.onTick = render;

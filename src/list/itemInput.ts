@@ -49,7 +49,8 @@ export const drawInputFor = (
     if (
       e.code === "ArrowLeft" ||
       e.code === "ArrowRight" ||
-      e.code === "KeyE"
+      e.code === "KeyE" ||
+      e.code === "Enter"
     ) {
       // do not handle this keys on root key handler
       e.stopPropagation();
