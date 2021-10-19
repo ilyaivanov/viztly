@@ -13,8 +13,7 @@ class Scrollbar {
 
   translateCanvas = () => {
     this.clampTransform();
-    this.canvas.ctx.resetTransform();
-    this.canvas.ctx.translate(0, -this.transformY);
+    this.canvas.setTranslationY(this.transformY);
   };
 
   isYPointOnScreen = (y: number) =>

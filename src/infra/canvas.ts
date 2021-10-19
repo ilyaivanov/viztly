@@ -1,6 +1,6 @@
 export class Canvas {
   el: HTMLCanvasElement;
-  ctx: CanvasRenderingContext2D;
+  private ctx: CanvasRenderingContext2D;
   width: number = 0;
   height: number = 0;
 
@@ -52,8 +52,7 @@ export class Canvas {
     this.ctx.stroke();
   };
 
-  clear = () =>
-    this.ctx.clearRect(-2000, -2000, Number.MAX_VALUE, Number.MAX_VALUE);
+  clear = () => this.ctx.clearRect(0, 0, 20000, 20000);
 
   drawText = (at: Vector, text: string, fontSize: number, color: string) => {
     this.ctx.font = `${fontSize}px Segoe UI`;
@@ -66,7 +65,19 @@ export class Canvas {
   updateHeight = () => {
     this.width = window.innerWidth;
     this.height = window.innerHeight;
-    this.el.setAttribute("width", this.width + "");
-    this.el.setAttribute("height", this.height + "");
+    const scaleFactor = window.devicePixelRatio;
+    this.el.width = this.width * scaleFactor;
+    this.el.height = this.height * scaleFactor;
+    this.el.style.width = this.width + "px";
+    this.el.style.height = this.height + "px";
+    this.ctx.scale(scaleFactor, scaleFactor);
+  };
+
+  setTranslationY = (val: number) => {
+    this.ctx.resetTransform();
+
+    const scaleFactor = window.devicePixelRatio;
+    this.ctx.scale(scaleFactor, scaleFactor);
+    this.ctx.translate(0, -val);
   };
 }
