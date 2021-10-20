@@ -7,7 +7,6 @@ import {
   visibleChildrenCount,
 } from "../itemTree";
 import { animateColor } from "../infra/animations";
-import { drawInputFor } from "./itemInput";
 
 //VIEW
 export type ItemRow = {
@@ -125,6 +124,19 @@ export class List {
     this.rows.splice(this.selectedItemIndex + 1, 0, row);
     this.selectNextItem();
     this.updateChildrenHeightForSelectedItemAndParents();
+  }
+
+  public moveSelectedItemRight() {
+    if (this.selectedItemIndex > 0) {
+      const prevRow = this.rows[this.selectedItemIndex - 1];
+      const row = this.getSelectedItemRow();
+      if (prevRow.level == row.level) {
+        row.level += 1;
+        row.position.x += spacings.xStep;
+        removeItem(this.root, row.item);
+        addItemInside(prevRow.item, row.item);
+      }
+    }
   }
 
   //hugely inefficient

@@ -36,6 +36,9 @@ document.addEventListener("keydown", (e) => {
     if (list.getSelectedItemRow().item.isOpen) list.selectNextItem();
     else list.openSelectedItem();
   }
+  if (e.code === "ArrowRight" && e.altKey && e.shiftKey) {
+    list.moveSelectedItemRight();
+  }
   if (e.code === "Enter") {
     list.createNewItemAfterSelected();
     drawInputFor(list.getSelectedItemRow(), scrollbar, render);
