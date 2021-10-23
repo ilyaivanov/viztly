@@ -1,5 +1,13 @@
 import { c, spacings } from "../designSystem";
-import { addItemAfter, addItemInside, removeItem } from "../itemTree";
+import {
+  addItemAfter,
+  addItemInside,
+  moveItemDown,
+  moveItemLeft,
+  moveItemRight,
+  moveItemUp,
+  removeItem,
+} from "../itemTree";
 import { animate, animateColor } from "../infra/animations";
 import { createRows } from "./layouter";
 
@@ -71,28 +79,27 @@ export class List {
   }
 
   public moveSelectedItemRight() {
-    if (this.selectedItemIndex > 0) {
-      const prevRow = this.rows[this.selectedItemIndex - 1];
-      const row = this.getSelectedItemRow();
-      if (prevRow.level == row.level) {
-        removeItem(this.root, row.item);
-        addItemInside(prevRow.item, row.item);
-        prevRow.item.isOpen = true;
-        this.updateRows();
-      }
-    }
+    const row = this.getSelectedItemRow();
+    moveItemRight(this.root, row.item);
+    this.updateRows();
   }
 
   public moveSelectedItemLeft() {
-    if (this.selectedItemIndex > 0) {
-      const row = this.getSelectedItemRow();
-      const parentView = this.getParentItemView(this.getSelectedItemRow().item);
-      if (parentView) {
-        removeItem(this.root, row.item);
-        addItemAfter(this.root, parentView.item, row.item);
-        this.updateRows();
-      }
-    }
+    const row = this.getSelectedItemRow();
+    moveItemLeft(this.root, row.item);
+    this.updateRows();
+  }
+
+  public moveSelectedItemUp() {
+    const row = this.getSelectedItemRow();
+    moveItemUp(this.root, row.item);
+    this.updateRows();
+  }
+
+  public moveSelectedItemDown() {
+    const row = this.getSelectedItemRow();
+    moveItemDown(this.root, row.item);
+    this.updateRows();
   }
 
   public selectParentItem() {

@@ -17,6 +17,57 @@ export const getVisibleChildren = (item: Item): Item[] => {
   return childs;
 };
 
+export const moveItemRight = (root: Item, item: Item): Item => {
+  const parent = findParent(root, item);
+  if (parent) {
+    const index = parent.children.indexOf(item);
+    if (index > 0) {
+      const prevItem = parent.children[index - 1];
+      prevItem.isOpen = true;
+      parent.children.splice(index, 1);
+      prevItem.children.push(item);
+    }
+  }
+  return root;
+};
+
+export const moveItemLeft = (root: Item, item: Item): Item => {
+  const parent = findParent(root, item);
+  if (parent) {
+    const parentOfParent = findParent(root, parent);
+    if (parentOfParent) {
+      const parentIndex = parentOfParent.children.indexOf(parent);
+      parent.children = parent.children.filter((i) => i !== item);
+      parentOfParent.children.splice(parentIndex + 1, 0, item);
+    }
+  }
+  return root;
+};
+
+export const moveItemUp = (root: Item, item: Item): Item => {
+  const parent = findParent(root, item);
+  if (parent) {
+    const index = parent.children.indexOf(item);
+    if (index > 0) {
+      parent.children.splice(index, 1);
+      parent.children.splice(index - 1, 0, item);
+    }
+  }
+  return root;
+};
+
+export const moveItemDown = (root: Item, item: Item): Item => {
+  const parent = findParent(root, item);
+  if (parent) {
+    const index = parent.children.indexOf(item);
+    if (index <= parent.children.length - 1) {
+      parent.children.splice(index, 1);
+      parent.children.splice(index + 1, 0, item);
+    }
+  }
+  return root;
+};
+
 //need to find parent quickly (probably store direct link on an item)
 export const removeItem = (root: Item, item: Item) => {
   const traverseChildren = (i: Item) => {
@@ -66,5 +117,18 @@ export const flattenItemChildren = <T>(
 
   traverseChildren(item, 0);
 
+  return res;
+};
+
+const findParent = (root: Item, item: Item): Item | undefined => {
+  let res: Item | undefined = undefined;
+
+  const traverseChildren = (i: Item) => {
+    const child = i.children.find((c) => c == item);
+    if (child) res = i;
+    else i.children.forEach(traverseChildren);
+  };
+
+  traverseChildren(root);
   return res;
 };

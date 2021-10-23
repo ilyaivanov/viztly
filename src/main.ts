@@ -35,10 +35,22 @@ const render = () => {
 };
 
 document.addEventListener("keydown", (e) => {
-  if (e.code === "ArrowRight" && e.altKey && e.shiftKey) {
-    list.moveSelectedItemRight();
-  } else if (e.code === "ArrowLeft" && e.altKey && e.shiftKey) {
+  if (
+    (e.code === "ArrowLeft" && e.altKey && e.shiftKey) ||
+    (e.code === "Tab" && e.shiftKey)
+  ) {
+    e.preventDefault();
     list.moveSelectedItemLeft();
+  } else if (
+    (e.code === "ArrowRight" && e.altKey && e.shiftKey) ||
+    e.code === "Tab"
+  ) {
+    e.preventDefault();
+    list.moveSelectedItemRight();
+  } else if (e.code === "ArrowUp" && e.altKey && e.shiftKey) {
+    list.moveSelectedItemUp();
+  } else if (e.code === "ArrowDown" && e.altKey && e.shiftKey) {
+    list.moveSelectedItemDown();
   } else if (e.code === "ArrowDown") list.selectNextItem();
   else if (e.code === "ArrowUp") list.selectPreviousItem();
   else if (e.code === "ArrowLeft") {
