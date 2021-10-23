@@ -1,5 +1,7 @@
 import { createItem, createRoot } from "./itemTree";
 
+const two = createRoot([createItem("First"), createItem("Second")]);
+
 const small = createRoot([
   createItem("First", [
     createItem("First.1"),

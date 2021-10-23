@@ -1,13 +1,7 @@
 import { c, spacings } from "../designSystem";
-import {
-  addItemAfter,
-  addItemInside,
-  flattenItemChildren,
-  removeItem,
-  visibleChildrenCount,
-} from "../itemTree";
-import { animateColor } from "../infra/animations";
-import { drawInputFor } from "./itemInput";
+import { addItemAfter, addItemInside, removeItem } from "../itemTree";
+import { animate, animateColor } from "../infra/animations";
+import { createRows } from "./layouter";
 
 //VIEW
 export type ItemRow = {
@@ -25,7 +19,7 @@ export class List {
   selectedItemIndex = 0;
 
   constructor(public root: Item) {
-    this.rows = this.createRows(root, spacings.yBase, 0);
+    this.rows = createRows(root);
     this.rows[this.selectedItemIndex].color = c.selectedItem;
   }
 
@@ -39,65 +33,25 @@ export class List {
   }
 
   public removeSelectedItem() {
-    const itemToRemoveAt = this.selectedItemIndex;
-    const view = this.getSelectedItemRow();
+    const itemToRemove = this.getSelectedItemRow().item;
 
     if (this.selectedItemIndex > 0)
       this.changeItemSelection(this.selectedItemIndex - 1);
     else if (this.selectedItemIndex === 0)
       this.changeItemSelection(this.selectedItemIndex + 1);
 
-    removeItem(this.root, view.item);
-
-    const itemsToRemove = visibleChildrenCount(view.item) + 1;
-    this.rows.splice(itemToRemoveAt, itemsToRemove);
-
-    const heightToMove = this.getItemHeight(view) + view.childrenHeight;
-    this.rows.slice(itemToRemoveAt).forEach((row) => {
-      row.position.y -= heightToMove;
-    });
-
-    this.updateChildrenHeightForSelectedItemAndParents();
+    removeItem(this.root, itemToRemove);
+    this.updateRows();
   }
 
   public closeSelectedItem() {
-    const childs = visibleChildrenCount(this.getSelectedItemRow().item);
-    this.rows.splice(this.selectedItemIndex + 1, childs);
-
-    const height = this.getSelectedItemRow().childrenHeight;
-    this.rows[this.selectedItemIndex].childrenHeight = 0;
-    this.rows[this.selectedItemIndex].item.isOpen = false;
-
-    this.rows.slice(this.selectedItemIndex + 1).forEach((row) => {
-      row.position.y -= height;
-    });
-
-    this.updateChildrenHeightForSelectedItemAndParents();
+    this.getSelectedItemRow().item.isOpen = false;
+    this.updateRows();
   }
 
   public openSelectedItem() {
-    const view = this.rows[this.selectedItemIndex];
-    const { item } = view;
-    item.isOpen = true;
-    const rows = this.createRows(
-      item,
-      view.position.y +
-        (view.level === 0
-          ? spacings.zeroLevelItemHeight / 2
-          : spacings.itemHeight / 2) +
-        spacings.itemHeight / 2,
-      view.level + 1
-    );
-    this.rows.splice(this.selectedItemIndex + 1, 0, ...rows);
-
-    const count = visibleChildrenCount(item);
-    view.childrenHeight = count * spacings.itemHeight;
-
-    this.rows.slice(this.selectedItemIndex + count + 1).forEach((row) => {
-      row.position.y += view.childrenHeight;
-    });
-
-    this.updateChildrenHeightForSelectedItemAndParents();
+    this.getSelectedItemRow().item.isOpen = true;
+    this.updateRows();
   }
 
   public createNewItemAfterSelected() {
@@ -112,30 +66,32 @@ export class List {
     } else {
       addItemAfter(this.root, view.item, newItem);
     }
-    const row = this.createRowItem(
-      newItem,
-      view.level + (view.item.isOpen ? 1 : 0),
-      view.position.y + this.getItemHeight(view) / 2
-    );
-    const itemHeight = this.getItemHeight(row);
-    row.position.y += itemHeight / 2;
-    this.rows.slice(this.selectedItemIndex + 1).forEach((row) => {
-      row.position.y += itemHeight;
-    });
-    this.rows.splice(this.selectedItemIndex + 1, 0, row);
     this.selectNextItem();
-    this.updateChildrenHeightForSelectedItemAndParents();
+    this.updateRows();
   }
 
-  //hugely inefficient
-  private updateChildrenHeightForSelectedItemAndParents() {
-    let parentIndex = this.selectedItemIndex;
+  public moveSelectedItemRight() {
+    if (this.selectedItemIndex > 0) {
+      const prevRow = this.rows[this.selectedItemIndex - 1];
+      const row = this.getSelectedItemRow();
+      if (prevRow.level == row.level) {
+        removeItem(this.root, row.item);
+        addItemInside(prevRow.item, row.item);
+        prevRow.item.isOpen = true;
+        this.updateRows();
+      }
+    }
+  }
 
-    while (parentIndex !== -1) {
-      this.rows[parentIndex].childrenHeight =
-        visibleChildrenCount(this.rows[parentIndex].item) * spacings.itemHeight;
-
-      parentIndex = this.getParentIndex(parentIndex);
+  public moveSelectedItemLeft() {
+    if (this.selectedItemIndex > 0) {
+      const row = this.getSelectedItemRow();
+      const parentView = this.getParentItemView(this.getSelectedItemRow().item);
+      if (parentView) {
+        removeItem(this.root, row.item);
+        addItemAfter(this.root, parentView.item, row.item);
+        this.updateRows();
+      }
     }
   }
 
@@ -154,6 +110,12 @@ export class List {
       lastItem.level === 0 ? spacings.zeroLevelItemHeight : spacings.itemHeight;
     return lastItem.position.y + lastITemHeight + spacings.yBase;
   }
+
+  //
+  //
+  // private part
+  //
+  //
 
   private changeItemSelection(index: number) {
     this.rows[this.selectedItemIndex];
@@ -179,47 +141,6 @@ export class List {
     this.rows[this.selectedItemIndex].color = c.selectedItem;
   }
 
-  private createRows = (
-    parent: Item,
-    startingOffset: number,
-    startingLevel: number
-  ) => {
-    let offset = startingOffset;
-    let isFirstItem = true;
-    const createRow = (item: Item, lvl: number): ItemRow => {
-      const level = lvl + startingLevel;
-      const halfOfHeight =
-        level === 0
-          ? spacings.zeroLevelItemHeight / 2
-          : spacings.itemHeight / 2;
-
-      if (!isFirstItem) offset += halfOfHeight;
-
-      isFirstItem = false;
-
-      const res: ItemRow = this.createRowItem(item, level, offset);
-      offset += halfOfHeight;
-      return res;
-    };
-    return flattenItemChildren(parent, createRow);
-  };
-
-  private createRowItem = (item: Item, level: number, y: number): ItemRow => ({
-    item,
-    level,
-    childrenHeight: this.getChildrenHeight(item),
-    position: { x: spacings.xBase + level * spacings.xStep, y },
-    color: c.text,
-    childrenColor: c.line,
-  });
-
-  // assumes all children are below level 0
-  private getChildrenHeight = (item: Item): number =>
-    flattenItemChildren(item, () => spacings.itemHeight).reduce(
-      (sum, val) => sum + val,
-      0
-    );
-
   private getParentItemView(item: Item) {
     return this.rows.find((r) => r.item.children.indexOf(item) >= 0);
   }
@@ -228,9 +149,41 @@ export class List {
     return this.rows.findIndex((r) => r.item.children.indexOf(item) >= 0);
   }
 
-  private getItemHeight = (item: ItemRow) => {
-    return item.level === 0
-      ? spacings.zeroLevelItemHeight
-      : spacings.itemHeight;
+  private updateRows = () => this.mergeRows(createRows(this.root));
+
+  private mergeRows = (newRows: ItemRow[]) => {
+    const prevRows = new Map(this.rows.map((r) => [r.item, r]));
+    const selectedItem = this.rows[this.selectedItemIndex].item;
+    this.rows = newRows;
+
+    this.rows.forEach((row) => {
+      const prevRow = prevRows.get(row.item);
+
+      if (prevRow && prevRow.position.y !== row.position.y) {
+        animate(prevRow.position.y, row.position.y, (val) => {
+          row.position.y = val;
+        });
+      }
+      if (prevRow && prevRow.position.x !== row.position.x) {
+        animate(prevRow.position.x, row.position.x, (val) => {
+          row.position.x = val;
+        });
+      }
+
+      if (prevRow && prevRow.childrenHeight !== row.childrenHeight) {
+        animate(prevRow.childrenHeight, row.childrenHeight, (val) => {
+          row.childrenHeight = val;
+        });
+      }
+    });
+
+    // I need to get prev and next state for each row
+    // preserve parent
+    this.selectedItemIndex = this.rows.findIndex(
+      (r) => r.item === selectedItem
+    );
+    const parent = this.getParentItemView(this.getSelectedItemRow().item);
+    if (parent) parent.childrenColor = c.lineSelected;
+    this.rows[this.selectedItemIndex].color = c.selectedItem;
   };
 }

@@ -1,6 +1,7 @@
-import { spacings } from "../../designSystem";
 import { createItem, createRoot } from "../../itemTree";
 import { List } from "../list";
+import { createItems, createRootWith } from "./itemCreation";
+import { verifyRowsLayout } from "./layoutCheck";
 
 describe("having four items", () => {
   let list: List;
@@ -21,14 +22,8 @@ describe("having four items", () => {
       list.removeSelectedItem();
     });
 
-    it("removes two items from list (including subchilds) ", () => {
-      expect(getTitles(list)).toEqual(["First", "Third"]);
-    });
-
-    it("moves Third item up", () => {
-      expect(list.rows[1].position.y).toEqual(
-        spacings.yBase + spacings.zeroLevelItemHeight
-      );
+    it("removes Second from rows", () => {
+      verifyRowsLayout(list.rows, createRootWith("First", "Third"));
     });
   });
 
@@ -40,7 +35,7 @@ describe("having four items", () => {
     });
 
     it("updates children height for Second", () => {
-      expect(list.rows[1].childrenHeight).toEqual(0);
+      verifyRowsLayout(list.rows, createRootWith("First", "Second", "Third"));
     });
   });
 
@@ -53,8 +48,13 @@ describe("having four items", () => {
     });
 
     it("removes last item list ", () => {
-      const items = ["First", "Second", "sub"];
-      expect(getTitles(list)).toEqual(items);
+      verifyRowsLayout(
+        list.rows,
+        createRoot([
+          createItem("First"),
+          createItem("Second", [createItem("sub")]),
+        ])
+      );
     });
   });
 });
@@ -65,11 +65,12 @@ describe("Creating new item", () => {
       createRoot([createItem("First"), createItem("Second")])
     );
 
-    const secondItemPosition = list.rows[1].position.y;
     list.createNewItemAfterSelected();
-    expect(getTitles(list)).toEqual(["First", "", "Second"]);
 
-    expect(list.rows[1].position.y).toEqual(secondItemPosition);
+    verifyRowsLayout(
+      list.rows,
+      createRoot([createItem("First"), createItem(""), createItem("Second")])
+    );
   });
 
   it("when item is open new item is being added as first child", () => {
@@ -80,12 +81,14 @@ describe("Creating new item", () => {
       ])
     );
 
-    const secondItemPosition = { ...list.rows[1].position };
     list.createNewItemAfterSelected();
-    expect(getTitles(list)).toEqual(["First", "", "First.1", "Second"]);
 
-    expect(list.rows[1].position).toEqual(secondItemPosition);
+    verifyRowsLayout(
+      list.rows,
+      createRoot([
+        createItem("First", createItems("", "First.1")),
+        createItem("Second"),
+      ])
+    );
   });
 });
-
-const getTitles = (list: List) => list.rows.map((r) => r.item.title);
