@@ -66,8 +66,8 @@ export class List {
     } else {
       addItemAfter(this.root, view.item, newItem);
     }
-    this.selectNextItem();
     this.updateRows();
+    this.selectNextItem();
   }
 
   public moveSelectedItemRight() {

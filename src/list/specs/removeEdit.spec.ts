@@ -71,6 +71,8 @@ describe("Creating new item", () => {
       list.rows,
       createRoot([createItem("First"), createItem(""), createItem("Second")])
     );
+
+    expect(list.getSelectedItemRow().item.title).toBe("");
   });
 
   it("when item is open new item is being added as first child", () => {
