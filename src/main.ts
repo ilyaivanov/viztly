@@ -6,6 +6,15 @@ import { drawInputFor } from "./list/itemInput";
 import { List } from "./list/list";
 import Scrollbar from "./list/scrollbar";
 
+//@ts-expect-error
+import devFavicon from "./designSystem/icons/devFavicon.svg";
+//@ts-expect-error
+import favicon from "./designSystem/icons/favicon.svg";
+
+if (location.hostname === "localhost")
+  document.getElementById("favicon")?.setAttribute("href", devFavicon);
+else document.getElementById("favicon")?.setAttribute("href", favicon);
+
 const canvas = new Canvas();
 
 const data = localStorage.getItem("items:v1");

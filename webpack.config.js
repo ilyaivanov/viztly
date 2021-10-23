@@ -23,6 +23,10 @@ module.exports = (env, argv) => {
           },
           exclude: /node_modules/,
         },
+        {
+          test: /\.(png|svg|jpg|jpeg|gif)$/i,
+          type: "asset/resource",
+        },
       ],
     },
     resolve: {
