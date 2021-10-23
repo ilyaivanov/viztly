@@ -153,7 +153,7 @@ export class List {
 
   private mergeRows = (newRows: ItemRow[]) => {
     const prevRows = new Map(this.rows.map((r) => [r.item, r]));
-
+    const selectedItem = this.rows[this.selectedItemIndex].item;
     this.rows = newRows;
 
     this.rows.forEach((row) => {
@@ -179,6 +179,9 @@ export class List {
 
     // I need to get prev and next state for each row
     // preserve parent
+    this.selectedItemIndex = this.rows.findIndex(
+      (r) => r.item === selectedItem
+    );
     const parent = this.getParentItemView(this.getSelectedItemRow().item);
     if (parent) parent.childrenColor = c.lineSelected;
     this.rows[this.selectedItemIndex].color = c.selectedItem;
