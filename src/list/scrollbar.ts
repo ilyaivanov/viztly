@@ -1,4 +1,4 @@
-import { animate } from "../infra/animations";
+import { spring } from "../infra/animations";
 import { Canvas } from "../infra/canvas";
 import { List } from "./list";
 
@@ -20,7 +20,7 @@ class Scrollbar {
     y >= this.transformY && y <= this.transformY + this.canvas.height;
 
   centerScrollOn = (y: number) => {
-    animate(this.transformY, y - this.canvas.height / 2, (val) => {
+    spring(this.transformY, y - this.canvas.height / 2, (val) => {
       this.transformY = val;
       this.translateCanvas();
     });
@@ -49,8 +49,13 @@ class Scrollbar {
       this.transformY = 0;
       return;
     }
-
     const contentHeight = list.getContentHeight();
+
+    if (this.canvas.height > contentHeight) {
+      this.transformY = 0;
+      return;
+    }
+
     if (this.transformY + this.canvas.height > contentHeight) {
       this.transformY = contentHeight - this.canvas.height;
     }

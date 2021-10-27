@@ -1,4 +1,3 @@
-import { engine } from "./index";
 import { lerpColor } from "./lerpColor";
 import { Animated } from "./animationEngine";
 
@@ -34,7 +33,6 @@ export class AnimatedColor2 implements Animated {
     this.targetColor = this.parseHex(hexColor);
     this.millisecondsEllapsed = 0;
     this.isAnimating = true;
-    engine.addAnimation(this);
   }
 
   stop() {

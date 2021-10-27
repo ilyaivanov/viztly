@@ -3,30 +3,31 @@ export interface Animated {
   tick: (deltaTime: number) => void;
 }
 
+const ANIMATION_SLOW_COEF = 1; // how much times to slow animation
+
 export class AnimationEngine {
-  currentAnimations: Set<Animated> = new Set();
-  startedAt: number = 0;
+  private currentAnimations: Set<Animated> = new Set();
+  private lastTime: number = 0;
   addAnimation(val: Animated) {
     if (this.currentAnimations.size === 0) requestAnimationFrame(this.tick);
 
     this.currentAnimations.add(val);
   }
 
-  tick = (time: number) => {
-    if (!this.startedAt) this.startedAt = time;
+  private tick = (currentTime: number) => {
+    const deltaTime = this.lastTime ? currentTime - this.lastTime : 1 / 60;
 
-    const deltaTime = time - this.startedAt;
-    this.startedAt = time;
+    this.lastTime = currentTime;
 
     const animationsToRemove: Animated[] = [];
     this.currentAnimations.forEach((a) => {
-      a.tick(deltaTime);
+      a.tick(deltaTime / ANIMATION_SLOW_COEF);
       if (!a.isAnimating) animationsToRemove.push(a);
     });
     animationsToRemove.forEach((a) => this.currentAnimations.delete(a));
 
     if (this.currentAnimations.size !== 0) requestAnimationFrame(this.tick);
-    else this.startedAt = 0;
+    else this.lastTime = 0;
 
     this.onTick && this.onTick();
   };
