@@ -1,5 +1,4 @@
 import { Animated } from "./animationEngine";
-import { engine } from "./index";
 
 //constant speed animation
 export class AnimatedNumber2 implements Animated {
@@ -46,6 +45,5 @@ export class AnimatedNumber2 implements Animated {
       this.targetValue > this.value ? "increating" : "decreasing";
 
     this.isAnimating = true;
-    engine.addAnimation(this);
   }
 }

@@ -8,7 +8,7 @@ import {
   moveItemUp,
   removeItem,
 } from "../itemTree";
-import { animate, animateColor } from "../infra/animations";
+import { animateColor, spring } from "../infra/animations";
 import { createRows } from "./layouter";
 
 //VIEW
@@ -167,18 +167,18 @@ export class List {
       const prevRow = prevRows.get(row.item);
 
       if (prevRow && prevRow.position.y !== row.position.y) {
-        animate(prevRow.position.y, row.position.y, (val) => {
+        spring(prevRow.position.y, row.position.y, (val) => {
           row.position.y = val;
         });
       }
       if (prevRow && prevRow.position.x !== row.position.x) {
-        animate(prevRow.position.x, row.position.x, (val) => {
+        spring(prevRow.position.x, row.position.x, (val) => {
           row.position.x = val;
         });
       }
 
       if (prevRow && prevRow.childrenHeight !== row.childrenHeight) {
-        animate(prevRow.childrenHeight, row.childrenHeight, (val) => {
+        spring(prevRow.childrenHeight, row.childrenHeight, (val) => {
           row.childrenHeight = val;
         });
       }
