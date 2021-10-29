@@ -1,6 +1,6 @@
-import { c, spacings } from "../designSystem";
+import { spacings } from "../designSystem";
 import { flattenItemChildren } from "../itemTree";
-import { ItemRow } from "./list";
+import ItemRow from "./ItemRow";
 
 export const createRows = (
   root: Item,
@@ -18,29 +18,9 @@ export const createRows = (
 
     isFirstItem = false;
 
-    const res: ItemRow = createRowItem(item, level, offset);
+    const res = new ItemRow(item, level, offset);
     offset += halfOfHeight;
     return res;
   };
   return flattenItemChildren(root, createRow);
 };
-
-export const createRowItem = (
-  item: Item,
-  level: number,
-  y: number
-): ItemRow => ({
-  item,
-  level,
-  childrenHeight: getChildrenHeight(item),
-  position: { x: spacings.xBase + level * spacings.xStep, y },
-  color: c.text,
-  childrenColor: c.line,
-});
-
-// assumes all children are below level 0
-const getChildrenHeight = (item: Item): number =>
-  flattenItemChildren(item, () => spacings.itemHeight).reduce(
-    (sum, val) => sum + val,
-    0
-  );

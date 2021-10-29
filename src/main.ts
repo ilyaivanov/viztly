@@ -1,8 +1,7 @@
 import { engine } from "./infra/animations";
 import { Canvas } from "./infra/canvas";
 import initialState from "./initialState";
-import drawItemRow from "./list/drawItem";
-import { drawInputFor } from "./list/itemInput";
+import { drawInputFor, updateInputCoordinates } from "./list/itemInput";
 import { List } from "./list/list";
 import Scrollbar from "./list/scrollbar";
 
@@ -39,8 +38,10 @@ canvas.onResize = () => {
 
 const render = () => {
   canvas.clear();
-  list.rows.forEach((view) => drawItemRow(view, canvas));
+  list.rows.forEach((view) => view.draw(canvas));
   scrollbar.draw();
+
+  updateInputCoordinates(list.getSelectedItemRow(), scrollbar);
 };
 
 document.addEventListener("keydown", (e) => {

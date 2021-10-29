@@ -8,18 +8,10 @@ import {
   moveItemUp,
   removeItem,
 } from "../itemTree";
-import { animateColor, spring } from "../infra/animations";
 import { createRows } from "./layouter";
+import ItemRow from "./ItemRow";
 
 //VIEW
-export type ItemRow = {
-  item: Item;
-  level: number;
-  position: Vector;
-  childrenHeight: number;
-  childrenColor: string;
-  color: string;
-};
 
 export class List {
   rows: ItemRow[];
@@ -132,16 +124,8 @@ export class List {
     const nextParent = this.getParentItemView(this.rows[index].item);
 
     if (currentParent !== nextParent) {
-      if (currentParent) {
-        animateColor(currentParent.childrenColor, c.line, (val) => {
-          currentParent.childrenColor = val;
-        });
-      }
-      if (nextParent) {
-        animateColor(nextParent.childrenColor, c.lineSelected, (val) => {
-          nextParent.childrenColor = val;
-        });
-      }
+      currentParent?.unhighlightChildrenBorder();
+      nextParent?.highlightChildrenBorder();
     }
     this.rows[this.selectedItemIndex].color = c.text;
     this.selectedItemIndex = index;
@@ -166,22 +150,7 @@ export class List {
     this.rows.forEach((row) => {
       const prevRow = prevRows.get(row.item);
 
-      if (prevRow && prevRow.position.y !== row.position.y) {
-        spring(prevRow.position.y, row.position.y, (val) => {
-          row.position.y = val;
-        });
-      }
-      if (prevRow && prevRow.position.x !== row.position.x) {
-        spring(prevRow.position.x, row.position.x, (val) => {
-          row.position.x = val;
-        });
-      }
-
-      if (prevRow && prevRow.childrenHeight !== row.childrenHeight) {
-        spring(prevRow.childrenHeight, row.childrenHeight, (val) => {
-          row.childrenHeight = val;
-        });
-      }
+      if (prevRow) row.merge(prevRow);
     });
 
     // I need to get prev and next state for each row

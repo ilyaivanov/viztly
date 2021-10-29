@@ -1,10 +1,31 @@
 import { c, fontSizes, spacings } from "../designSystem";
-import { ItemRow } from "./list";
+import ItemRow from "./ItemRow";
 import Scrollbar from "./scrollbar";
 
 let input: HTMLInputElement | undefined;
 let itemBeingEdited: ItemRow | undefined;
 let onDone: () => void | undefined;
+
+export const updateInputCoordinates = (
+  itemView: ItemRow,
+  scrollbar: Scrollbar
+) => {
+  if (input) {
+    const font = itemView.level == 0 ? fontSizes.big : fontSizes.regular;
+
+    input.style.top =
+      itemView.position.y - scrollbar.transformY - font * 0.32 * 2.5 + "px";
+
+    const x =
+      itemView.position.x +
+      (itemView.level == 0
+        ? spacings.zeroLevelCircleToTextDistance
+        : spacings.circleToTextDistance);
+    input.style.left = x + "px";
+    input.style.width = window.innerWidth - x + "px";
+    input.style.fontSize = font + "px";
+  }
+};
 
 export const drawInputFor = (
   itemView: ItemRow,
@@ -13,23 +34,12 @@ export const drawInputFor = (
 ) => {
   input = document.createElement("input");
   onDone = done;
-  const font = itemView.level == 0 ? fontSizes.big : fontSizes.regular;
 
   itemBeingEdited = itemView;
   input.classList.add("title-input");
-  input.style.top =
-    itemView.position.y - scrollbar.transformY - font * 0.32 * 2.5 + "px";
+  updateInputCoordinates(itemView, scrollbar);
 
-  const x =
-    itemView.position.x +
-    (itemView.level == 0
-      ? spacings.zeroLevelCircleToTextDistance
-      : spacings.circleToTextDistance);
-  input.style.left = x + "px";
-
-  input.style.fontSize = font + "px";
   input.style.color = c.selectedItem;
-  input.style.width = window.innerWidth - x + "px";
   input.value = itemView.item.title;
   itemView.item.title = "";
 
