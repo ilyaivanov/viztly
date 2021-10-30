@@ -12,6 +12,7 @@ class MyItemRow {
 
   opacity = 1;
   fontSize: number;
+  circleR: number;
 
   constructor(public item: Item, public level: number, y: number) {
     this.color = c.text;
@@ -19,6 +20,9 @@ class MyItemRow {
     this.childrenColor = c.line;
     this.position = { x: spacings.xBase + level * spacings.xStep, y };
     this.childrenHeight = this.getChildrenHeight(item);
+    this.circleR =
+      spacings.circleRadius *
+      (level === 0 ? fontSizes.big / fontSizes.regular : 1);
   }
 
   // this is called 60FPS,
@@ -27,8 +31,8 @@ class MyItemRow {
     const { item, position, level, fontSize, color } = this;
 
     if (item.children.length > 0)
-      canvas.drawCircle(position, sp.circleRadius, color);
-    else canvas.drawCirclePath(position, sp.circleRadius, color);
+      canvas.drawCircle(position, this.circleR, color);
+    else canvas.drawCirclePath(position, this.circleR, color);
 
     canvas.drawText(this.getTextPosition(), item.title, fontSize, color);
 

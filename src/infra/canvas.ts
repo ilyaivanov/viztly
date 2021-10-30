@@ -1,6 +1,6 @@
 export class Canvas {
   el: HTMLCanvasElement;
-  private ctx: CanvasRenderingContext2D;
+  public ctx: CanvasRenderingContext2D;
   width: number = 0;
   height: number = 0;
 

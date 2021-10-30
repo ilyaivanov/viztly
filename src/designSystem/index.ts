@@ -16,11 +16,15 @@ export const c = {
   lineSelected: "#638038",
 
   scrollbar: "#424242",
+
+  header: "#3C3C3C",
 };
 
+const header = 48;
 export const spacings = {
+  header,
   xBase: 40,
-  yBase: 40,
+  yBase: 40 + header,
   xStep: 20,
 
   circleRadius: 3,

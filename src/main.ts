@@ -9,6 +9,7 @@ import Scrollbar from "./list/scrollbar";
 import devFavicon from "./designSystem/icons/devFavicon.svg";
 //@ts-expect-error
 import favicon from "./designSystem/icons/favicon.svg";
+import { draw } from "./list/header";
 
 if (location.hostname === "localhost")
   document.getElementById("favicon")?.setAttribute("href", devFavicon);
@@ -38,9 +39,10 @@ canvas.onResize = () => {
 
 const render = () => {
   canvas.clear();
-  list.rows.forEach((view) => view.draw(canvas));
-  scrollbar.draw();
+  // list.rows.forEach((view) => view.draw(canvas));
+  // scrollbar.draw();
 
+  draw(canvas);
   updateInputCoordinates(list.getSelectedItemRow(), scrollbar);
 };
 
