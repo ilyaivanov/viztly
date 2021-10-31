@@ -17,14 +17,14 @@ export const c = {
 
   scrollbar: "#424242",
 
-  header: "#3C3C3C",
+  header: "rgba(60,60,60,1)",
 };
 
 const header = 48;
 export const spacings = {
   header,
   xBase: 40,
-  yBase: 40 + header,
+  yBase: 40,
   xStep: 20,
 
   circleRadius: 3,

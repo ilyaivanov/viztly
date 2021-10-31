@@ -1,5 +1,9 @@
 import { spacings } from "../designSystem";
-import { flattenItemChildren } from "../itemTree";
+import {
+  flattenItemChildren,
+  flattenItemWithChildren,
+  isRoot,
+} from "../itemTree";
 import ItemRow from "./ItemRow";
 
 export const createRows = (
@@ -22,5 +26,6 @@ export const createRows = (
     offset += halfOfHeight;
     return res;
   };
-  return flattenItemChildren(root, createRow);
+  if (isRoot(root)) return flattenItemChildren(root, createRow);
+  else return flattenItemWithChildren(root, createRow);
 };

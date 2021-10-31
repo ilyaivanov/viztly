@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "start": "npm run dev",
-    "test:watch": "jest --watchAll",
+    "test:watch": "jest --watchAll --detectOpenHandles",
     "dev": "webpack serve --mode development",
     "build": "webpack --mode production",
     "deploy": "npm run build && bash firebase-deploy.sh"
@@ -28,6 +28,7 @@
     "@testing-library/jest-dom": "^5.14.1",
     "@types/jest": "^27.0.1",
     "clean-webpack-plugin": "^4.0.0",
+    "copy-webpack-plugin": "^9.0.1",
     "html-webpack-plugin": "^5.3.1",
     "jest": "27.0.5",
     "prettier": "^2.3.2",

@@ -1,6 +1,6 @@
 import { difference } from "../../infra/set";
 import { createRows } from "../layouter";
-import { ItemRow } from "../list";
+import ItemRow from "../ItemRow";
 
 export const verifyRowsLayout = (rows: ItemRow[], root: Item) => {
   const expectedRows = createRows(root);

@@ -7,6 +7,7 @@ import {
   moveItemRight,
   moveItemUp,
   removeItem,
+  isRoot,
 } from "../itemTree";
 import { createRows } from "./layouter";
 import ItemRow from "./ItemRow";
@@ -20,7 +21,19 @@ export class List {
 
   constructor(public root: Item) {
     this.rows = createRows(root);
+    this.itemFocused = root;
     this.rows[this.selectedItemIndex].color = c.selectedItem;
+  }
+
+  itemFocused: Item;
+  public setFocus(item: Item) {
+    this.itemFocused = item;
+    const selectedItem = this.getSelectedItemRow().item;
+    this.updateRows(true);
+    this.selectedItemIndex = this.rows.findIndex(
+      (i) => i.item === selectedItem
+    );
+    this.changeItemSelection(this.selectedItemIndex);
   }
 
   public selectNextItem() {
@@ -140,7 +153,10 @@ export class List {
     return this.rows.findIndex((r) => r.item.children.indexOf(item) >= 0);
   }
 
-  private updateRows = () => this.mergeRows(createRows(this.root));
+  private updateRows = (quick = false) => {
+    if (quick) this.rows = createRows(this.itemFocused);
+    else this.mergeRows(createRows(this.itemFocused));
+  };
 
   private mergeRows = (newRows: ItemRow[]) => {
     const prevRows = new Map(this.rows.map((r) => [r.item, r]));

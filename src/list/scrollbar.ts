@@ -4,6 +4,7 @@ import { List } from "./list";
 
 class Scrollbar {
   transformY = 0;
+
   constructor(private canvas: Canvas, private list: List) {}
 
   translateBy = (delta: number) => {
@@ -13,7 +14,7 @@ class Scrollbar {
 
   translateCanvas = () => {
     this.clampTransform();
-    this.canvas.setTranslationY(this.transformY);
+    // this.canvas.setTranslation(0, -this.transformY);
   };
 
   isYPointOnScreen = (y: number) =>
@@ -38,7 +39,7 @@ class Scrollbar {
     const scrollbarHeight = (canvas.height * canvas.height) / contentHeight;
     const position = {
       x: canvas.width - width,
-      y: transformY + transformY * coef,
+      y: transformY * coef,
     };
     canvas.drawRect(position, width, scrollbarHeight, "rgba(255,255,255,0.2)");
   };
