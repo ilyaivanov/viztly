@@ -7,7 +7,6 @@ import {
   moveItemRight,
   moveItemUp,
   removeItem,
-  isRoot,
 } from "../itemTree";
 import { createRows } from "./layouter";
 import ItemRow from "./ItemRow";
@@ -83,30 +82,6 @@ export class List {
     this.selectNextItem();
   }
 
-  public moveSelectedItemRight() {
-    const row = this.getSelectedItemRow();
-    moveItemRight(this.root, row.item);
-    this.updateRows();
-  }
-
-  public moveSelectedItemLeft() {
-    const row = this.getSelectedItemRow();
-    moveItemLeft(this.root, row.item);
-    this.updateRows();
-  }
-
-  public moveSelectedItemUp() {
-    const row = this.getSelectedItemRow();
-    moveItemUp(this.root, row.item);
-    this.updateRows();
-  }
-
-  public moveSelectedItemDown() {
-    const row = this.getSelectedItemRow();
-    moveItemDown(this.root, row.item);
-    this.updateRows();
-  }
-
   public selectParentItem() {
     const parentIndex = this.getParentIndex(this.selectedItemIndex);
     if (parentIndex != -1) this.changeItemSelection(parentIndex);
@@ -114,6 +89,9 @@ export class List {
 
   public getSelectedItemRow() {
     return this.rows[this.selectedItemIndex];
+  }
+  public getSelectedItem() {
+    return this.rows[this.selectedItemIndex].item;
   }
 
   public getContentHeight() {
@@ -153,7 +131,7 @@ export class List {
     return this.rows.findIndex((r) => r.item.children.indexOf(item) >= 0);
   }
 
-  private updateRows = (quick = false) => {
+  updateRows = (quick = false) => {
     if (quick) this.rows = createRows(this.itemFocused);
     else this.mergeRows(createRows(this.itemFocused));
   };
