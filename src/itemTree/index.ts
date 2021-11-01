@@ -98,8 +98,15 @@ export const createItem = (title: string, children: Item[] = []): Item => ({
   children,
 });
 
+const rootName = "51230812GIBERISHMAKINGSURETHISISUNIQUE%42%";
+
 export const createRoot = (children: Item[] = []): Item =>
-  createItem("Home", children);
+  createItem(rootName, children);
+
+export const isRoot = (item: Item) =>
+  //this is buggy, but I need to check for Home for backward compatability.
+  //in future I will probably add a parent link to an Item data structure
+  item.title === rootName || item.title === "Home";
 
 export const flattenItemChildren = <T>(
   item: Item,
@@ -119,8 +126,26 @@ export const flattenItemChildren = <T>(
 
   return res;
 };
+export const flattenItemWithChildren = <T>(
+  item: Item,
+  mapper: (item: Item, level: number) => T
+): T[] => {
+  const res: T[] = [];
 
-const findParent = (root: Item, item: Item): Item | undefined => {
+  const traverseItem = (item: Item, level: number) => {
+    res.push(mapper(item, level));
+    item.isOpen &&
+      item.children.forEach((c) => {
+        traverseItem(c, level + 1);
+      });
+  };
+
+  traverseItem(item, 0);
+
+  return res;
+};
+
+export const findParent = (root: Item, item: Item): Item | undefined => {
   let res: Item | undefined = undefined;
 
   const traverseChildren = (i: Item) => {
@@ -131,4 +156,18 @@ const findParent = (root: Item, item: Item): Item | undefined => {
 
   traverseChildren(root);
   return res;
+};
+
+export const getPath = (root: Item, item: Item) => {
+  const parents: Item[] = [];
+
+  let i: Item | undefined = item;
+  let iterationsLeft = 20;
+  while (iterationsLeft > 0 && i && !isRoot(i)) {
+    parents.push(i);
+    i = findParent(root, i);
+    iterationsLeft -= 1;
+  }
+
+  return parents;
 };

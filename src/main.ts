@@ -5,20 +5,15 @@ import { drawInputFor, updateInputCoordinates } from "./list/itemInput";
 import { List } from "./list/list";
 import Scrollbar from "./list/scrollbar";
 
-//@ts-expect-error
-import devFavicon from "./designSystem/icons/devFavicon.svg";
-//@ts-expect-error
-import favicon from "./designSystem/icons/favicon.svg";
-
-if (location.hostname === "localhost")
-  document.getElementById("favicon")?.setAttribute("href", devFavicon);
-else document.getElementById("favicon")?.setAttribute("href", favicon);
+import { draw } from "./list/header";
+import { spacings } from "./designSystem";
+import { findParent, getPath, isRoot } from "./itemTree";
 
 const canvas = new Canvas();
 
 const data = localStorage.getItem("items:v1");
 
-const SHOULD_READ_LOCALSTORAGE = true;
+const SHOULD_READ_LOCALSTORAGE = false;
 
 const list = new List(
   data && SHOULD_READ_LOCALSTORAGE ? JSON.parse(data) : initialState
@@ -36,11 +31,21 @@ canvas.onResize = () => {
   render();
 };
 
+let yFocusTranslation = 0;
+let xFocusTranslation = 0;
 const render = () => {
   canvas.clear();
+  canvas.setTranslation(
+    -xFocusTranslation,
+    -scrollbar.transformY - yFocusTranslation
+  );
+
   list.rows.forEach((view) => view.draw(canvas));
+
+  canvas.setTranslation(0, 0);
   scrollbar.draw();
 
+  // draw(canvas, list);
   updateInputCoordinates(list.getSelectedItemRow(), scrollbar);
 };
 
@@ -57,6 +62,18 @@ document.addEventListener("keydown", (e) => {
   ) {
     e.preventDefault();
     list.moveSelectedItemRight();
+  } else if (e.code === "ArrowRight" && e.altKey) {
+    scrollbar.transformY = 0;
+    list.setFocus(list.getSelectedItemRow().item);
+    e.preventDefault();
+  } else if (e.code === "ArrowLeft" && e.altKey) {
+    if (!isRoot(list.itemFocused)) {
+      const parent = findParent(list.root, list.itemFocused);
+      if (parent) {
+        list.setFocus(parent);
+      }
+      e.preventDefault();
+    }
   } else if (e.code === "ArrowUp" && e.altKey && e.shiftKey) {
     list.moveSelectedItemUp();
   } else if (e.code === "ArrowDown" && e.altKey && e.shiftKey) {

@@ -1,5 +1,12 @@
 import { createItem, createRoot } from "./itemTree";
 
+const createItems = (prefix: string, count: number): Item[] =>
+  Array.from(new Array(count)).map((_, index) => ({
+    children: [],
+    isOpen: false,
+    title: `${prefix}.${index + 1}`,
+  }));
+
 const two = createRoot([createItem("First"), createItem("Second")]);
 
 const small = createRoot([
@@ -30,11 +37,7 @@ const big = createRoot([
       createItem("Music.2.2"),
       createItem("Music.3.3"),
       createItem("M.Second", [
-        createItem("M.Second.1", [
-          createItem("M.Second.1.1"),
-          createItem("M.Second.2.2"),
-          createItem("M.Second.3.3"),
-        ]),
+        createItem("M.Second.1", createItems("M.Second.1", 20)),
       ]),
     ]),
     createItem("Music", [
@@ -43,11 +46,7 @@ const big = createRoot([
         createItem("Music.2.2"),
         createItem("Music.3.3"),
         createItem("M.Second", [
-          createItem("M.Second.1", [
-            createItem("M.Second.1.1"),
-            createItem("M.Second.2.2"),
-            createItem("M.Second.3.3"),
-          ]),
+          createItem("M.Second.1", createItems("M.Second.1", 30)),
         ]),
       ]),
     ]),
