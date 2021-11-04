@@ -2,11 +2,11 @@ import { c, fontSizes, spacings as sp, spacings } from "../designSystem";
 import { animateColor, spring } from "../infra/animations";
 import { Canvas } from "../infra/canvas";
 import { add } from "../infra/vector";
-import { flattenItemChildren } from "../itemTree";
+import Item from "../itemTree/item";
 
-class MyItemRow {
+class ItemRow {
   position: Vector;
-  childrenHeight: number;
+  public childrenHeight?: number;
   childrenColor: string;
   color: string;
 
@@ -15,11 +15,10 @@ class MyItemRow {
   circleR: number;
 
   constructor(public item: Item, public level: number, y: number) {
-    this.color = c.text;
+    this.color = item.isSelected ? c.selectedItem : c.text;
     this.fontSize = level == 0 ? fontSizes.big : fontSizes.regular;
     this.childrenColor = c.line;
     this.position = { x: spacings.xBase + level * spacings.xStep, y };
-    this.childrenHeight = this.getChildrenHeight(item);
     this.circleR =
       spacings.circleRadius *
       (level === 0 ? fontSizes.big / fontSizes.regular : 1);
@@ -45,7 +44,7 @@ class MyItemRow {
     }
   }
 
-  public merge(old: MyItemRow) {
+  public merge(old: ItemRow) {
     const row = this;
     if (old.position.y !== row.position.y)
       spring(old.position.y, row.position.y, (val) => {
@@ -58,7 +57,7 @@ class MyItemRow {
       });
 
     if (old.childrenHeight !== row.childrenHeight)
-      spring(old.childrenHeight, row.childrenHeight, (val) => {
+      spring(old.childrenHeight || 0, row.childrenHeight || 0, (val) => {
         row.childrenHeight = val;
       });
 
@@ -66,17 +65,16 @@ class MyItemRow {
       spring(old.fontSize, row.fontSize, (val) => {
         row.fontSize = val;
       });
+
+    if (old.childrenColor !== row.childrenColor)
+      animateColor(old.childrenColor, row.childrenColor, (val) => {
+        row.childrenColor = val;
+      });
   }
 
-  public unhighlightChildrenBorder = () =>
-    animateColor(this.childrenColor, c.line, (val) => {
-      this.childrenColor = val;
-    });
-
-  public highlightChildrenBorder = () =>
-    animateColor(this.childrenColor, c.lineSelected, (val) => {
-      this.childrenColor = val;
-    });
+  highlightChildrenBorder = () => {
+    this.childrenColor = c.lineSelected;
+  };
 
   private getTextPosition = () => {
     const x =
@@ -85,13 +83,6 @@ class MyItemRow {
         : sp.circleToTextDistance;
     return add(this.position, { x, y: this.fontSize * 0.32 });
   };
-
-  // assumes all children are below level 0
-  private getChildrenHeight = (item: Item): number =>
-    flattenItemChildren(item, () => spacings.itemHeight).reduce(
-      (sum, val) => sum + val,
-      0
-    );
 }
 
-export default MyItemRow;
+export default ItemRow;
