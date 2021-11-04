@@ -62,7 +62,7 @@ class Tree {
   };
 
   createItem = (): Item => {
-    const newItem = new Item("New Item");
+    const newItem = new Item("");
     if (this.selectedNode.children.length > 0)
       crud.addItemInside(this.selectedNode, newItem);
     else crud.addItemAfter(this.selectedNode, newItem);
