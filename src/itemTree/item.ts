@@ -25,6 +25,20 @@ class Item {
       new Item(item.title, item.children?.map(map));
     return map(root);
   };
+
+  addChildAt = (item: Item, index: number) => {
+    this.children.splice(index, 0, item);
+    item.parent = this;
+  };
+
+  addChildAtEnd = (item: Item, index: number) => {
+    this.children.splice(index, 0, item);
+    item.parent = this;
+  };
+
+  removeChild = (item: Item) => {
+    this.children = this.children.filter((c) => c !== item);
+  };
 }
 
 type ItemToSerialize = {

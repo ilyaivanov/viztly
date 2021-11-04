@@ -1,5 +1,7 @@
 import Item from "./item";
 import * as traversal from "./tree.traversal";
+import * as movement from "./tree.movement";
+import * as crud from "./tree.crud";
 
 class Tree {
   selectedNode: Item;
@@ -49,6 +51,16 @@ class Tree {
     }
   };
 
+  moveItemRight = () => movement.moveItemRight(this.selectedNode);
+  moveItemLeft = () => movement.moveItemLeft(this.selectedNode);
+  moveItemUp = () => movement.moveItemUp(this.selectedNode);
+  moveItemDown = () => movement.moveItemDown(this.selectedNode);
+
+  removeSelected = () => {
+    const newSelection = crud.removeItem(this.selectedNode);
+    this.selectItem(newSelection);
+  };
+
   flattenItemChildren = <T>(
     item: Item,
     mapper: (item: Item, level: number) => T
@@ -59,10 +71,12 @@ class Tree {
     mapper: (item: Item, level: number) => T
   ): T[] => traversal.flattenItemWithChildren(item, mapper);
 
-  private selectItem = (item: Item) => {
+  private selectItem = (item: Item | undefined) => {
     this.selectedNode.isSelected = false;
-    this.selectedNode = item;
-    this.selectedNode.isSelected = true;
+    if (item) {
+      this.selectedNode = item;
+      this.selectedNode.isSelected = true;
+    }
   };
 }
 

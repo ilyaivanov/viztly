@@ -1,7 +1,7 @@
-import ItemsTree from "../itemTree/tree";
+import Tree from "../itemTree/tree";
 
 class KeyboardHandler {
-  constructor(private tree: ItemsTree, private onKeyHandled: () => void) {
+  constructor(private tree: Tree, private onKeyHandled: () => void) {
     document.addEventListener("keydown", this.onKey);
   }
 
@@ -9,17 +9,19 @@ class KeyboardHandler {
     const { tree, onKeyHandled } = this;
 
     if (e.code === "ArrowDown") {
-      tree.selectNextItem();
-    }
-
-    if (e.code === "ArrowUp") {
-      tree.selectPreviousItem();
-    }
-    if (e.code === "ArrowLeft") {
-      tree.selectParentOrCloseSelected();
-    }
-    if (e.code === "ArrowRight") {
-      tree.selectFirstChildOrOpenSelected();
+      if (e.shiftKey && e.altKey) tree.moveItemDown();
+      else tree.selectNextItem();
+    } else if (e.code === "ArrowUp") {
+      if (e.shiftKey && e.altKey) tree.moveItemUp();
+      else tree.selectPreviousItem();
+    } else if (e.code === "ArrowLeft") {
+      if (e.shiftKey && e.altKey) tree.moveItemLeft();
+      else tree.selectParentOrCloseSelected();
+    } else if (e.code === "ArrowRight") {
+      if (e.shiftKey && e.altKey) tree.moveItemRight();
+      else tree.selectFirstChildOrOpenSelected();
+    } else if (e.code === "Backspace" && e.shiftKey && e.altKey) {
+      tree.removeSelected();
     }
 
     // const { root } = list;
