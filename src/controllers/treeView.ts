@@ -14,10 +14,10 @@ export class TreeView {
 
   draw = (canvas: Canvas) => this.rows.forEach((view) => view.draw(canvas));
 
-  updateRows = (quick = false) => {
-    this.itemToRows = new Map(this.rows.map((r) => [r.item, r]));
-    if (quick) this.rows = this.createRows(this.tree.focusedNode);
-    else this.mergeRows(this.createRows(this.tree.focusedNode));
+  updateRows = () => {
+    const rows = this.createRows(this.tree.focusedNode);
+    this.itemToRows = new Map(rows.map((r) => [r.item, r]));
+    this.mergeRows(rows);
   };
 
   public getContentHeight() {
@@ -28,10 +28,11 @@ export class TreeView {
   }
 
   private mergeRows = (newRows: ItemRow[]) => {
+    const prevRows = new Map(this.rows.map((r) => [r.item, r]));
     this.rows = newRows;
 
     this.rows.forEach((row) => {
-      const prevRow = this.itemToRows.get(row.item);
+      const prevRow = prevRows.get(row.item);
 
       if (prevRow) row.merge(prevRow);
     });
