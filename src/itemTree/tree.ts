@@ -75,10 +75,7 @@ class Tree {
   };
 
   focusOnParent = () => {
-    console.log(this.focusedNode.parent);
-    if (this.focusedNode.parent) {
-      this.focusedNode = this.focusedNode.parent;
-    }
+    if (this.focusedNode.parent) this.focusedNode = this.focusedNode.parent;
   };
 
   flattenItemChildren = <T>(
