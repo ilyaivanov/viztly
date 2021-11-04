@@ -71,6 +71,9 @@ class Tree {
   };
 
   focusOnSelected = () => {
+    const { selectedNode } = this;
+    if (!selectedNode.isOpen && selectedNode.children.length > 0)
+      selectedNode.isOpen = true;
     this.focusedNode = this.selectedNode;
   };
 

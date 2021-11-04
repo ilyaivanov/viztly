@@ -39,7 +39,7 @@ export class TreeView {
   };
 
   private createRows = (
-    root: Item,
+    localRoot: Item,
     startingYOffset = spacings.yBase,
     startingLevel = 0
   ): ItemRow[] => {
@@ -63,9 +63,9 @@ export class TreeView {
       offset += halfOfHeight;
       return res;
     };
-    const newRows = this.tree.isRoot(root)
-      ? this.tree.flattenItemChildren(root, createRow)
-      : this.tree.flattenItemWithChildren(root, createRow);
+    const newRows = this.tree.isRoot(localRoot)
+      ? this.tree.flattenItemChildren(localRoot, createRow)
+      : this.tree.flattenItemWithChildren(localRoot, createRow);
     return this.updateHeights(newRows);
   };
 

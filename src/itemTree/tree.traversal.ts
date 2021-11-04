@@ -20,7 +20,7 @@ export const flattenItemChildren = <T>(
 };
 
 export const flattenItemWithChildren = <T>(
-  item: Item,
+  localFocus: Item,
   mapper: (item: Item, level: number) => T
 ): T[] => {
   const res: T[] = [];
@@ -33,7 +33,7 @@ export const flattenItemWithChildren = <T>(
       });
   };
 
-  traverseItem(item, 0);
+  traverseItem(localFocus, 0);
 
   return res;
 };
