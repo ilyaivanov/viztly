@@ -14,14 +14,14 @@ const root = stateReader.load();
 
 const onKeyHandled = () => {
   stateReader.save(root);
-  list.updateRows();
+  treeView.updateRows();
   render();
 };
 
-const selection = new Tree(root);
-const list = new TreeView(selection);
-const scrollbar = new Scrollbar(canvas, list);
-const input = new KeyboardHandler(selection, onKeyHandled);
+const tree = new Tree(root);
+const treeView = new TreeView(tree);
+const scrollbar = new Scrollbar(canvas, treeView);
+const input = new KeyboardHandler(tree, treeView, scrollbar, onKeyHandled);
 
 canvas.onResize = () => {
   scrollbar.translateCanvas();
@@ -32,12 +32,13 @@ const render = () => {
   canvas.clear();
   canvas.setTranslation(0, -scrollbar.transformY);
 
-  list.draw(canvas);
+  treeView.draw(canvas);
 
   canvas.setTranslation(0, 0);
   scrollbar.draw();
 
-  // updateInputCoordinates(list.getSelectedItemRow(), scrollbar);
+  const item = treeView.itemToRows.get(tree.selectedNode);
+  if (item) updateInputCoordinates(item, scrollbar);
 };
 
 document.addEventListener("wheel", (e) => {

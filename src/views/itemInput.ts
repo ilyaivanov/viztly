@@ -6,6 +6,8 @@ let input: HTMLInputElement | undefined;
 let itemBeingEdited: ItemRow | undefined;
 let onDone: () => void | undefined;
 
+export const isEditing = () => !!input;
+
 export const updateInputCoordinates = (
   itemView: ItemRow,
   scrollbar: Scrollbar
@@ -43,30 +45,6 @@ export const drawInputFor = (
   input.value = itemView.item.title;
   itemView.item.title = "";
 
-  input.addEventListener("keydown", (e) => {
-    if (
-      e.code === "ArrowUp" ||
-      e.code === "ArrowDown" ||
-      e.code === "Enter" ||
-      e.code === "NumpadEnter" ||
-      e.code === "Escape"
-    ) {
-      input?.removeEventListener("blur", onBlur);
-      finishEdit();
-      onDone();
-    }
-
-    if (
-      e.code === "ArrowLeft" ||
-      e.code === "ArrowRight" ||
-      e.code === "KeyE" ||
-      e.code === "Enter"
-    ) {
-      // do not handle this keys on root key handler
-      e.stopPropagation();
-    }
-  });
-
   input.addEventListener("blur", onBlur);
   document.body.appendChild(input);
   input.focus();
@@ -78,7 +56,7 @@ const onBlur = () => {
   onDone();
 };
 
-const finishEdit = () => {
+export const finishEdit = () => {
   if (input && itemBeingEdited) {
     itemBeingEdited.item.title = input.value;
     input.remove();
