@@ -61,6 +61,15 @@ class Tree {
     this.selectItem(newSelection);
   };
 
+  createItem = (): Item => {
+    const newItem = new Item("New Item");
+    if (this.selectedNode.children.length > 0)
+      crud.addItemInside(this.selectedNode, newItem);
+    else crud.addItemAfter(this.selectedNode, newItem);
+    this.selectItem(newItem);
+    return newItem;
+  };
+
   flattenItemChildren = <T>(
     item: Item,
     mapper: (item: Item, level: number) => T

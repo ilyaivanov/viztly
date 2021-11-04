@@ -14,3 +14,12 @@ export const removeItem = (item: Item): Item | undefined => {
   }
   return selectedItem;
 };
+
+export const addItemAfter = (item: Item, itemToAdd: Item) => {
+  const parent = item.parent;
+
+  if (parent) parent.addChildAt(itemToAdd, parent.children.indexOf(item) + 1);
+};
+export const addItemInside = (item: Item, itemToAdd: Item) => {
+  item.addChildAtEnd(itemToAdd, 0);
+};

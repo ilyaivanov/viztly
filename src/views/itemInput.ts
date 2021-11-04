@@ -58,6 +58,7 @@ const onBlur = () => {
 
 export const finishEdit = () => {
   if (input && itemBeingEdited) {
+    input.removeEventListener("blur", onBlur);
     itemBeingEdited.item.title = input.value;
     input.remove();
 

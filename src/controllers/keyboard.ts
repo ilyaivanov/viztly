@@ -38,6 +38,11 @@ class KeyboardHandler {
         const item = this.list.itemToRows.get(tree.selectedNode);
         if (item) drawInputFor(item, this.scrollbar, this.onKeyHandled);
         e.preventDefault();
+      } else if (e.code === "Enter") {
+        const newItem = tree.createItem();
+        this.list.updateRows();
+        const item = this.list.itemToRows.get(newItem);
+        if (item) drawInputFor(item, this.scrollbar, this.onKeyHandled);
       }
     }
 
