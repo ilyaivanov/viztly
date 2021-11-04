@@ -9,12 +9,7 @@ class Scrollbar {
 
   translateBy = (delta: number) => {
     this.transformY += delta;
-    this.translateCanvas();
-  };
-
-  translateCanvas = () => {
     this.clampTransform();
-    // this.canvas.setTranslation(0, -this.transformY);
   };
 
   isYPointOnScreen = (y: number) =>
@@ -23,7 +18,7 @@ class Scrollbar {
   centerScrollOn = (y: number) => {
     spring(this.transformY, y - this.canvas.height / 2, (val) => {
       this.transformY = val;
-      this.translateCanvas();
+      this.clampTransform();
     });
   };
 

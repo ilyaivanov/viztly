@@ -23,10 +23,7 @@ const treeView = new TreeView(tree);
 const scrollbar = new Scrollbar(canvas, treeView);
 const input = new KeyboardHandler(tree, treeView, scrollbar, onKeyHandled);
 
-canvas.onResize = () => {
-  scrollbar.translateCanvas();
-  render();
-};
+canvas.onResize = () => render();
 
 const render = () => {
   canvas.clear();
