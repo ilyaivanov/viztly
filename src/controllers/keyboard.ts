@@ -14,7 +14,7 @@ class KeyboardHandler {
   }
 
   onKey = (e: KeyboardEvent) => {
-    const { tree, scrollbar, onKeyHandled } = this;
+    const { tree, list, scrollbar, onKeyHandled } = this;
 
     if (isEditing()) {
       if (e.code === "Enter" || e.code === "NumpadEnter" || e.code === "Escape")
@@ -35,23 +35,23 @@ class KeyboardHandler {
       } else if (e.code === "Backspace" && e.shiftKey && e.altKey) {
         tree.removeSelected();
       } else if (e.code === "KeyE") {
-        const item = this.list.itemToRows.get(tree.selectedNode);
-        if (item) drawInputFor(item, this.scrollbar, this.onKeyHandled);
+        const item = list.itemToRows.get(tree.selectedNode);
+        if (item) drawInputFor(item, scrollbar, onKeyHandled);
         e.preventDefault();
       } else if (e.code === "Enter") {
         const newItem = tree.createItem();
-        this.list.updateRows();
-        const item = this.list.itemToRows.get(newItem);
-        if (item) drawInputFor(item, this.scrollbar, this.onKeyHandled);
+        list.updateRows();
+        const item = list.itemToRows.get(newItem);
+        if (item) drawInputFor(item, scrollbar, onKeyHandled);
       }
     }
 
-    const item = this.list.itemToRows.get(tree.selectedNode);
+    onKeyHandled();
+
+    const item = list.itemToRows.get(tree.selectedNode);
 
     if (item && !scrollbar.isYPointOnScreen(item.position.y))
       scrollbar.centerScrollOn(item.position.y);
-
-    onKeyHandled();
   };
 }
 export default KeyboardHandler;
