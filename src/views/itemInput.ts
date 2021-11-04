@@ -1,6 +1,6 @@
 import { c, fontSizes, spacings } from "../designSystem";
 import ItemRow from "./ItemRow";
-import Scrollbar from "./scrollbar";
+import Scrollbar from "../controllers/scrollbar";
 
 let input: HTMLInputElement | undefined;
 let itemBeingEdited: ItemRow | undefined;

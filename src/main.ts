@@ -1,24 +1,27 @@
 import { engine } from "./infra/animations";
 import { Canvas } from "./infra/canvas";
-import { updateInputCoordinates } from "./list/itemInput";
-import { List } from "./list/list";
-import Scrollbar from "./list/scrollbar";
+import { updateInputCoordinates } from "./views/itemInput";
+import { List } from "./controllers/list";
+import Scrollbar from "./controllers/scrollbar";
 
 import * as stateReader from "./stateReader";
-import KeyboardHandler from "./keyboard";
+import KeyboardHandler from "./controllers/keyboard";
+import ItemsTree from "./itemTree/tree";
 
 const canvas = new Canvas();
 
-const root: Item = stateReader.load();
+const root = stateReader.load();
 
 const onKeyHandled = () => {
   stateReader.save(root);
+  list.updateRows();
   render();
 };
 
-const list = new List(root);
+const selection = new ItemsTree(root);
+const list = new List(selection);
 const scrollbar = new Scrollbar(canvas, list);
-const input = new KeyboardHandler(list, scrollbar, onKeyHandled);
+const input = new KeyboardHandler(selection, onKeyHandled);
 
 canvas.onResize = () => {
   scrollbar.translateCanvas();
@@ -29,12 +32,12 @@ const render = () => {
   canvas.clear();
   canvas.setTranslation(0, -scrollbar.transformY);
 
-  list.rows.forEach((view) => view.draw(canvas));
+  list.draw(canvas);
 
   canvas.setTranslation(0, 0);
   scrollbar.draw();
 
-  updateInputCoordinates(list.getSelectedItemRow(), scrollbar);
+  // updateInputCoordinates(list.getSelectedItemRow(), scrollbar);
 };
 
 document.addEventListener("wheel", (e) => {

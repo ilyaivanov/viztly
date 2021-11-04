@@ -1,3 +1,5 @@
+import Item from "./item";
+
 export const hasVisibleChildren = (item: Item) =>
   item.isOpen && item.children.length > 0;
 
@@ -68,6 +70,33 @@ export const moveItemDown = (root: Item, item: Item): Item => {
   return root;
 };
 
+//this goes down into children
+export const getItemBelow = (root: Item, item: Item): Item | undefined => {
+  if (item.isOpen && item.children) return item.children![0];
+
+  const followingItem = getFollowingItem(root, item);
+  if (followingItem) return followingItem;
+  else {
+    let parent = findParent(root, item);
+    while (parent && isLast(root, parent)) {
+      parent = findParent(root, parent);
+    }
+    if (parent) return getFollowingItem(root, parent);
+  }
+};
+
+//this always returns following item without going down to children
+export const getFollowingItem = (root: Item, item: Item): Item | undefined => {
+  const parent = findParent(root, item);
+  if (parent) {
+    const context: Item[] = parent.children!;
+    const index = context.indexOf(item);
+    if (index < context.length - 1) {
+      return context[index + 1];
+    }
+  }
+};
+
 //need to find parent quickly (probably store direct link on an item)
 export const removeItem = (root: Item, item: Item) => {
   const traverseChildren = (i: Item) => {
@@ -77,6 +106,9 @@ export const removeItem = (root: Item, item: Item) => {
 
   traverseChildren(root);
 };
+
+export const isLast = (root: Item, item: Item): boolean =>
+  !getFollowingItem(root, item);
 
 export const addItemAfter = (root: Item, item: Item, itemToAdd: Item) => {
   const traverseChildren = (i: Item) => {
@@ -92,11 +124,11 @@ export const addItemInside = (item: Item, itemToAdd: Item) => {
   item.children = [itemToAdd].concat(item.children);
 };
 
-export const createItem = (title: string, children: Item[] = []): Item => ({
-  title,
-  isOpen: children.length > 0,
-  children,
-});
+export const createItem = (title: string, children: Item[] = []): Item => {
+  const item = new Item(title, children);
+  item.isOpen = children.length > 0;
+  return item;
+};
 
 const rootName = "51230812GIBERISHMAKINGSURETHISISUNIQUE%42%";
 
@@ -107,6 +139,33 @@ export const isRoot = (item: Item) =>
   //this is buggy, but I need to check for Home for backward compatability.
   //in future I will probably add a parent link to an Item data structure
   item.title === rootName || item.title === "Home";
+
+export const findParent = (root: Item, item: Item): Item | undefined => {
+  let res: Item | undefined = undefined;
+
+  const traverseChildren = (i: Item) => {
+    const child = i.children.find((c) => c == item);
+    if (child) res = i;
+    else i.children.forEach(traverseChildren);
+  };
+
+  traverseChildren(root);
+  return res;
+};
+
+export const getPath = (root: Item, item: Item) => {
+  const parents: Item[] = [];
+
+  let i: Item | undefined = item;
+  let iterationsLeft = 20;
+  while (iterationsLeft > 0 && i && !isRoot(i)) {
+    parents.push(i);
+    i = findParent(root, i);
+    iterationsLeft -= 1;
+  }
+
+  return parents;
+};
 
 export const flattenItemChildren = <T>(
   item: Item,
@@ -145,29 +204,10 @@ export const flattenItemWithChildren = <T>(
   return res;
 };
 
-export const findParent = (root: Item, item: Item): Item | undefined => {
-  let res: Item | undefined = undefined;
-
-  const traverseChildren = (i: Item) => {
-    const child = i.children.find((c) => c == item);
-    if (child) res = i;
-    else i.children.forEach(traverseChildren);
-  };
-
-  traverseChildren(root);
-  return res;
-};
-
-export const getPath = (root: Item, item: Item) => {
-  const parents: Item[] = [];
-
-  let i: Item | undefined = item;
-  let iterationsLeft = 20;
-  while (iterationsLeft > 0 && i && !isRoot(i)) {
-    parents.push(i);
-    i = findParent(root, i);
-    iterationsLeft -= 1;
+export const getLastNestedItem = (item: Item): Item => {
+  if (item.isOpen && item.children) {
+    const { children } = item;
+    return getLastNestedItem(children[children.length - 1]);
   }
-
-  return parents;
+  return item;
 };

@@ -1,4 +1,5 @@
 import initialState from "./initialState";
+import Item from "./itemTree/item";
 const SHOULD_READ_LOCALSTORAGE = false;
 
 export const load = (): Item => {

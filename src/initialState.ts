@@ -1,11 +1,10 @@
 import { createItem, createRoot } from "./itemTree";
+import Item from "./itemTree/item";
 
 const createItems = (prefix: string, count: number): Item[] =>
-  Array.from(new Array(count)).map((_, index) => ({
-    children: [],
-    isOpen: false,
-    title: `${prefix}.${index + 1}`,
-  }));
+  Array.from(new Array(count)).map((_, index) =>
+    createItem(`${prefix}.${index + 1}`)
+  );
 
 const two = createRoot([createItem("First"), createItem("Second")]);
 
