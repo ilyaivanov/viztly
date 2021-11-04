@@ -87,4 +87,4 @@ const big = createRoot([
     ]),
   ]),
 ]);
-export default big;
+export default small;
