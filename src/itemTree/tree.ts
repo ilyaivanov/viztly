@@ -70,6 +70,17 @@ class Tree {
     return newItem;
   };
 
+  focusOnSelected = () => {
+    this.focusedNode = this.selectedNode;
+  };
+
+  focusOnParent = () => {
+    console.log(this.focusedNode.parent);
+    if (this.focusedNode.parent) {
+      this.focusedNode = this.focusedNode.parent;
+    }
+  };
+
   flattenItemChildren = <T>(
     item: Item,
     mapper: (item: Item, level: number) => T

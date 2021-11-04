@@ -28,9 +28,11 @@ class KeyboardHandler {
         else tree.selectPreviousItem();
       } else if (e.code === "ArrowLeft") {
         if (e.shiftKey && e.altKey) tree.moveItemLeft();
+        else if (e.altKey) tree.focusOnParent();
         else tree.selectParentOrCloseSelected();
       } else if (e.code === "ArrowRight") {
         if (e.shiftKey && e.altKey) tree.moveItemRight();
+        else if (e.altKey) tree.focusOnSelected();
         else tree.selectFirstChildOrOpenSelected();
       } else if (e.code === "Backspace" && e.shiftKey && e.altKey) {
         tree.removeSelected();
