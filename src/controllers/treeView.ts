@@ -1,4 +1,4 @@
-import { c, spacings } from "../designSystem";
+import { spacings } from "../designSystem";
 import { Canvas } from "../infra/canvas";
 import Item from "../itemTree/item";
 import Tree from "../itemTree/tree";
@@ -81,13 +81,13 @@ export class TreeView {
   private getItemHeight = (map: Map<Item, ItemRow>, row: ItemRow) => {
     if (!row.item.isOpen) return 0;
 
-    let lastNestedChild = row;
+    let lastNestedChild: ItemRow | undefined = row;
 
-    while (lastNestedChild.item.isOpen) {
+    while (lastNestedChild && lastNestedChild.item.isOpen) {
       lastNestedChild = map.get(
         lastNestedChild.item.children[lastNestedChild.item.children.length - 1]
-      )!;
+      );
     }
-    return lastNestedChild.position.y - row.position.y;
+    return lastNestedChild ? lastNestedChild.position.y - row.position.y : 0;
   };
 }

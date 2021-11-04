@@ -29,15 +29,27 @@ class Item {
   addChildAt = (item: Item, index: number) => {
     this.children.splice(index, 0, item);
     item.parent = this;
+    this.updateIsOpenFlag();
   };
 
   addChildAtEnd = (item: Item, index: number) => {
     this.children.splice(index, 0, item);
     item.parent = this;
+    this.updateIsOpenFlag();
   };
 
   removeChild = (item: Item) => {
     this.children = this.children.filter((c) => c !== item);
+    this.updateIsOpenFlag();
+  };
+
+  removeChildAt = (index: number) => {
+    this.children.splice(index, 1);
+    this.updateIsOpenFlag();
+  };
+
+  private updateIsOpenFlag = () => {
+    this.isOpen = this.children.length !== 0;
   };
 }
 

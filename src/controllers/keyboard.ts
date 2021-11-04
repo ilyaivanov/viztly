@@ -14,7 +14,7 @@ class KeyboardHandler {
   }
 
   onKey = (e: KeyboardEvent) => {
-    const { tree, onKeyHandled } = this;
+    const { tree, scrollbar, onKeyHandled } = this;
 
     if (isEditing()) {
       if (e.code === "Enter" || e.code === "NumpadEnter" || e.code === "Escape")
@@ -40,6 +40,11 @@ class KeyboardHandler {
         e.preventDefault();
       }
     }
+
+    const item = this.list.itemToRows.get(tree.selectedNode);
+
+    if (item && !scrollbar.isYPointOnScreen(item.position.y))
+      scrollbar.centerScrollOn(item.position.y);
 
     // const { root } = list;
     // if (
