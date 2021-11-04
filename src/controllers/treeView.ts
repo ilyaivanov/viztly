@@ -1,13 +1,13 @@
 import { c, spacings } from "../designSystem";
 import { Canvas } from "../infra/canvas";
 import Item from "../itemTree/item";
-import ItemsTree from "../itemTree/tree";
+import Tree from "../itemTree/tree";
 import ItemRow from "../views/ItemRow";
 
-export class List {
+export class TreeView {
   rows: ItemRow[];
 
-  constructor(public tree: ItemsTree) {
+  constructor(public tree: Tree) {
     this.rows = this.createRows(tree.focusedNode);
   }
 
@@ -55,6 +55,8 @@ export class List {
       isFirstItem = false;
 
       const res = new ItemRow(item, level, offset);
+
+      if (item === this.tree.selectedNode.parent) res.highlightChildrenBorder();
 
       offset += halfOfHeight;
       return res;

@@ -65,17 +65,16 @@ class MyItemRow {
       spring(old.fontSize, row.fontSize, (val) => {
         row.fontSize = val;
       });
+
+    if (old.childrenColor !== row.childrenColor)
+      animateColor(old.childrenColor, row.childrenColor, (val) => {
+        row.childrenColor = val;
+      });
   }
 
-  public unhighlightChildrenBorder = () =>
-    animateColor(this.childrenColor, c.line, (val) => {
-      this.childrenColor = val;
-    });
-
-  public highlightChildrenBorder = () =>
-    animateColor(this.childrenColor, c.lineSelected, (val) => {
-      this.childrenColor = val;
-    });
+  highlightChildrenBorder = () => {
+    this.childrenColor = c.lineSelected;
+  };
 
   private getTextPosition = () => {
     const x =

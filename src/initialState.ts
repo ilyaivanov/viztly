@@ -1,5 +1,9 @@
-import { createItem, createRoot } from "./itemTree";
 import Item from "./itemTree/item";
+
+const createItem = (title: string, children: Item[] = []) =>
+  new Item(title, children);
+
+const createRoot = (children: Item[]) => createItem("Home", children);
 
 const createItems = (prefix: string, count: number): Item[] =>
   Array.from(new Array(count)).map((_, index) =>

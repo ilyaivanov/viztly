@@ -5,6 +5,7 @@ class Item {
   parent?: Item;
 
   constructor(public title: string = "", public children: Item[] = []) {
+    this.isOpen = children.length > 0;
     children.forEach((child) => (child.parent = this));
   }
 
@@ -19,7 +20,10 @@ class Item {
   };
 
   public static parse = (str: string): Item => {
-    return new Item("");
+    const root = JSON.parse(str) as ItemToSerialize;
+    const map = (item: ItemToSerialize): Item =>
+      new Item(item.title, item.children?.map(map));
+    return map(root);
   };
 }
 

@@ -1,12 +1,12 @@
 import { engine } from "./infra/animations";
 import { Canvas } from "./infra/canvas";
 import { updateInputCoordinates } from "./views/itemInput";
-import { List } from "./controllers/list";
+import { TreeView } from "./controllers/treeView";
 import Scrollbar from "./controllers/scrollbar";
 
 import * as stateReader from "./stateReader";
 import KeyboardHandler from "./controllers/keyboard";
-import ItemsTree from "./itemTree/tree";
+import Tree from "./itemTree/tree";
 
 const canvas = new Canvas();
 
@@ -18,8 +18,8 @@ const onKeyHandled = () => {
   render();
 };
 
-const selection = new ItemsTree(root);
-const list = new List(selection);
+const selection = new Tree(root);
+const list = new TreeView(selection);
 const scrollbar = new Scrollbar(canvas, list);
 const input = new KeyboardHandler(selection, onKeyHandled);
 

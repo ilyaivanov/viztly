@@ -1,11 +1,11 @@
 import { spring } from "../infra/animations";
 import { Canvas } from "../infra/canvas";
-import { List } from "./list";
+import { TreeView } from "./treeView";
 
 class Scrollbar {
   transformY = 0;
 
-  constructor(private canvas: Canvas, private list: List) {}
+  constructor(private canvas: Canvas, private list: TreeView) {}
 
   translateBy = (delta: number) => {
     this.transformY += delta;

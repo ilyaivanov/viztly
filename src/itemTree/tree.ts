@@ -1,15 +1,10 @@
-import {
-  flattenItemChildren,
-  flattenItemWithChildren,
-  getItemBelow,
-  findParent,
-  getLastNestedItem,
-} from ".";
 import Item from "./item";
+import * as traversal from "./tree.traversal";
 
-class ItemsTree {
+class Tree {
   selectedNode: Item;
   focusedNode: Item;
+
   constructor(public root: Item) {
     this.focusedNode = root;
     this.selectedNode = root.children[0];
@@ -19,18 +14,18 @@ class ItemsTree {
   isRoot = (item: Item) => item === this.root;
 
   selectPreviousItem = () => {
-    const parent = findParent(this.root, this.selectedNode);
+    const parent = this.selectedNode.parent;
     if (parent) {
       const index = parent.children.indexOf(this.selectedNode);
       if (index > 0) {
         const previousItem = parent.children[index - 1];
-        return this.selectItem(getLastNestedItem(previousItem));
+        return this.selectItem(traversal.getLastNestedItem(previousItem));
       } else if (parent != this.root) this.selectItem(parent);
     }
   };
 
   selectNextItem = () => {
-    const itemBelow = getItemBelow(this.root, this.selectedNode);
+    const itemBelow = traversal.getItemBelow(this.selectedNode);
     if (itemBelow) {
       this.selectedNode.isSelected = false;
       itemBelow.isSelected = true;
@@ -41,7 +36,7 @@ class ItemsTree {
   selectParentOrCloseSelected = () => {
     if (this.selectedNode.isOpen) this.selectedNode.isOpen = false;
     else {
-      const parent = findParent(this.root, this.selectedNode);
+      const parent = this.selectedNode.parent;
       if (parent && parent !== this.root) this.selectItem(parent);
     }
   };
@@ -57,12 +52,12 @@ class ItemsTree {
   flattenItemChildren = <T>(
     item: Item,
     mapper: (item: Item, level: number) => T
-  ): T[] => flattenItemChildren(item, mapper);
+  ): T[] => traversal.flattenItemChildren(item, mapper);
 
   flattenItemWithChildren = <T>(
     item: Item,
     mapper: (item: Item, level: number) => T
-  ): T[] => flattenItemWithChildren(item, mapper);
+  ): T[] => traversal.flattenItemWithChildren(item, mapper);
 
   private selectItem = (item: Item) => {
     this.selectedNode.isSelected = false;
@@ -71,4 +66,4 @@ class ItemsTree {
   };
 }
 
-export default ItemsTree;
+export default Tree;
