@@ -5,12 +5,13 @@ import * as crud from "./tree.crud";
 
 class Tree {
   selectedNode: Item;
+
   focusedNode: Item;
 
   constructor(public root: Item) {
     this.focusedNode = root;
     this.selectedNode = root.children[0];
-    this.selectedNode.isSelected = true;
+    if (this.selectedNode) this.selectedNode.isSelected = true;
   }
 
   isRoot = (item: Item) => item === this.root;
@@ -63,7 +64,8 @@ class Tree {
 
   createItem = (): Item => {
     const newItem = new Item("");
-    if (this.selectedNode.children.length > 0)
+    if (!this.selectedNode) crud.addItemInside(this.root, newItem);
+    else if (this.selectedNode.children.length > 0)
       crud.addItemInside(this.selectedNode, newItem);
     else crud.addItemAfter(this.selectedNode, newItem);
     this.selectItem(newItem);
@@ -92,7 +94,7 @@ class Tree {
   ): T[] => traversal.flattenItemWithChildren(item, mapper);
 
   private selectItem = (item: Item | undefined) => {
-    this.selectedNode.isSelected = false;
+    if (this.selectedNode) this.selectedNode.isSelected = false;
     if (item) {
       this.selectedNode = item;
       this.selectedNode.isSelected = true;

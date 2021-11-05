@@ -15,12 +15,22 @@ export class TreeView {
   draw = (canvas: Canvas) => this.rows.forEach((view) => view.draw(canvas));
 
   updateRows = () => {
+    if (
+      this.tree.focusedNode.isRoot() &&
+      this.tree.focusedNode.children.length === 0
+    ) {
+      this.rows = [];
+      this.itemToRows = new Map();
+      return;
+    }
     const rows = this.createRows(this.tree.focusedNode);
     this.itemToRows = new Map(rows.map((r) => [r.item, r]));
     this.mergeRows(rows);
   };
 
   public getContentHeight() {
+    if (this.rows.length === 0) return 0;
+
     const lastItem = this.rows[this.rows.length - 1];
     const lastITemHeight =
       lastItem.level === 0 ? spacings.zeroLevelItemHeight : spacings.itemHeight;

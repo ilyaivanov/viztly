@@ -7,8 +7,12 @@ export const removeItem = (item: Item): Item | undefined => {
     const index = parent.children.indexOf(item);
     if (index > 0) selectedItem = parent.children[index - 1];
     else {
-      selectedItem = parent;
-      parent.isOpen = parent.children.length > 1;
+      if (parent.isRoot()) {
+        selectedItem = parent.children[index + 1];
+      } else {
+        selectedItem = parent;
+        parent.isOpen = parent.children.length > 1;
+      }
     }
     parent.removeChild(item);
   }

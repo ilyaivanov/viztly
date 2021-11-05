@@ -31,6 +31,8 @@ class Item {
     this.updateIsOpenFlag();
   };
 
+  isRoot = () => !this.parent;
+
   private updateIsOpenFlag = () => {
     this.isOpen = this.children.length !== 0;
   };
