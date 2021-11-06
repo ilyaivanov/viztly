@@ -1,8 +1,14 @@
+type ItemType = "folder" | "YTVideo";
+
 class Item {
   isOpen: boolean = false;
   isSelected: boolean = false;
 
   parent?: Item;
+
+  type: ItemType = "folder";
+  videoId?: string;
+  isPlaying?: boolean;
 
   constructor(public title: string = "", public children: Item[] = []) {
     this.isOpen = children.length > 0;

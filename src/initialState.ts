@@ -3,6 +3,13 @@ import Item from "./itemTree/item";
 const createItem = (title: string, children: Item[] = []) =>
   new Item(title, children);
 
+const createVideo = (title: string, videoId: string, children: Item[] = []) => {
+  const res = new Item(title, children);
+  res.type = "YTVideo";
+  res.videoId = videoId;
+  return res;
+};
+
 const createRoot = (children: Item[]) => createItem("Home", children);
 
 const createItems = (prefix: string, count: number): Item[] =>
@@ -13,10 +20,13 @@ const createItems = (prefix: string, count: number): Item[] =>
 const two = createRoot([createItem("First"), createItem("Second")]);
 
 const small = createRoot([
-  createItem("First", [
-    createItem("First.1"),
-    createItem("First.2"),
-    createItem("First.3"),
+  createItem("Blues", [
+    createVideo("Dark Blues Music to Escape to...", "s4ACjyobAug"),
+    createVideo(
+      "WHISKEY BLUES | Best Of Slow Blues/Blues Rock | Modern Electric Blues",
+      "f5jGX9A6ErA"
+    ),
+    createVideo("CHILL BLUES GUITAR to Relax To...", "NYhKmvglrxk"),
   ]),
   createItem("Second"),
 ]);
@@ -87,4 +97,4 @@ const big = createRoot([
     ]),
   ]),
 ]);
-export default big;
+export default small;

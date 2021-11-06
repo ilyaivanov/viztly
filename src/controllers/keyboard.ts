@@ -2,6 +2,7 @@ import Tree from "../itemTree/tree";
 import { drawInputFor, finishEdit, isEditing } from "../views/itemInput";
 import Scrollbar from "./scrollbar";
 import { TreeView } from "./treeView";
+import { pause, play, resume } from "./youtubePlayer";
 
 class KeyboardHandler {
   constructor(
@@ -45,6 +46,19 @@ class KeyboardHandler {
         list.updateRows();
         const item = list.itemToRows.get(newItem);
         if (item) drawInputFor(item, scrollbar, onKeyHandled);
+      } else if (e.code === "Space") {
+        if (tree.itemPlayed && tree.itemPlayed == tree.selectedNode) {
+          if (tree.itemPlayed.isPlaying) {
+            pause();
+            tree.pause();
+          } else {
+            resume();
+            tree.resume();
+          }
+        } else {
+          tree.play(tree.selectedNode);
+          if (tree.selectedNode.videoId) play(tree.selectedNode.videoId);
+        }
       }
     }
 

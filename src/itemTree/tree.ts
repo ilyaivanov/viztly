@@ -8,6 +8,8 @@ class Tree {
 
   focusedNode: Item;
 
+  itemPlayed?: Item;
+
   constructor(public root: Item) {
     this.focusedNode = root;
     this.selectedNode = root.children[0];
@@ -99,6 +101,21 @@ class Tree {
       this.selectedNode = item;
       this.selectedNode.isSelected = true;
     }
+  };
+
+  play = (item: Item) => {
+    if (this.itemPlayed) this.itemPlayed.isPlaying = false;
+
+    this.itemPlayed = item;
+    if (this.itemPlayed) this.itemPlayed.isPlaying = true;
+  };
+
+  pause = () => {
+    if (this.itemPlayed) this.itemPlayed.isPlaying = false;
+  };
+
+  resume = () => {
+    if (this.itemPlayed) this.itemPlayed.isPlaying = true;
   };
 }
 

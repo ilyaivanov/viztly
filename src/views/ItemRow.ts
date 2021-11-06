@@ -3,6 +3,7 @@ import { animateColor, spring } from "../infra/animations";
 import { Canvas } from "../infra/canvas";
 import { add } from "../infra/vector";
 import Item from "../itemTree/item";
+import * as icons from "./icons";
 
 class ItemRow {
   position: Vector;
@@ -29,10 +30,7 @@ class ItemRow {
   draw(canvas: Canvas) {
     const { item, position, level, fontSize, color } = this;
 
-    if (item.children.length > 0)
-      canvas.drawCircle(position, this.circleR, color);
-    else canvas.drawCirclePath(position, this.circleR, color);
-
+    this.drawIcon(canvas);
     canvas.drawText(this.getTextPosition(), item.title, fontSize, color);
 
     const { childrenColor, childrenHeight } = this;
@@ -43,6 +41,33 @@ class ItemRow {
       canvas.drawLine(start, end, 2, childrenColor);
     }
   }
+
+  drawIcon = (canvas: Canvas) => {
+    const { item, position, level, color } = this;
+    if (item.type && item.type === "YTVideo") {
+      const ctx = canvas.ctx;
+
+      const scale = level === 0 ? 0.02 : 0.014;
+
+      ctx.save();
+      ctx.translate(
+        position.x - (icons.width / 2) * scale,
+        position.y - (icons.height / 2) * scale
+      );
+
+      ctx.scale(scale, scale);
+
+      const path = item.isPlaying ? icons.pause : icons.play;
+      ctx.lineWidth = 1 / scale;
+      ctx.fillStyle = color;
+
+      ctx.fill(path);
+
+      ctx.restore();
+    } else if (item.children.length > 0)
+      canvas.drawCircle(position, this.circleR, color);
+    else canvas.drawCirclePath(position, this.circleR, color);
+  };
 
   public merge(old: ItemRow) {
     const row = this;
