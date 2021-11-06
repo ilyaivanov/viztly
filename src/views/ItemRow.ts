@@ -45,25 +45,9 @@ class ItemRow {
   drawIcon = (canvas: Canvas) => {
     const { item, position, level, color } = this;
     if (item.type && item.type === "YTVideo") {
-      const ctx = canvas.ctx;
-
-      const scale = level === 0 ? 0.02 : 0.014;
-
-      ctx.save();
-      ctx.translate(
-        position.x - (icons.width / 2) * scale,
-        position.y - (icons.height / 2) * scale
-      );
-
-      ctx.scale(scale, scale);
-
+      const iconWidth = level === 0 ? 9 : 6;
       const path = item.isPlaying ? icons.pause : icons.play;
-      ctx.lineWidth = 1 / scale;
-      ctx.fillStyle = color;
-
-      ctx.fill(path);
-
-      ctx.restore();
+      icons.drawAt(canvas, position.x, position.y, iconWidth, path, color);
     } else if (item.children.length > 0)
       canvas.drawCircle(position, this.circleR, color);
     else canvas.drawCirclePath(position, this.circleR, color);

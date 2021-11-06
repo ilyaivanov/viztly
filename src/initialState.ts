@@ -37,6 +37,14 @@ const big = createRoot([
     createItem("First.2"),
     createItem("First.3"),
   ]),
+  createItem("Blues", [
+    createVideo("Dark Blues Music to Escape to...", "s4ACjyobAug"),
+    createVideo(
+      "WHISKEY BLUES | Best Of Slow Blues/Blues Rock | Modern Electric Blues",
+      "f5jGX9A6ErA"
+    ),
+    createVideo("CHILL BLUES GUITAR to Relax To...", "NYhKmvglrxk"),
+  ]),
   createItem("Second", [
     createItem("Second.1", [
       createItem("Second.1.1"),
@@ -97,4 +105,4 @@ const big = createRoot([
     ]),
   ]),
 ]);
-export default small;
+export default big;

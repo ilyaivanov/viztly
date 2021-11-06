@@ -59,6 +59,16 @@ class KeyboardHandler {
           tree.play(tree.selectedNode);
           if (tree.selectedNode.videoId) play(tree.selectedNode.videoId);
         }
+      } else if (e.code === "KeyX") {
+        if (tree.itemPlayed) {
+          if (tree.itemPlayed.isPlaying) {
+            pause();
+            tree.pause();
+          } else {
+            resume();
+            tree.resume();
+          }
+        }
       }
     }
 

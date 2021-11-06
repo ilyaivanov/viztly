@@ -7,6 +7,7 @@ import Scrollbar from "./controllers/scrollbar";
 import * as stateReader from "./stateReader";
 import KeyboardHandler from "./controllers/keyboard";
 import Tree from "./itemTree/tree";
+import Footer from "./views/footer";
 
 const canvas = new Canvas();
 
@@ -22,7 +23,7 @@ const tree = new Tree(root);
 const treeView = new TreeView(tree);
 const scrollbar = new Scrollbar(canvas, treeView);
 const input = new KeyboardHandler(tree, treeView, scrollbar, onKeyHandled);
-
+const footer = new Footer(canvas, tree);
 canvas.onResize = () => render();
 
 const render = () => {
@@ -34,6 +35,7 @@ const render = () => {
   canvas.setTranslation(0, 0);
   scrollbar.draw();
 
+  footer.draw();
   const item = treeView.itemToRows.get(tree.selectedNode);
   if (item) updateInputCoordinates(item, scrollbar);
 };

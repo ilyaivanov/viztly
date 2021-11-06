@@ -18,6 +18,11 @@ export const c = {
   scrollbar: "#424242",
 
   header: "rgba(60,60,60,1)",
+
+  //UI
+
+  //dark
+  footer: "#252526",
 };
 
 const header = 48;
