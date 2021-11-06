@@ -18,7 +18,7 @@ class Footer {
 
     const x = 30;
     const y = canvas.height - height / 2;
-    icons.drawAt(this.canvas, x, y, 18, icons.playNext, c.selectedItem, true);
+    icons.drawAt(this.canvas, x, y, 17, icons.playNext, c.selectedItem, true);
 
     const playIcon =
       this.tree.itemPlayed && this.tree.itemPlayed.isPlaying
@@ -26,7 +26,7 @@ class Footer {
         : icons.play;
 
     icons.drawAt(this.canvas, x + 30, y, 20, playIcon, c.selectedItem);
-    icons.drawAt(this.canvas, x + 60, y, 18, icons.playNext, c.selectedItem);
+    icons.drawAt(this.canvas, x + 60, y, 17, icons.playNext, c.selectedItem);
   }
 }
 

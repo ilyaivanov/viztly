@@ -10,7 +10,7 @@ class Item {
   videoId?: string;
   isPlaying?: boolean;
 
-  constructor(public title: string = "", public children: Item[] = []) {
+  constructor(public title: string, public children: Item[] = []) {
     this.isOpen = children.length > 0;
     children.forEach((child) => (child.parent = this));
   }

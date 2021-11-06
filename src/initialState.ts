@@ -17,6 +17,21 @@ const createItems = (prefix: string, count: number): Item[] =>
     createItem(`${prefix}.${index + 1}`)
   );
 
+// export const mapItem = (id: string): Item => {
+//   const a = (visultyRoot as any)[id];
+//   const children = a.children ? a.children.map(mapItem) : [];
+//   const i = new Item(a.title, children);
+//   if (a.title === "Home") i.title = "Viztly";
+
+//   i.isOpen = false;
+
+//   if (a.type === "YTvideo") {
+//     i.type = "YTVideo";
+//     i.videoId = a.videoId;
+//   }
+//   return i;
+// };
+
 const two = createRoot([createItem("First"), createItem("Second")]);
 
 const small = createRoot([
@@ -37,14 +52,27 @@ const big = createRoot([
     createItem("First.2"),
     createItem("First.3"),
   ]),
-  createItem("Blues", [
-    createVideo("Dark Blues Music to Escape to...", "s4ACjyobAug"),
-    createVideo(
-      "WHISKEY BLUES | Best Of Slow Blues/Blues Rock | Modern Electric Blues",
-      "f5jGX9A6ErA"
-    ),
-    createVideo("CHILL BLUES GUITAR to Relax To...", "NYhKmvglrxk"),
+  createItem("Music", [
+    createItem("Blues", [
+      createVideo("Dark Blues Music to Escape to...", "s4ACjyobAug"),
+      createVideo(
+        "WHISKEY BLUES | Best Of Slow Blues/Blues Rock | Modern Electric Blues",
+        "f5jGX9A6ErA"
+      ),
+      createVideo("CHILL BLUES GUITAR to Relax To...", "NYhKmvglrxk"),
+    ]),
+    createItem("Kiffness", [
+      createVideo(
+        "Batzorig Vaanchig / Mongolian Throat Singer - In Praise of Genghis Khan (The Kiffness Remix)",
+        "fn5UXy20utM"
+      ),
+      createVideo(
+        "The Kiffness X Big Billy (Live Looping Talking Cat Remix)",
+        "T0P6MC8Ris8"
+      ),
+    ]),
   ]),
+  // mapItem("HOME"),
   createItem("Second", [
     createItem("Second.1", [
       createItem("Second.1.1"),

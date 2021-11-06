@@ -117,6 +117,27 @@ class Tree {
   resume = () => {
     if (this.itemPlayed) this.itemPlayed.isPlaying = true;
   };
+
+  playNext = () => {
+    if (this.itemPlayed) {
+      const parent = this.itemPlayed.parent;
+      if (parent) {
+        const index = parent.children.indexOf(this.itemPlayed);
+        if (index < parent.children.length - 1)
+          this.play(parent.children[index + 1]);
+      }
+    }
+  };
+
+  playPrevious = () => {
+    if (this.itemPlayed) {
+      const parent = this.itemPlayed.parent;
+      if (parent) {
+        const index = parent.children.indexOf(this.itemPlayed);
+        if (index > 0) this.play(parent.children[index - 1]);
+      }
+    }
+  };
 }
 
 export default Tree;

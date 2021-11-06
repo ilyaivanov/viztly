@@ -1,8 +1,9 @@
+import Item from "../itemTree/item";
 import Tree from "../itemTree/tree";
 import { drawInputFor, finishEdit, isEditing } from "../views/itemInput";
 import Scrollbar from "./scrollbar";
 import { TreeView } from "./treeView";
-import { pause, play, resume } from "./youtubePlayer";
+import * as player from "./youtubePlayer";
 
 class KeyboardHandler {
   constructor(
@@ -12,6 +13,11 @@ class KeyboardHandler {
     private onKeyHandled: () => void
   ) {
     document.addEventListener("keydown", this.onKey);
+
+    player.addEventListener("videoEnd", () => {
+      this.playNext();
+      this.onKeyHandled();
+    });
   }
 
   onKey = (e: KeyboardEvent) => {
@@ -48,27 +54,19 @@ class KeyboardHandler {
         if (item) drawInputFor(item, scrollbar, onKeyHandled);
       } else if (e.code === "Space") {
         if (tree.itemPlayed && tree.itemPlayed == tree.selectedNode) {
-          if (tree.itemPlayed.isPlaying) {
-            pause();
-            tree.pause();
-          } else {
-            resume();
-            tree.resume();
-          }
+          this.togglePlayStatus(tree.itemPlayed);
         } else {
           tree.play(tree.selectedNode);
-          if (tree.selectedNode.videoId) play(tree.selectedNode.videoId);
+          if (tree.selectedNode.videoId) player.play(tree.selectedNode.videoId);
         }
       } else if (e.code === "KeyX") {
         if (tree.itemPlayed) {
-          if (tree.itemPlayed.isPlaying) {
-            pause();
-            tree.pause();
-          } else {
-            resume();
-            tree.resume();
-          }
+          this.togglePlayStatus(tree.itemPlayed);
         }
+      } else if (e.code === "KeyC") {
+        this.playNext();
+      } else if (e.code === "KeyZ") {
+        this.playPrevious();
       }
     }
 
@@ -79,5 +77,41 @@ class KeyboardHandler {
     if (item && !scrollbar.isYPointOnScreen(item.position.y))
       scrollbar.centerScrollOn(item.position.y);
   };
+
+  //player
+  togglePlayStatus = (item: Item) => {
+    if (item.isPlaying) this.pause();
+    else this.resume();
+  };
+
+  playNext = () => {
+    const { tree } = this;
+    if (tree.itemPlayed) {
+      const currentItem = tree.itemPlayed;
+      tree.playNext();
+      if (currentItem !== tree.itemPlayed && tree.itemPlayed.videoId) {
+        player.play(tree.itemPlayed.videoId);
+      }
+    }
+  };
+  playPrevious = () => {
+    const { tree } = this;
+    if (tree.itemPlayed) {
+      const currentItem = tree.itemPlayed;
+      tree.playPrevious();
+      if (currentItem !== tree.itemPlayed && tree.itemPlayed.videoId) {
+        player.play(tree.itemPlayed.videoId);
+      }
+    }
+  };
+  pause = () => {
+    player.pause();
+    this.tree.pause();
+  };
+  resume = () => {
+    player.resume();
+    this.tree.resume();
+  };
 }
+
 export default KeyboardHandler;

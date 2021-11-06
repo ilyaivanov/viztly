@@ -58,8 +58,7 @@ function init() {
 
   tag.src = "https://www.youtube.com/iframe_api";
   const firstScriptTag = document.getElementsByTagName("script")[0];
-  //@ts-ignore
-  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+  firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
 }
 
 //@ts-ignore
