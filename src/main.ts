@@ -22,8 +22,15 @@ const onKeyHandled = () => {
 const tree = new Tree(root);
 const treeView = new TreeView(tree);
 const scrollbar = new Scrollbar(canvas, treeView);
-const input = new KeyboardHandler(tree, treeView, scrollbar, onKeyHandled);
 const footer = new Footer(canvas, tree);
+
+const input = new KeyboardHandler(
+  tree,
+  treeView,
+  footer,
+  scrollbar,
+  onKeyHandled
+);
 
 canvas.onResize = () => render();
 

@@ -1,5 +1,6 @@
 import Item from "../itemTree/item";
 import Tree from "../itemTree/tree";
+import Footer from "../views/footer";
 import { drawInputFor, finishEdit, isEditing } from "../views/itemInput";
 import Scrollbar from "./scrollbar";
 import { loadFromFirestore, saveToFirestore } from "./stateReader";
@@ -10,6 +11,7 @@ class KeyboardHandler {
   constructor(
     private tree: Tree,
     private list: TreeView,
+    private footer: Footer,
     private scrollbar: Scrollbar,
     private onKeyHandled: () => void
   ) {
@@ -60,6 +62,7 @@ class KeyboardHandler {
           tree.play(tree.selectedNode);
           if (tree.selectedNode.videoId) player.play(tree.selectedNode.videoId);
         }
+        if (!this.footer.isShown) this.footer.show();
       } else if (e.code === "KeyX") {
         if (tree.itemPlayed) {
           this.togglePlayStatus(tree.itemPlayed);
@@ -77,6 +80,8 @@ class KeyboardHandler {
           onKeyHandled();
         });
         e.preventDefault();
+      } else if (e.code === "KeyM") {
+        this.footer.toggleYoutubeVisibility();
       }
     }
 
