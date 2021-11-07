@@ -2,6 +2,7 @@ import Item from "../itemTree/item";
 import Tree from "../itemTree/tree";
 import { drawInputFor, finishEdit, isEditing } from "../views/itemInput";
 import Scrollbar from "./scrollbar";
+import { loadFromFirestore, saveToFirestore } from "./stateReader";
 import { TreeView } from "./treeView";
 import * as player from "./youtubePlayer";
 
@@ -67,6 +68,15 @@ class KeyboardHandler {
         this.playNext();
       } else if (e.code === "KeyZ") {
         this.playPrevious();
+      } else if (e.code === "KeyS" && e.ctrlKey) {
+        saveToFirestore(tree.root);
+        e.preventDefault();
+      } else if (e.code === "KeyL" && e.ctrlKey) {
+        loadFromFirestore().then((root) => {
+          tree.updateRoot(root);
+          onKeyHandled();
+        });
+        e.preventDefault();
       }
     }
 

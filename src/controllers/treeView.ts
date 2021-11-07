@@ -73,7 +73,7 @@ export class TreeView {
       offset += halfOfHeight;
       return res;
     };
-    const newRows = this.tree.isRoot(localRoot)
+    const newRows = localRoot.isRoot()
       ? this.tree.flattenItemChildren(localRoot, createRow)
       : this.tree.flattenItemWithChildren(localRoot, createRow);
     return this.updateHeights(newRows);

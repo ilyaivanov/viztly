@@ -1,4 +1,4 @@
-type ItemType = "folder" | "YTVideo";
+export type ItemType = "folder" | "YTvideo" | "YTplaylist" | "YTchannel";
 
 class Item {
   isOpen: boolean = false;
@@ -8,6 +8,10 @@ class Item {
 
   type: ItemType = "folder";
   videoId?: string;
+  imageUrl?: string;
+  channelId?: string;
+  playlistId?: string;
+
   isPlaying?: boolean;
 
   constructor(public title: string, public children: Item[] = []) {
@@ -21,8 +25,8 @@ class Item {
     this.updateIsOpenFlag();
   };
 
-  addChildAtEnd = (item: Item, index: number) => {
-    this.children.splice(index, 0, item);
+  addChildAtEnd = (item: Item) => {
+    this.children.splice(this.children.length, 0, item);
     item.parent = this;
     this.updateIsOpenFlag();
   };

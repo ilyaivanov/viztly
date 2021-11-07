@@ -44,7 +44,7 @@ class ItemRow {
 
   drawIcon = (canvas: Canvas) => {
     const { item, position, level, color } = this;
-    if (item.type && item.type === "YTVideo") {
+    if (item.type && item.type === "YTvideo") {
       const iconWidth = level === 0 ? 9 : 6;
       const path = item.isPlaying ? icons.pause : icons.play;
       icons.drawAt(canvas, position.x, position.y, iconWidth, path, color);

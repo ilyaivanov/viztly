@@ -4,17 +4,17 @@ import { updateInputCoordinates } from "./views/itemInput";
 import { TreeView } from "./controllers/treeView";
 import Scrollbar from "./controllers/scrollbar";
 
-import * as stateReader from "./stateReader";
+import * as stateReader from "./controllers/stateReader";
 import KeyboardHandler from "./controllers/keyboard";
 import Tree from "./itemTree/tree";
 import Footer from "./views/footer";
 
 const canvas = new Canvas();
 
-const root = stateReader.load();
+const root = stateReader.loadLocally();
 
 const onKeyHandled = () => {
-  stateReader.save(root);
+  stateReader.saveLocally(root);
   treeView.updateRows();
   render();
 };
@@ -24,6 +24,7 @@ const treeView = new TreeView(tree);
 const scrollbar = new Scrollbar(canvas, treeView);
 const input = new KeyboardHandler(tree, treeView, scrollbar, onKeyHandled);
 const footer = new Footer(canvas, tree);
+
 canvas.onResize = () => render();
 
 const render = () => {

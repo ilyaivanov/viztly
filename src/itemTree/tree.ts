@@ -13,10 +13,15 @@ class Tree {
   constructor(public root: Item) {
     this.focusedNode = root;
     this.selectedNode = root.children[0];
-    if (this.selectedNode) this.selectedNode.isSelected = true;
+    this.updateRoot(root);
   }
 
-  isRoot = (item: Item) => item === this.root;
+  updateRoot = (anotherRoot: Item) => {
+    this.root.children = anotherRoot.children;
+    this.focusedNode = this.root;
+    this.selectedNode = this.root.children[0];
+    if (this.selectedNode) this.selectedNode.isSelected = true;
+  };
 
   selectPreviousItem = () => {
     const parent = this.selectedNode.parent;

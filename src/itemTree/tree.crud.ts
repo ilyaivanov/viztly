@@ -25,5 +25,5 @@ export const addItemAfter = (item: Item, itemToAdd: Item) => {
   if (parent) parent.addChildAt(itemToAdd, parent.children.indexOf(item) + 1);
 };
 export const addItemInside = (item: Item, itemToAdd: Item) => {
-  item.addChildAtEnd(itemToAdd, 0);
+  item.addChildAt(itemToAdd, 0);
 };
