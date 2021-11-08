@@ -8,6 +8,7 @@ import * as stateReader from "./controllers/stateReader";
 import KeyboardHandler from "./controllers/keyboard";
 import Tree from "./itemTree/tree";
 import Footer from "./views/footer";
+import * as modal from "./views/modal";
 
 const canvas = new Canvas();
 
@@ -44,6 +45,8 @@ const render = () => {
   scrollbar.draw();
 
   footer.draw();
+
+  modal.draw(canvas);
   const item = treeView.itemToRows.get(tree.selectedNode);
   if (item) updateInputCoordinates(item, scrollbar);
 };

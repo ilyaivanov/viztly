@@ -2,6 +2,7 @@ import Item from "../itemTree/item";
 import Tree from "../itemTree/tree";
 import Footer from "../views/footer";
 import { drawInputFor, finishEdit, isEditing } from "../views/itemInput";
+import { showModal } from "../views/modal";
 import Scrollbar from "./scrollbar";
 import { loadFromFirestore, saveToFirestore } from "./stateReader";
 import { TreeView } from "./treeView";
@@ -82,6 +83,9 @@ class KeyboardHandler {
         e.preventDefault();
       } else if (e.code === "KeyM") {
         this.footer.toggleYoutubeVisibility();
+      } else if (e.code === "KeyF" && e.ctrlKey) {
+        showModal();
+        e.preventDefault();
       }
     }
 
