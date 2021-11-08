@@ -12,7 +12,7 @@ export class SpringAnimated implements Animated {
   damping = 4;
   invertedMass = 0.25;
 
-  onTick?: (val: number) => void;
+  onTick?: (val: number, ended: boolean) => void;
 
   constructor(public current: number) {
     this.target = current;
@@ -35,6 +35,6 @@ export class SpringAnimated implements Animated {
       this.current += d;
     }
 
-    this.onTick && this.onTick(this.current);
+    this.onTick && this.onTick(this.current, !this.isAnimating);
   };
 }

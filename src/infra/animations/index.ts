@@ -30,7 +30,7 @@ export const animateColor = (
 export const spring = (
   from: number,
   to: number,
-  onTick: (currentVal: number) => void
+  onTick: (currentVal: number, ended: boolean) => void
 ) => {
   const anim = new SpringAnimated(from);
   anim.target = to;

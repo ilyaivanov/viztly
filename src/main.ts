@@ -46,7 +46,7 @@ const render = () => {
 
   footer.draw();
 
-  modal.draw(canvas);
+  modal.view(canvas);
   const item = treeView.itemToRows.get(tree.selectedNode);
   if (item) updateInputCoordinates(item, scrollbar);
 };

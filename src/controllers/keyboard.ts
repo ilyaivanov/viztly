@@ -7,6 +7,7 @@ import Scrollbar from "./scrollbar";
 import { loadFromFirestore, saveToFirestore } from "./stateReader";
 import { TreeView } from "./treeView";
 import * as player from "./youtubePlayer";
+import * as modal from "../views/modal";
 
 class KeyboardHandler {
   constructor(
@@ -30,6 +31,8 @@ class KeyboardHandler {
     if (isEditing()) {
       if (e.code === "Enter" || e.code === "NumpadEnter" || e.code === "Escape")
         finishEdit();
+    } else if (modal.isShown()) {
+      if (e.code === "Escape") modal.hide();
     } else {
       if (e.code === "ArrowDown") {
         if (e.shiftKey && e.altKey) tree.moveItemDown();
