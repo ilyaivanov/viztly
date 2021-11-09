@@ -1,7 +1,9 @@
 import { spring } from "../infra/animations";
 import { Canvas } from "../infra/canvas";
-import { drawInputAt } from "./input";
+import { drawInputAt, remove } from "./input";
 import * as draw from "./draw";
+import { drawTextAt } from "./modal.text";
+import { c } from "../designSystem";
 
 const state = {
   isShown: false,
@@ -13,7 +15,10 @@ export const isShown = () => state.isShown;
 export const hide = () => {
   spring(state.progress, 0, (v, finished) => {
     state.progress = v;
-    if (finished) state.isShown = false;
+    if (finished) {
+      remove();
+      state.isShown = false;
+    }
   });
 };
 
@@ -28,6 +33,7 @@ export const view = (canvas: Canvas) => {
   const progressNormalized = state.progress / 100;
   if (state.isShown) {
     canvas.ctx.fillStyle = `rgba(0,0,0,${progressNormalized * 0.3})`;
+
     canvas.ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     const modalWidth = Math.min(canvas.width - 60, 480);
@@ -37,6 +43,7 @@ export const view = (canvas: Canvas) => {
     const y =
       canvas.height / 2 - modalHeight / 2 + (1 - progressNormalized) * 40;
     draw.roundedRectangle(canvas.ctx, x, y, modalWidth, modalHeight, 10);
+
     canvas.ctx.filter = "drop-shadow(1px 1px 3px black)";
     canvas.ctx.fillStyle = `rgba(37,37,37,${progressNormalized})`;
     canvas.ctx.fill();
@@ -59,5 +66,15 @@ export const view = (canvas: Canvas) => {
     canvas.ctx.fill();
 
     drawInputAt(inputX + 5, inputY, inputHeight, inputWidth - 10);
+
+    const base = 25;
+    drawTextAt(canvas, inputX, inputY + inputHeight + base, c.text);
+    drawTextAt(
+      canvas,
+      inputX,
+      inputY + inputHeight + base + 25,
+      c.selectedItem
+    );
+    drawTextAt(canvas, inputX, inputY + inputHeight + base + 50, c.text);
   }
 };

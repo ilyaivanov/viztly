@@ -1,5 +1,10 @@
 let input: HTMLInputElement | undefined;
 
+export const remove = () => {
+  input?.remove();
+  input = undefined;
+};
+
 export const drawInputAt = (x: number, y: number, h: number, w: number) => {
   if (!input) {
     input = document.createElement("input");

@@ -11,8 +11,7 @@ export const c = {
   //dark theme
   circle: "white",
   text: "white",
-  // selectedItem: "#ACE854",
-  selectedItem: "#9ccc65",
+  selectedItem: "#ACE854",
   line: "#3C413D",
   lineSelected: "#638038",
 
