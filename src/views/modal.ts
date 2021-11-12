@@ -1,9 +1,10 @@
 import { spring } from "../infra/animations";
 import { Canvas } from "../infra/canvas";
-import { drawInputAt, remove } from "./input";
+import { create, drawInputAt, remove } from "./input";
 import * as draw from "./draw";
-import { drawTextAt } from "./modal.text";
+import { drawTextAt, findLocalItems, LocalSearchEntry } from "./modal.text";
 import { c } from "../designSystem";
+import Tree from "../itemTree/tree";
 
 const state = {
   isShown: false,
@@ -21,11 +22,20 @@ export const hide = () => {
     }
   });
 };
-
-export const showModal = () => {
+let items: LocalSearchEntry[] = [];
+export const showModal = (tree: Tree, draw: () => void) => {
   state.isShown = true;
   spring(state.progress, 100, (v) => {
     state.progress = v;
+  });
+
+  create((text) => {
+    if (text) {
+      items = findLocalItems(tree.root, text).items;
+    } else {
+      items = [];
+    }
+    draw();
   });
 };
 
@@ -33,8 +43,8 @@ export const view = (canvas: Canvas) => {
   const progressNormalized = state.progress / 100;
   if (state.isShown) {
     canvas.ctx.fillStyle = `rgba(0,0,0,${progressNormalized * 0.3})`;
-
     canvas.ctx.fillRect(0, 0, canvas.width, canvas.height);
+    canvas.ctx.globalAlpha = progressNormalized;
 
     const modalWidth = Math.min(canvas.width - 60, 480);
     const modalHeight = 400;
@@ -45,7 +55,7 @@ export const view = (canvas: Canvas) => {
     draw.roundedRectangle(canvas.ctx, x, y, modalWidth, modalHeight, 10);
 
     canvas.ctx.filter = "drop-shadow(1px 1px 3px black)";
-    canvas.ctx.fillStyle = `rgba(37,37,37,${progressNormalized})`;
+    canvas.ctx.fillStyle = `rgb(37,37,37)`;
     canvas.ctx.fill();
     canvas.ctx.filter = "none";
 
@@ -62,19 +72,17 @@ export const view = (canvas: Canvas) => {
       inputHeight,
       2
     );
-    canvas.ctx.fillStyle = `rgba(255,255,255,${progressNormalized})`;
+    canvas.ctx.fillStyle = `rgb(255,255,255)`;
     canvas.ctx.fill();
 
     drawInputAt(inputX + 5, inputY, inputHeight, inputWidth - 10);
 
     const base = 25;
-    drawTextAt(canvas, inputX, inputY + inputHeight + base, c.text);
-    drawTextAt(
-      canvas,
-      inputX,
-      inputY + inputHeight + base + 25,
-      c.selectedItem
-    );
-    drawTextAt(canvas, inputX, inputY + inputHeight + base + 50, c.text);
+    items.forEach((row, i) => {
+      const y = inputY + inputHeight + base + 25 * i;
+      drawTextAt(canvas, inputX, y, row);
+    });
+
+    canvas.ctx.globalAlpha = 1;
   }
 };

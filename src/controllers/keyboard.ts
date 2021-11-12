@@ -87,7 +87,7 @@ class KeyboardHandler {
       } else if (e.code === "KeyM") {
         this.footer.toggleYoutubeVisibility();
       } else if (e.code === "KeyF" && e.ctrlKey) {
-        showModal();
+        showModal(tree, onKeyHandled);
         e.preventDefault();
       }
     }
