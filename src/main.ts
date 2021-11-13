@@ -41,11 +41,11 @@ const render = () => {
 
   const { ctx } = canvas;
   ctx.font = `${16}px Segoe UI`;
-
-  ctx.save();
-
   treeView.draw(canvas);
+
+  ctx.resetTransform();
   modal.view(canvas);
+  scrollbar.draw();
   const item = treeView.itemToRows.get(tree.selectedNode);
   if (item) updateInputCoordinates(item, scrollbar);
 };

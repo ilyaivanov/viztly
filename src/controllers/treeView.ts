@@ -83,22 +83,13 @@ export class TreeView {
     const set = new Map(rows.map((r) => [r.item, r]));
 
     rows.forEach((row) => {
-      row.childrenHeight = this.getItemHeight(set, row);
+      const lastChild = row.item.children[row.item.children.length - 1];
+      if (lastChild) {
+        const view = set.get(lastChild);
+        if (view) row.lastChildY = view.position.y + 1;
+      }
     });
 
     return rows;
-  };
-
-  private getItemHeight = (map: Map<Item, ItemRow>, row: ItemRow) => {
-    if (!row.item.isOpen) return 0;
-
-    let lastNestedChild: ItemRow | undefined = row;
-
-    while (lastNestedChild && lastNestedChild.item.isOpen) {
-      lastNestedChild = map.get(
-        lastNestedChild.item.children[lastNestedChild.item.children.length - 1]
-      );
-    }
-    return lastNestedChild ? lastNestedChild.position.y - row.position.y : 0;
   };
 }

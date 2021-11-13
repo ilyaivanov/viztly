@@ -7,7 +7,7 @@ import * as icons from "./icons";
 
 class ItemRow {
   position: Vector;
-  public childrenHeight?: number;
+  public lastChildY?: number;
   childrenColor: string;
   color: string;
 
@@ -29,17 +29,26 @@ class ItemRow {
   // thus making this code faster will improve animation perfomance
   draw(canvas: Canvas) {
     const { item, position, level, fontSize, color } = this;
+    const { childrenColor, lastChildY } = this;
+
+    if (level !== 0)
+      canvas.drawLine(
+        add(this.position, { x: -spacings.circleRadius, y: 0 }),
+        add(this.position, { x: -spacings.xStep + 1, y: 0 }),
+        2,
+        color === c.selectedItem ? c.lineSelected : c.line
+      );
+    if (lastChildY) {
+      canvas.drawLine(
+        this.position,
+        { x: this.position.x, y: lastChildY },
+        2,
+        childrenColor
+      );
+    }
 
     this.drawIcon(canvas);
     canvas.drawText(this.getTextPosition(), item.title, fontSize, color);
-
-    const { childrenColor, childrenHeight } = this;
-    if (childrenHeight) {
-      const itemHeight = level === 0 ? sp.zeroLevelItemHeight : sp.itemHeight;
-      const start = add(position, { x: 0, y: itemHeight / 2 });
-      const end = add(start, { x: 0, y: childrenHeight });
-      canvas.drawLine(start, end, 2, childrenColor);
-    }
   }
 
   drawIcon = (canvas: Canvas) => {
@@ -63,11 +72,6 @@ class ItemRow {
     if (old.position.x !== row.position.x)
       spring(old.position.x, row.position.x, (val) => {
         row.position.x = val;
-      });
-
-    if (old.childrenHeight !== row.childrenHeight)
-      spring(old.childrenHeight || 0, row.childrenHeight || 0, (val) => {
-        row.childrenHeight = val;
       });
 
     if (old.fontSize !== row.fontSize)
