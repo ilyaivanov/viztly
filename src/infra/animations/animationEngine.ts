@@ -15,7 +15,7 @@ export class AnimationEngine {
   }
 
   private tick = (currentTime: number) => {
-    const deltaTime = this.lastTime ? currentTime - this.lastTime : 1 / 60;
+    const deltaTime = this.lastTime ? currentTime - this.lastTime : 1000 / 60;
 
     this.lastTime = currentTime;
 

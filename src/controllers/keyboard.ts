@@ -33,6 +33,21 @@ class KeyboardHandler {
         finishEdit();
     } else if (modal.isShown()) {
       if (e.code === "Escape") modal.hide();
+      if (e.code === "ArrowDown") modal.selectNext();
+      else if (e.code === "ArrowUp") modal.selectPrevious();
+      else if (e.code === "Enter" && e.ctrlKey) {
+        const { item } = modal.getSelectedItem();
+        if (item && item.videoId) {
+          tree.play(item);
+          player.play(item.videoId);
+        }
+      } else if (e.code === "Enter") {
+        const { item } = modal.getSelectedItem();
+        if (item) {
+          tree.focusOn(item);
+          modal.hide();
+        }
+      }
     } else {
       if (e.code === "ArrowDown") {
         if (e.shiftKey && e.altKey) tree.moveItemDown();

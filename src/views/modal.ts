@@ -3,7 +3,6 @@ import { Canvas } from "../infra/canvas";
 import { create, drawInputAt, remove } from "./input";
 import * as draw from "./draw";
 import { drawTextAt, findLocalItems, LocalSearchEntry } from "./modal.text";
-import { c } from "../designSystem";
 import Tree from "../itemTree/tree";
 
 const state = {
@@ -23,6 +22,26 @@ export const hide = () => {
   });
 };
 let items: LocalSearchEntry[] = [];
+let selectedItem = 0;
+
+export const selectNext = () => {
+  if (selectedItem < items.length - 1) {
+    items[selectedItem].isSelected = false;
+    selectedItem += 1;
+    items[selectedItem].isSelected = true;
+  }
+};
+
+export const selectPrevious = () => {
+  if (selectedItem > 0) {
+    items[selectedItem].isSelected = false;
+    selectedItem -= 1;
+    items[selectedItem].isSelected = true;
+  }
+};
+
+export const getSelectedItem = (): LocalSearchEntry => items[selectedItem];
+
 export const showModal = (tree: Tree, draw: () => void) => {
   state.isShown = true;
   spring(state.progress, 100, (v) => {
@@ -32,6 +51,8 @@ export const showModal = (tree: Tree, draw: () => void) => {
   create((text) => {
     if (text) {
       items = findLocalItems(tree.root, text).items;
+      selectedItem = 0;
+      items[0].isSelected = true;
     } else {
       items = [];
     }
@@ -47,7 +68,7 @@ export const view = (canvas: Canvas) => {
     canvas.ctx.globalAlpha = progressNormalized;
 
     const modalWidth = Math.min(canvas.width - 60, 480);
-    const modalHeight = 400;
+    const modalHeight = 435;
 
     const x = canvas.width / 2 - modalWidth / 2;
     const y =

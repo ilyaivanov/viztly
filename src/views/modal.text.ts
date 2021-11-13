@@ -41,7 +41,7 @@ export const findLocalItems = (
   rootItem: Item,
   term: string
 ): LocalSearchResults => {
-  const MAX_ITEMS_TO_FIND = 12;
+  const MAX_ITEMS_TO_FIND = 15;
 
   const terms = term
     .toLocaleLowerCase()
@@ -56,6 +56,7 @@ export const findLocalItems = (
       return {
         item,
         highlights: createTermsFound(item.title, terms),
+        isSelected: false,
       };
     return undefined;
   };
@@ -103,14 +104,15 @@ export const drawTextAt = (
   canvas: Canvas,
   x: number,
   y: number,
-  { highlights, item }: LocalSearchEntry
+  { highlights, item, isSelected }: LocalSearchEntry
 ) => {
   const { ctx } = canvas;
 
   const parts = createRowTitleWithHighlightsFromTerms(highlights, item.title);
 
   let offset = x;
-  ctx.fillStyle = "white";
+
+  ctx.fillStyle = isSelected ? c.selectedItem : "white";
   parts.forEach((part) => {
     if (part.isBold) ctx.font = `600 ${fontSizes.regular}px Segoe UI`;
     else ctx.font = `300 ${fontSizes.regular}px Segoe UI`;
@@ -148,8 +150,9 @@ const createRowTitleWithHighlightsFromTerms = (
     });
 
 export type LocalSearchEntry = {
-  item: { title: string };
+  item: Item;
   highlights: Highlight[];
+  isSelected: boolean;
 };
 
 type Highlight = { from: number; to: number };

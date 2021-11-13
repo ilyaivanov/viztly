@@ -32,6 +32,7 @@ export class SpringAnimated implements Animated {
       this.isAnimating = false;
       this.current = target;
     } else {
+      this.last = this.current;
       this.current += d;
     }
 
