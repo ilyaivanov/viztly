@@ -68,8 +68,6 @@ export class TreeView {
 
       const res = new ItemRow(item, level, offset);
 
-      if (item === this.tree.selectedNode.parent) res.highlightChildrenBorder();
-
       offset += halfOfHeight;
       return res;
     };
