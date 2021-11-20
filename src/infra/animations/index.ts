@@ -2,6 +2,7 @@ import { SpringAnimated } from "./spring";
 import { AnimatedColor2 } from "./animatedColor2";
 import { AnimatedNumber2 } from "./animatedNumber";
 import { AnimationEngine } from "./animationEngine";
+import { Point } from "../point";
 
 export const engine = new AnimationEngine();
 
@@ -37,4 +38,45 @@ export const spring = (
   anim.onTick = onTick;
   anim.isAnimating = true;
   engine.addAnimation(anim);
+};
+
+export const springKeyed = (
+  key: {},
+  from: number,
+  to: number,
+  onTick: (currentVal: number, ended: boolean) => void
+) => {
+  const current = engine.getAnim(key);
+  if (current) {
+    if (current instanceof SpringAnimated) {
+      current.target = to;
+      current.onTick = onTick;
+    }
+  } else {
+    const anim = new SpringAnimated(from);
+    anim.target = to;
+    anim.onTick = onTick;
+    anim.isAnimating = true;
+    engine.addKeyedAnimation(key, anim);
+  }
+};
+
+export const animatePosition = (position: Point, x: number, y: number) => {
+  const xStart = position.x;
+  const yStart = position.y;
+  if (position.x != x) {
+    springKeyed(position, xStart, x, (v) => {
+      const xNormalized = Math.abs(xStart - v) / Math.abs(x - xStart); //0..1
+      const yInterpolated = yStart + (y - yStart) * xNormalized;
+      position.x = v;
+      position.y = yInterpolated;
+    });
+  } else {
+    springKeyed(position, yStart, y, (v) => {
+      const yNormalized = Math.abs(yStart - v) / Math.abs(y - yStart); //0..1
+      const xInterpolated = xStart + (x - xStart) * yNormalized;
+      position.y = v;
+      position.x = xInterpolated;
+    });
+  }
 };

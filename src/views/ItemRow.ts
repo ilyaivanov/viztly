@@ -1,6 +1,7 @@
 import { c, fontSizes, spacings as sp, spacings } from "../designSystem";
-import { animateColor, spring } from "../infra/animations";
+import { animatePosition, spring } from "../infra/animations";
 import { Canvas } from "../infra/canvas";
+import { isEqual } from "../infra/point";
 import { add } from "../infra/vector";
 import Item from "../itemTree/item";
 import * as icons from "./icons";
@@ -10,7 +11,6 @@ class ItemRow {
   public lastChildY?: number;
   color: string;
 
-  opacity = 1;
   fontSize: number;
   circleR: number;
 
@@ -55,22 +55,19 @@ class ItemRow {
       const iconWidth = level === 0 ? 9 : 6;
       const path = item.isPlaying ? icons.pause : icons.play;
       icons.drawAt(canvas, position.x, position.y, iconWidth, path, color);
-    } else if (item.children.length > 0)
+    } else if (item.children.length > 0) {
       canvas.drawCircle(position, this.circleR, color);
-    else canvas.drawCirclePath(position, this.circleR, color);
+      canvas.drawCirclePath(position, this.circleR, color);
+    } else canvas.drawCirclePath(position, this.circleR, color);
   };
 
   public merge(old: ItemRow) {
     const row = this;
-    if (old.position.y !== row.position.y)
-      spring(old.position.y, row.position.y, (val) => {
-        row.position.y = val;
-      });
-
-    if (old.position.x !== row.position.x)
-      spring(old.position.x, row.position.x, (val) => {
-        row.position.x = val;
-      });
+    if (!isEqual(row.position, old.position)) {
+      const { x, y } = row.position;
+      row.position = old.position;
+      animatePosition(row.position, x, y);
+    }
 
     if (old.fontSize !== row.fontSize)
       spring(old.fontSize, row.fontSize, (val) => {

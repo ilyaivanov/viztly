@@ -6,12 +6,21 @@ export interface Animated {
 const ANIMATION_SLOW_COEF = 1; // how much times to slow animation
 
 export class AnimationEngine {
-  private currentAnimations: Set<Animated> = new Set();
+  private currentAnimations: Map<{}, Animated> = new Map();
   private lastTime: number = 0;
+
   addAnimation(val: Animated) {
     if (this.currentAnimations.size === 0) requestAnimationFrame(this.tick);
 
-    this.currentAnimations.add(val);
+    this.currentAnimations.set(Math.random(), val);
+  }
+
+  getAnim = (key: {}) => this.currentAnimations.get(key);
+
+  addKeyedAnimation(key: {}, val: Animated) {
+    if (this.currentAnimations.size === 0) requestAnimationFrame(this.tick);
+
+    this.currentAnimations.set(key, val);
   }
 
   private tick = (currentTime: number) => {
@@ -19,12 +28,12 @@ export class AnimationEngine {
 
     this.lastTime = currentTime;
 
-    const animationsToRemove: Animated[] = [];
-    this.currentAnimations.forEach((a) => {
+    const animationsToRemove: {}[] = [];
+    Array.from(this.currentAnimations.entries()).forEach(([key, a]) => {
       a.tick(deltaTime / ANIMATION_SLOW_COEF);
-      if (!a.isAnimating) animationsToRemove.push(a);
+      if (!a.isAnimating) animationsToRemove.push(key);
     });
-    animationsToRemove.forEach((a) => this.currentAnimations.delete(a));
+    animationsToRemove.forEach((key) => this.currentAnimations.delete(key));
 
     if (this.currentAnimations.size !== 0) requestAnimationFrame(this.tick);
     else this.lastTime = 0;

@@ -1,4 +1,4 @@
-import { engine, spring } from "./infra/animations";
+import { animatePosition, engine } from "./infra/animations";
 import { Canvas } from "./infra/canvas";
 import { TreeView } from "./controllers/treeView";
 import Scrollbar from "./controllers/scrollbar";
@@ -9,6 +9,8 @@ import Tree from "./itemTree/tree";
 import Footer from "./views/footer";
 import * as modal from "./views/modal";
 import { updateInputCoordinates } from "./views/itemInput";
+import { Point } from "./infra/point";
+import { Line } from "./primitives";
 
 const canvas = new Canvas();
 
@@ -35,20 +37,29 @@ const input = new KeyboardHandler(
 
 canvas.onResize = () => render();
 
+const line = new Line(canvas);
+
 const render = () => {
   canvas.clear();
+
   canvas.setTranslation(0, -scrollbar.transformY);
 
-  const { ctx } = canvas;
-  ctx.font = `${16}px Segoe UI`;
+  // canvas.ctx.font = `${16}px Segoe UI`;
+  // line.draw();
+
   treeView.draw(canvas);
 
-  ctx.resetTransform();
+  canvas.ctx.resetTransform();
   modal.view(canvas);
   scrollbar.draw();
   const item = treeView.itemToRows.get(tree.selectedNode);
   if (item) updateInputCoordinates(item, scrollbar);
 };
+
+document.addEventListener("click", (e) => {
+  // animatePosition(position, e.clientX, e.clientY);
+  // render();
+});
 
 document.addEventListener("wheel", (e) => {
   scrollbar.translateBy(e.deltaY);
