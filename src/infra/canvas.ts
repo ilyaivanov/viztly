@@ -55,7 +55,7 @@ export class Canvas {
   clear = () => this.ctx.clearRect(-20000, -20000, 40000, 40000);
 
   drawText = (at: Vector, text: string, fontSize: number, color: string) => {
-    this.ctx.font = `${fontSize}px Segoe UI`;
+    this.ctx.font = `${fontSize}px Segoe UI, Ubuntu`;
     this.ctx.fillStyle = color;
     this.ctx.fillText(text, at.x, at.y);
   };
