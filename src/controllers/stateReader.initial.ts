@@ -10,6 +10,13 @@ const createVideo = (title: string, videoId: string, children: Item[] = []) => {
   return res;
 };
 
+const createEmptyPlaylist = (title: string, playlistId: string) => {
+  const res = new Item(title);
+  res.type = "YTplaylist";
+  res.playlistId = playlistId;
+  return res;
+};
+
 const createRoot = (children: Item[]) => createItem("Home", children);
 
 const small = createRoot([
@@ -21,7 +28,16 @@ const small = createRoot([
     ),
     createVideo("CHILL BLUES GUITAR to Relax To...", "NYhKmvglrxk"),
   ]),
-  createItem("Second"),
+  createItem("Second", [
+    createEmptyPlaylist(
+      "Sync24 - Source | Leftfield Records [Full Album]",
+      "PLrz8hHdG8-5BaFU3C8-klOA4L6ws-Lw_b"
+    ),
+    createEmptyPlaylist(
+      "Sync24 - Source | Leftfield Records [Full Album]",
+      "PLrz8hHdG8-5BaFU3C8-klOA4L6ws-Lw_b"
+    ),
+  ]),
 ]);
 
 export default small;
