@@ -14,7 +14,13 @@ export const create = (onInput: (val: string) => void) => {
   input.addEventListener("input", () => onInput(input ? input.value : ""));
 };
 
-export const drawInputAt = (x: number, y: number, h: number, w: number) => {
+export const drawInputAt = (
+  x: number,
+  y: number,
+  h: number,
+  w: number,
+  opacity: number
+) => {
   if (input) {
     const { style } = input;
 
@@ -23,5 +29,6 @@ export const drawInputAt = (x: number, y: number, h: number, w: number) => {
     style.left = x + "px";
     style.top = y + "px";
     style.color = "black";
+    style.opacity = opacity + "";
   }
 };

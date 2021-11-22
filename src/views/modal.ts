@@ -61,8 +61,8 @@ export const showModal = (tree: Tree, draw: () => void) => {
 };
 
 export const view = (canvas: Canvas) => {
-  const progressNormalized = state.progress / 100;
   if (state.isShown) {
+    const progressNormalized = Math.max(state.progress / 100, 0);
     canvas.ctx.fillStyle = `rgba(0,0,0,${progressNormalized * 0.3})`;
     canvas.ctx.fillRect(0, 0, canvas.width, canvas.height);
     canvas.ctx.globalAlpha = progressNormalized;
@@ -96,7 +96,13 @@ export const view = (canvas: Canvas) => {
     canvas.ctx.fillStyle = `rgb(255,255,255)`;
     canvas.ctx.fill();
 
-    drawInputAt(inputX + 5, inputY, inputHeight, inputWidth - 10);
+    drawInputAt(
+      inputX + 5,
+      inputY,
+      inputHeight,
+      inputWidth - 10,
+      progressNormalized
+    );
 
     const base = 25;
     items.forEach((row, i) => {
