@@ -69,6 +69,8 @@ export class TreeView {
       const res = new ItemRow(item, level, offset);
 
       offset += halfOfHeight;
+
+      if (item.isLoading) offset += 15;
       return res;
     };
     const newRows = localRoot.isRoot()

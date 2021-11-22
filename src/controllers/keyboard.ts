@@ -60,6 +60,29 @@ class KeyboardHandler {
         else if (e.altKey) tree.focusOnParent();
         else tree.selectParentOrCloseSelected();
       } else if (e.code === "ArrowRight") {
+        if (
+          tree.selectedNode.type === "YTplaylist" &&
+          tree.selectedNode.children.length === 0
+        ) {
+          tree.selectedNode.isLoading = true;
+
+          setTimeout(() => {
+            tree.selectedNode.isLoading = false;
+            tree.selectedNode.isOpen = true;
+            tree.selectedNode.setChildren([
+              new Item("Fooo"),
+              new Item("Bar"),
+              new Item("Buz", [
+                new Item("Buzaardy child"),
+                new Item("Buzaardazsh"),
+                new Item("Buzaardopolis"),
+              ]),
+              new Item("Buzaard"),
+            ]);
+
+            onKeyHandled();
+          }, 1000);
+        }
         if (e.shiftKey && e.altKey) tree.moveItemRight();
         else if (e.altKey) tree.focusOnSelected();
         else tree.selectFirstChildOrOpenSelected();

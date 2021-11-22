@@ -13,9 +13,15 @@ class Item {
   playlistId?: string;
 
   isPlaying?: boolean;
+  isLoading?: boolean;
 
   constructor(public title: string, public children: Item[] = []) {
     this.isOpen = children.length > 0;
+    this.setChildren(children);
+  }
+
+  setChildren(children: Item[]) {
+    this.children = children;
     children.forEach((child) => (child.parent = this));
   }
 

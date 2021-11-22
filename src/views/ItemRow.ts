@@ -45,6 +45,14 @@ class ItemRow {
       );
     }
 
+    if (item.isLoading)
+      canvas.drawText(
+        add(this.getTextPosition(), { x: 10, y: 20 }),
+        "Loading...",
+        fontSize,
+        "gray"
+      );
+
     this.drawIcon(canvas);
     canvas.drawText(this.getTextPosition(), item.title, fontSize, color);
   }
