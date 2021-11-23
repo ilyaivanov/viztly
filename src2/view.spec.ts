@@ -1,5 +1,5 @@
 import { Tree, createItem, remove, createTree } from "./core";
-import { flattenItems } from "./view";
+import { flattenItems, sp, c } from "./view";
 
 describe("Having a bunch of nested items", () => {
   let tree: Tree;
@@ -22,8 +22,16 @@ describe("Having a bunch of nested items", () => {
       "Item 2",
     ]);
 
-    expect(views.map((v) => v.y)).toEqual([20, 40, 60]);
-    expect(views.map((v) => v.x)).toEqual([20, 40, 20]);
+    expect(views.map((v) => v.circlePosition.y)).toEqual([
+      sp.yStep,
+      sp.yStep * 2,
+      sp.yStep * 3,
+    ]);
+    expect(views.map((v) => v.circlePosition.x)).toEqual([
+      sp.xStep,
+      sp.xStep * 2,
+      sp.xStep,
+    ]);
   });
 
   it("removing second item removes it from the list and moves items up", () => {
@@ -33,17 +41,20 @@ describe("Having a bunch of nested items", () => {
 
     expect(views.map((v) => v.item.title)).toEqual(["Item 1", "Item 2"]);
 
-    expect(views.map((v) => v.y)).toEqual([20, 40]);
-    expect(views.map((v) => v.x)).toEqual([20, 20]);
+    expect(views.map((v) => v.circlePosition.y)).toEqual([
+      sp.yStep,
+      sp.yStep * 2,
+    ]);
+    expect(views.map((v) => v.circlePosition.x)).toEqual([sp.xStep, sp.xStep]);
   });
 
   it("Item 1 has a selected color", () => {
     const views = flattenItems(tree);
-    expect(views[0].color).toBe("red");
+    expect(views[0].color).toBe(c.textSelected);
   });
 
   it("Item 2 has a regular color", () => {
     const views = flattenItems(tree);
-    expect(views[1].color).toBe("white");
+    expect(views[1].color).toBe(c.textRegular);
   });
 });

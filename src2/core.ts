@@ -56,6 +56,28 @@ export const selectItem = (tree: Tree, item: Item) => {
   tree.selectedItem.isSelected = true;
 };
 
+export const selectParent = (tree: Tree, item: Item) => {
+  if (item.parent && item.parent !== tree.root) {
+    selectItem(tree, item.parent);
+  }
+};
+
+export const selectFirstChild = (tree: Tree, item: Item) => {
+  if (hasChildren(item)) {
+    selectItem(tree, item.children[0]);
+  }
+};
+
+export const closeItem = (item: Item) => {
+  item.isOpen = false;
+};
+
+export const openItem = (item: Item) => {
+  item.isOpen = true;
+};
+
+export const hasChildren = (item: Item) => item.children.length > 0;
+
 // //this goes down into children
 const getItemBelow = (item: Item): Item | undefined => {
   if (item.isOpen && item.children) return item.children![0];
