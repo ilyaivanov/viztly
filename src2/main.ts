@@ -1,5 +1,10 @@
 import { Canvas } from "../src/infra/canvas";
-import { createItem, createTree } from "./core";
+import {
+  createItem,
+  createTree,
+  selectNextItem,
+  selectPreviousItem,
+} from "./core";
 import { flattenItems, ItemView } from "./view";
 
 const canvas = new Canvas();
@@ -12,7 +17,7 @@ const tree = createTree(
     createItem("Item 2"),
   ])
 );
-const rows = flattenItems(tree);
+let rows = flattenItems(tree);
 
 const drawItem = (view: ItemView) => {
   canvas.ctx.fillStyle = view.color;
@@ -21,9 +26,22 @@ const drawItem = (view: ItemView) => {
 };
 
 const render = () => {
+  canvas.clear();
   canvas.ctx.font = `18px Segoe UI`;
   rows.forEach(drawItem);
 };
 
 render();
 canvas.onResize = render;
+
+const updateRows = () => {
+  rows = flattenItems(tree);
+};
+
+document.addEventListener("keydown", (e) => {
+  if (e.code === "ArrowDown") selectNextItem(tree);
+  if (e.code === "ArrowUp") selectPreviousItem(tree);
+
+  updateRows();
+  render();
+});
