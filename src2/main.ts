@@ -1,5 +1,6 @@
 import { Canvas } from "../src/infra/canvas";
-import { createItem, createTree, flattenItems, Item, ItemView } from "./core";
+import { createItem, createTree } from "./core";
+import { flattenItems, ItemView } from "./view";
 
 const canvas = new Canvas();
 
