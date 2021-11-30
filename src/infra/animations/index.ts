@@ -64,7 +64,9 @@ export const springKeyed = (
 export const animatePosition = (position: Point, x: number, y: number) => {
   const xStart = position.x;
   const yStart = position.y;
-  if (position.x != x) {
+  const yDiff = Math.abs(yStart - position.y);
+  const xDiff = Math.abs(xStart - position.x);
+  if (xDiff > yDiff) {
     springKeyed(position, xStart, x, (v) => {
       const xNormalized = Math.abs(xStart - v) / Math.abs(x - xStart); //0..1
       const yInterpolated = yStart + (y - yStart) * xNormalized;

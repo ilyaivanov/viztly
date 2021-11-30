@@ -1,7 +1,9 @@
+import { engine } from "../src/infra/animations";
 import { Canvas } from "../src/infra/canvas";
 import {
   closeItem,
   createItem,
+  createItemClosed,
   createTree,
   openItem,
   selectFirstChild,
@@ -9,7 +11,7 @@ import {
   selectParent,
   selectPreviousItem,
 } from "./core";
-import { flattenItems, ItemView, sp } from "./view";
+import { createList, forEachView, ItemView, sp, updateList } from "./view";
 
 const canvas = new Canvas();
 
@@ -34,6 +36,16 @@ const tree = createTree(
         createItem("Item 2.1.6"),
       ]),
     ]),
+    createItemClosed("Item 3", [
+      createItem("Item 3.1", [
+        createItem("Item 3.1.1"),
+        createItem("Item 3.1.2"),
+        createItem("Item 3.1.3"),
+        createItem("Item 3.1.4"),
+        createItem("Item 3.1.5"),
+        createItem("Item 3.1.6"),
+      ]),
+    ]),
     createItem("Item 3"),
     createItem("Item 4"),
     createItem("Item 5"),
@@ -42,29 +54,26 @@ const tree = createTree(
     createItem("Item 8"),
   ])
 );
-let rows = flattenItems(tree);
+let list = createList(tree);
 
 const drawItem = (view: ItemView) => {
   const { item } = view;
+  canvas.ctx.globalAlpha = view.opacity;
   canvas.ctx.fillStyle = view.color;
-  canvas.drawCirclePath(view.circlePosition, view.circleRadius, view.color);
+  canvas.drawCirclePath(view.position, view.circleRadius, view.color);
   if (!view.isCircleEmpty)
-    canvas.drawCircle(view.circlePosition, view.circleRadius, view.color);
+    canvas.drawCircle(view.position, view.circleRadius, view.color);
   canvas.drawText(view.textPosition, item.title, sp.fontSize, view.color);
 };
 
 const render = () => {
   canvas.clear();
   canvas.ctx.font = `${sp.fontSize}px Segoe UI`;
-  rows.forEach(drawItem);
+  forEachView(list, drawItem);
 };
 
 render();
 canvas.onResize = render;
-
-const updateRows = () => {
-  rows = flattenItems(tree);
-};
 
 document.addEventListener("keydown", (e) => {
   if (e.code === "ArrowDown") selectNextItem(tree);
@@ -82,6 +91,8 @@ document.addEventListener("keydown", (e) => {
   }
   if (e.code === "ArrowUp") selectPreviousItem(tree);
 
-  updateRows();
+  updateList(list, tree);
   render();
 });
+
+engine.onTick = render;

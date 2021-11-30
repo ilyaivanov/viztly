@@ -57,6 +57,6 @@ document.addEventListener("wheel", (e) => {
 
 document.body.appendChild(canvas.el);
 
-engine.onTick = render;
+// engine.onTick = render;
 
 render();

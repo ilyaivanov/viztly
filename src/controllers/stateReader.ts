@@ -10,7 +10,7 @@ const db = getFirestore(app);
 const userId = "ilya-test";
 const docRef = doc(db, "users", userId);
 
-const SHOULD_READ_LOCALSTORAGE = true;
+const SHOULD_READ_LOCALSTORAGE = false;
 
 export const loadLocally = (): Item => {
   const data = localStorage.getItem("items:v1");

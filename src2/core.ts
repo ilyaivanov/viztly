@@ -17,6 +17,15 @@ export const createItem = (title: string, children: Item[] = []): Item => {
   children.forEach((c) => (c.parent = item));
   return item;
 };
+export const createItemClosed = (
+  title: string,
+
+  children: Item[] = []
+): Item => {
+  const item = createItem(title, children);
+  item.isOpen = false;
+  return item;
+};
 
 export const remove = (item: Item) => {
   const parent = item.parent;

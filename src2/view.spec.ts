@@ -1,5 +1,5 @@
 import { Tree, createItem, remove, createTree } from "./core";
-import { flattenItems, sp, c } from "./view";
+import { createList, sp, c, getViews } from "./view";
 
 describe("Having a bunch of nested items", () => {
   let tree: Tree;
@@ -14,7 +14,7 @@ describe("Having a bunch of nested items", () => {
   });
 
   it("should have proper offsets", () => {
-    const views = flattenItems(tree);
+    const views = getViews(createList(tree));
 
     expect(views.map((v) => v.item.title)).toEqual([
       "Item 1",
@@ -22,12 +22,12 @@ describe("Having a bunch of nested items", () => {
       "Item 2",
     ]);
 
-    expect(views.map((v) => v.circlePosition.y)).toEqual([
+    expect(views.map((v) => v.position.y)).toEqual([
       sp.yStep,
       sp.yStep * 2,
       sp.yStep * 3,
     ]);
-    expect(views.map((v) => v.circlePosition.x)).toEqual([
+    expect(views.map((v) => v.position.x)).toEqual([
       sp.xStep,
       sp.xStep * 2,
       sp.xStep,
@@ -37,24 +37,21 @@ describe("Having a bunch of nested items", () => {
   it("removing second item removes it from the list and moves items up", () => {
     remove(tree.root.children[0].children[0]);
 
-    const views = flattenItems(tree);
+    const views = getViews(createList(tree));
 
     expect(views.map((v) => v.item.title)).toEqual(["Item 1", "Item 2"]);
 
-    expect(views.map((v) => v.circlePosition.y)).toEqual([
-      sp.yStep,
-      sp.yStep * 2,
-    ]);
-    expect(views.map((v) => v.circlePosition.x)).toEqual([sp.xStep, sp.xStep]);
+    expect(views.map((v) => v.position.y)).toEqual([sp.yStep, sp.yStep * 2]);
+    expect(views.map((v) => v.position.x)).toEqual([sp.xStep, sp.xStep]);
   });
 
   it("Item 1 has a selected color", () => {
-    const views = flattenItems(tree);
+    const views = getViews(createList(tree));
     expect(views[0].color).toBe(c.textSelected);
   });
 
   it("Item 2 has a regular color", () => {
-    const views = flattenItems(tree);
+    const views = getViews(createList(tree));
     expect(views[1].color).toBe(c.textRegular);
   });
 });
