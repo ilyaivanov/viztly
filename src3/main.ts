@@ -1,13 +1,14 @@
-import { engine } from "../src/infra/animations";
+import { engine, spring } from "../src/infra/animations";
 import { Canvas } from "../src/infra/canvas";
-import { createItem, Item, Tree } from "../src2/core";
+import { Item, selectNextItem, selectPreviousItem, Tree } from "../src2/core";
+import { tree } from "./initialState";
 
 const canvas = new Canvas();
 
 document.body.appendChild(canvas.el);
 
 const mapTree = <T>(
-  { root }: Tree,
+  root: Item,
   map: (item: Item, offset: number, level: number) => T
 ): T[] => {
   const res: T[] = [];
@@ -24,53 +25,79 @@ const mapTree = <T>(
   traverseChildren(root, 0);
   return res;
 };
-const tree: Tree = {
-  root: createItem("Root", [
-    createItem("Music", [
-      createItem("Carbon Based Lifeforms", [
-        createItem("1998 - The Path"),
-        createItem("2003 - Hydroponic Garden"),
-        createItem("2006 - World Of Sleepers"),
-        createItem("2010 - Interloper"),
-        createItem("2011 - Twentythree"),
-        createItem("2013 - Refuge"),
-        createItem("2016 - Alt:01"),
-        createItem("2017 - Derelicts"),
-        createItem("2020 - ALT:02"),
-      ]),
-      createItem("Sync24"),
-      createItem("Solar Fields"),
-    ]),
-    createItem("Tasks"),
-  ]),
+
+const start = 50;
+const xStep = 20;
+const yStep = 20;
+const map = new Map<Item, ItemView>();
+
+const createView = (item: Item, index: number, level: number): ItemView => ({
+  x: start + xStep * level,
+  y: start + yStep * index,
+  index,
+  level,
+  item,
+  opacity: 1,
+});
+
+mapTree(tree.root, (item, index, level) => {
+  map.set(item, createView(item, index, level));
+});
+
+const updatePositions = (tree: Tree) => {
+  mapTree(tree.root, (item, index, level) => {
+    const view = map.get(item);
+    if (view) {
+      if (view.index !== index) {
+        spring(start + yStep * view.index, start + yStep * index, (v) => {
+          view.y = v;
+        });
+        view.index = index;
+      }
+    }
+  });
+};
+
+const remove = () => {
+  const itemToRemove = tree.selectedItem;
+  const parent = itemToRemove?.parent;
+  if (itemToRemove && parent) {
+    selectPreviousItem(tree);
+    parent.children = parent.children.filter((i) => i !== itemToRemove);
+    startRemovalAnimation(itemToRemove);
+    mapTree(itemToRemove, (item) => {
+      startRemovalAnimation(item);
+    });
+  }
+};
+
+const startRemovalAnimation = (item: Item) => {
+  const view = map.get(item);
+  if (view) {
+    const start = view.x;
+    const end = view.x - 20;
+    spring(start, end, (v, isDone) => {
+      view.x = v;
+      view.opacity = Math.max((v - end) / (start - end), 0);
+      if (isDone) {
+        map.delete(view.item);
+        updatePositions(tree);
+      }
+    });
+  }
 };
 
 const render = () => {
   canvas.clear();
-
-  canvas.ctx.fillStyle = "white";
-
-  const start = 50;
-  const xStep = 20;
-  const yStep = 20;
-  const map = new Map<Item, ItemView>();
-  const views = mapTree(tree, (item, index, level) => {
-    const view = {
-      x: start + xStep * level,
-      y: start + yStep * index,
-      level,
-      item,
-    };
-    map.set(item, view);
-    return view;
-  });
-
+  const views = Array.from(map.values());
   views.forEach((view) => {
     const parent = view.item.parent;
     if (parent) {
       const parentView = map.get(parent);
-      if (parentView)
+      if (parentView) {
+        canvas.ctx.globalAlpha = view.opacity;
         drawItemConnection(view.x, view.y, parentView.x, parentView.y);
+      }
     }
   });
 
@@ -80,14 +107,18 @@ const render = () => {
 type ItemView = {
   x: number;
   y: number;
+  opacity: number;
+  index: number;
   level: number;
   item: Item;
 };
 
-const drawItem = ({ item, x, y }: ItemView) => {
+const drawItem = ({ item, x, y, opacity }: ItemView) => {
+  canvas.ctx.globalAlpha = opacity;
   const fontSize = 14;
+  canvas.ctx.fillStyle = item.isSelected ? "#ACE854" : "white";
   canvas.ctx.font = `${fontSize}px 'Ubuntu', sans-serif`;
-  canvas.drawCircle({ x, y }, 3, "white");
+  canvas.drawCircle({ x, y }, 3, item.isSelected ? "#ACE854" : "white");
   canvas.ctx.fillText(item.title, x + 10, y + 0.32 * fontSize);
 };
 
@@ -105,6 +136,9 @@ render();
 canvas.onResize = render;
 
 document.addEventListener("keydown", (e) => {
+  if (e.code === "Space") remove();
+  if (e.code === "ArrowDown") selectNextItem(tree);
+  if (e.code === "ArrowUp") selectPreviousItem(tree);
   render();
 });
 

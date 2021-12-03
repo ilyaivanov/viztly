@@ -1,6 +1,6 @@
 import {
   Tree,
-  createItem,
+  createItemTree,
   createTree,
   selectNextItem,
   selectPreviousItem,
@@ -12,10 +12,12 @@ describe("Having a bit of nested items", () => {
 
   beforeEach(() => {
     tree = createTree(
-      createItem("root", [
-        createItem("i1", [createItem("i1.1", [createItem("i1.1.1")])]),
-        createItem("i2"),
-        createItem("i3"),
+      createItemTree("root", [
+        createItemTree("i1", [
+          createItemTree("i1.1", [createItemTree("i1.1.1")]),
+        ]),
+        createItemTree("i2"),
+        createItemTree("i3"),
       ])
     );
   });

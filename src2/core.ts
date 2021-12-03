@@ -2,6 +2,7 @@ export type Item = {
   title: string;
   children: Item[];
   isOpen: boolean;
+  view: "tree" | "board";
   parent?: Item;
   isSelected?: boolean;
 };
@@ -11,18 +12,29 @@ export type Tree = {
   selectedItem?: Item;
 };
 
-export const createItem = (title: string, children: Item[] = []): Item => {
+const createItem = (
+  title: string,
+  view: "tree" | "board",
+  children: Item[]
+) => {
   const isOpen = children.length > 0;
-  const item: Item = { title, isOpen, children };
+  const item: Item = { title, isOpen, view: view, children };
   children.forEach((c) => (c.parent = item));
   return item;
 };
+
+export const createItemTree = (title: string, children: Item[] = []): Item =>
+  createItem(title, "tree", children);
+
+export const createItemBoard = (title: string, children: Item[] = []): Item =>
+  createItem(title, "board", children);
+
 export const createItemClosed = (
   title: string,
 
   children: Item[] = []
 ): Item => {
-  const item = createItem(title, children);
+  const item = createItemTree(title, children);
   item.isOpen = false;
   return item;
 };

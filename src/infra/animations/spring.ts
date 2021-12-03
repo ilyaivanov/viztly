@@ -9,7 +9,7 @@ export class SpringAnimated implements Animated {
   private last: number;
 
   // { stiffness: 0.02, damping: 2, invertedMass: 0.2 },
-  stiffness = 0.02;
+  stiffness = 0.017;
   damping = 1.2;
   invertedMass = 0.28;
 

@@ -1,4 +1,4 @@
-import { Tree, createItem, remove, createTree } from "./core";
+import { Tree, createItemTree, remove, createTree } from "./core";
 import { createList, sp, c, getViews } from "./view";
 
 describe("Having a bunch of nested items", () => {
@@ -6,9 +6,9 @@ describe("Having a bunch of nested items", () => {
 
   beforeEach(() => {
     tree = createTree(
-      createItem("root", [
-        createItem("Item 1", [createItem("Item 1.1")]),
-        createItem("Item 2"),
+      createItemTree("root", [
+        createItemTree("Item 1", [createItemTree("Item 1.1")]),
+        createItemTree("Item 2"),
       ])
     );
   });
