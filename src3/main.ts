@@ -168,7 +168,6 @@ document.addEventListener("keydown", (e) => {
       const s = tree.selectedItem;
       if (s) {
         s.view = s.view === "board" ? "tree" : "board";
-        updateViews(tree.root);
       }
     } else remove();
   } else if (e.code === "ArrowRight") {
@@ -183,6 +182,8 @@ document.addEventListener("keydown", (e) => {
     } else if (tree.selectedItem) t.selectParent(tree, tree.selectedItem);
   } else if (e.code === "ArrowDown") t.selectNextItem(tree);
   else if (e.code === "ArrowUp") t.selectPreviousItem(tree);
+
+  updateViews(tree.root);
   render();
 });
 

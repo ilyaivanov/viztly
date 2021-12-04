@@ -130,7 +130,10 @@ export const hasChildren = (item: Item) => item.children.length > 0;
 // //this goes down into children
 const getItemBelow = (item: Item): Item | undefined => {
   if (item.isOpen && item.children) return item.children![0];
-
+  if (item.parent?.view === "board") {
+    if (!isLast(item.parent)) return getFollowingItem(item.parent);
+    else if (item.parent.parent) return getFollowingItem(item.parent.parent);
+  }
   const followingItem = getFollowingItem(item);
   if (followingItem) return followingItem;
   else {
@@ -140,7 +143,9 @@ const getItemBelow = (item: Item): Item | undefined => {
     }
     if (parent) {
       if (parent.parent && parent.parent.view === "board") {
-        return getFollowingItem(parent.parent);
+        if (!isLast(parent.parent)) return getFollowingItem(parent.parent);
+        else if (parent.parent.parent)
+          return getFollowingItem(parent.parent.parent);
       }
       return getFollowingItem(parent);
     }
