@@ -1,16 +1,16 @@
 import { engine } from "../src/infra/animations";
 import { Canvas } from "../src/infra/canvas";
-import { Item, selectNextItem, selectPreviousItem } from "../src2/core";
+import * as t from "./tree";
 import { tree } from "./initialState";
-
+type Item = t.Item;
 const canvas = new Canvas();
 
 document.body.appendChild(canvas.el);
 
-const getTreeWidth = (parent: Item) => {
+const getTreeWidth = (parent: t.Item) => {
   let maxWidth = 0;
 
-  const traverse = (item: Item) => {
+  const traverse = (item: t.Item) => {
     const view = map.get(item);
     if (view) {
       const width =
@@ -32,7 +32,7 @@ const yStep = 20;
 
 //design
 const fontSize = 14;
-const circleToTextDistance = 10;
+const circleToTextDistance = 8;
 
 const updateViews = (root: Item) => {
   map.clear();
@@ -85,7 +85,7 @@ const remove = () => {
   const itemToRemove = tree.selectedItem;
   const parent = itemToRemove?.parent;
   if (itemToRemove && parent) {
-    selectPreviousItem(tree);
+    t.selectPreviousItem(tree);
     parent.children = parent.children.filter((i) => i !== itemToRemove);
     updateViews(tree.root);
   }
@@ -171,9 +171,18 @@ document.addEventListener("keydown", (e) => {
         updateViews(tree.root);
       }
     } else remove();
-  }
-  if (e.code === "ArrowDown") selectNextItem(tree);
-  if (e.code === "ArrowUp") selectPreviousItem(tree);
+  } else if (e.code === "ArrowRight") {
+    if (e.ctrlKey) t.selectTabRight(tree);
+    else if (tree.selectedItem && !tree.selectedItem.isOpen) {
+      t.openItem(tree.selectedItem);
+    } else if (tree.selectedItem) t.selectFirstChild(tree, tree.selectedItem);
+  } else if (e.code === "ArrowLeft") {
+    if (e.ctrlKey) t.selectTabLeft(tree);
+    else if (tree.selectedItem && tree.selectedItem.isOpen) {
+      t.closeItem(tree.selectedItem);
+    } else if (tree.selectedItem) t.selectParent(tree, tree.selectedItem);
+  } else if (e.code === "ArrowDown") t.selectNextItem(tree);
+  else if (e.code === "ArrowUp") t.selectPreviousItem(tree);
   render();
 });
 
