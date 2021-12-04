@@ -1,62 +1,85 @@
-import { engine, spring } from "../src/infra/animations";
+import { engine } from "../src/infra/animations";
 import { Canvas } from "../src/infra/canvas";
-import { Item, selectNextItem, selectPreviousItem, Tree } from "../src2/core";
+import { Item, selectNextItem, selectPreviousItem } from "../src2/core";
 import { tree } from "./initialState";
 
 const canvas = new Canvas();
 
 document.body.appendChild(canvas.el);
 
-const mapTree = <T>(
-  root: Item,
-  map: (item: Item, offset: number, level: number) => T
-): T[] => {
-  const res: T[] = [];
-  let index = 0;
-  const traverseChildren = (parent: Item, level: number) => {
-    parent.isOpen &&
-      parent.children.forEach((item) => {
-        res.push(map(item, index, level));
-        index += 1;
-        traverseChildren(item, level + 1);
-      });
+const getTreeWidth = (parent: Item) => {
+  let maxWidth = 0;
+
+  const traverse = (item: Item) => {
+    const view = map.get(item);
+    if (view) {
+      const width =
+        view.x +
+        canvas.ctx.measureText(item.title).width +
+        circleToTextDistance;
+      maxWidth = Math.max(width, maxWidth);
+    }
+    item.isOpen && item.children.forEach(traverse);
   };
 
-  traverseChildren(root, 0);
-  return res;
+  traverse(parent);
+  return maxWidth;
 };
 
 const start = 50;
 const xStep = 20;
 const yStep = 20;
-const map = new Map<Item, ItemView>();
 
-const createView = (item: Item, index: number, level: number): ItemView => ({
-  x: start + xStep * level,
-  y: start + yStep * index,
-  index,
-  level,
-  item,
-  opacity: 1,
-});
+//design
+const fontSize = 14;
+const circleToTextDistance = 10;
 
-mapTree(tree.root, (item, index, level) => {
-  map.set(item, createView(item, index, level));
-});
+const updateViews = (root: Item) => {
+  map.clear();
 
-const updatePositions = (tree: Tree) => {
-  mapTree(tree.root, (item, index, level) => {
-    const view = map.get(item);
-    if (view) {
-      if (view.index !== index) {
-        spring(start + yStep * view.index, start + yStep * index, (v) => {
-          view.y = v;
+  //returns height of the list
+  const renderList = (x: number, y: number, parent: Item) => {
+    let listStart = y;
+    canvas.ctx.font = `${fontSize}px 'Ubuntu', sans-serif`;
+    parent.children.forEach((item) => {
+      if (item.view === "tree") listStart += renderTreeAt(x, listStart, item);
+      else {
+        map.set(item, createView(x, listStart, item));
+        let tabHeights: number[] = [];
+        let lastTreeWidth = 0;
+        item.children.forEach((child, index) => {
+          tabHeights.push(
+            renderTreeAt(
+              (index == 0 ? x : 0) + xStep + lastTreeWidth,
+              listStart + yStep * 1.4,
+              child
+            )
+          );
+          lastTreeWidth = getTreeWidth(child);
         });
-        view.index = index;
+        listStart +=
+          tabHeights.reduce((val, max) => Math.max(max, val), 0) + yStep * 1.4;
       }
-    }
-  });
+    });
+    return listStart - y + yStep;
+  };
+
+  const renderTreeAt = (
+    x: number,
+    y: number,
+    item: Item,
+    totalHeight = 0
+  ): number => {
+    map.set(item, createView(x, y, item));
+    if (item.isOpen)
+      return totalHeight + renderList(x + xStep, y + yStep, item);
+    else return totalHeight + yStep;
+  };
+
+  renderList(start, start, root);
 };
+
+const map = new Map<Item, ItemView>();
 
 const remove = () => {
   const itemToRemove = tree.selectedItem;
@@ -64,26 +87,7 @@ const remove = () => {
   if (itemToRemove && parent) {
     selectPreviousItem(tree);
     parent.children = parent.children.filter((i) => i !== itemToRemove);
-    startRemovalAnimation(itemToRemove);
-    mapTree(itemToRemove, (item) => {
-      startRemovalAnimation(item);
-    });
-  }
-};
-
-const startRemovalAnimation = (item: Item) => {
-  const view = map.get(item);
-  if (view) {
-    const start = view.x;
-    const end = view.x - 20;
-    spring(start, end, (v, isDone) => {
-      view.x = v;
-      view.opacity = Math.max((v - end) / (start - end), 0);
-      if (isDone) {
-        map.delete(view.item);
-        updatePositions(tree);
-      }
-    });
+    updateViews(tree.root);
   }
 };
 
@@ -96,7 +100,9 @@ const render = () => {
       const parentView = map.get(parent);
       if (parentView) {
         canvas.ctx.globalAlpha = view.opacity;
-        drawItemConnection(view.x, view.y, parentView.x, parentView.y);
+        if (parentView.item.view === "board")
+          drawTabConnection(view.x, view.y, parentView.x, parentView.y);
+        else drawItemConnection(view.x, view.y, parentView.x, parentView.y);
       }
     }
   });
@@ -104,22 +110,30 @@ const render = () => {
   views.forEach((view) => drawItem(view));
 };
 
+const createView = (x: number, y: number, item: Item): ItemView => ({
+  x,
+  y,
+  item,
+  opacity: 1,
+});
+
 type ItemView = {
   x: number;
   y: number;
   opacity: number;
-  index: number;
-  level: number;
   item: Item;
 };
 
 const drawItem = ({ item, x, y, opacity }: ItemView) => {
   canvas.ctx.globalAlpha = opacity;
-  const fontSize = 14;
   canvas.ctx.fillStyle = item.isSelected ? "#ACE854" : "white";
   canvas.ctx.font = `${fontSize}px 'Ubuntu', sans-serif`;
   canvas.drawCircle({ x, y }, 3, item.isSelected ? "#ACE854" : "white");
-  canvas.ctx.fillText(item.title, x + 10, y + 0.32 * fontSize);
+  canvas.ctx.fillText(
+    item.title,
+    x + circleToTextDistance,
+    y + 0.32 * fontSize
+  );
 };
 
 const drawItemConnection = (x1: number, y1: number, x2: number, y2: number) => {
@@ -132,11 +146,32 @@ const drawItemConnection = (x1: number, y1: number, x2: number, y2: number) => {
   canvas.ctx.stroke();
 };
 
+const drawTabConnection = (x1: number, y1: number, x2: number, y2: number) => {
+  canvas.ctx.strokeStyle = "#3C413D";
+  canvas.ctx.lineWidth = 2;
+  const height = Math.abs(y2 - y1);
+  canvas.ctx.beginPath();
+  canvas.ctx.moveTo(x1, y1);
+  canvas.ctx.lineTo(x1, y1 - height / 2);
+  canvas.ctx.lineTo(x2, y1 - height / 2);
+  canvas.ctx.lineTo(x2, y2);
+  canvas.ctx.stroke();
+};
+
+updateViews(tree.root);
 render();
 canvas.onResize = render;
 
 document.addEventListener("keydown", (e) => {
-  if (e.code === "Space") remove();
+  if (e.code === "Space") {
+    if (e.ctrlKey) {
+      const s = tree.selectedItem;
+      if (s) {
+        s.view = s.view === "board" ? "tree" : "board";
+        updateViews(tree.root);
+      }
+    } else remove();
+  }
   if (e.code === "ArrowDown") selectNextItem(tree);
   if (e.code === "ArrowUp") selectPreviousItem(tree);
   render();
