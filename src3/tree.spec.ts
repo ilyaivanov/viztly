@@ -1,6 +1,4 @@
-import { traverseOpenViews } from "../src2/view";
 import {
-  Item,
   Tree,
   createItemTree,
   createTree,
@@ -10,19 +8,31 @@ import {
   createItemBoard,
   selectTabRight,
   selectTabLeft,
+  Item,
 } from "./tree";
+
+const createOpenItem = (title: string, children?: Item[]): Item => {
+  const item = createItemTree(title, children);
+  item.isOpen = !!children && children.length > 0;
+  return item;
+};
+const createOpenBoardItem = (title: string, children?: Item[]): Item => {
+  const item = createItemBoard(title, children);
+  item.isOpen = !!children && children.length > 0;
+  return item;
+};
 
 describe("Having a bit of nested items", () => {
   let tree: Tree;
 
   beforeEach(() => {
     tree = createTree(
-      createItemTree("root", [
-        createItemTree("i1", [
-          createItemTree("i1.1", [createItemTree("i1.1.1")]),
+      createOpenItem("root", [
+        createOpenItem("i1", [
+          createOpenItem("i1.1", [createOpenItem("i1.1.1")]),
         ]),
-        createItemTree("i2"),
-        createItemTree("i3"),
+        createOpenItem("i2"),
+        createOpenItem("i3"),
       ])
     );
   });
@@ -100,13 +110,13 @@ describe("having a board", () => {
   let tree: Tree;
   beforeEach(() => {
     tree = createTree(
-      createItemTree("Root", [
-        createItemBoard("Board", [
-          createItemTree("one", [createItemTree("one child")]),
-          createItemTree("two", [createItemTree("two child")]),
-          createItemTree("three"),
+      createOpenItem("Root", [
+        createOpenBoardItem("Board", [
+          createOpenItem("one", [createOpenItem("one child")]),
+          createOpenItem("two", [createOpenItem("two child")]),
+          createOpenItem("three"),
         ]),
-        createItemTree("Tasks"),
+        createOpenItem("Tasks"),
       ])
     );
   });
@@ -185,11 +195,8 @@ it("having a board as a single element going down from latest child of the first
     ])
   );
 
-  let mLive: Item | undefined;
-  traverseOpenViews(music, (i) => {
-    if (i.title === "M (Live)") mLive = i;
-  });
-  if (!mLive) throw new Error("Cant find M (Live) node");
+  let mLive =
+    music.root.children[0].children[0].children[0].children[0].children[0];
 
   selectItem(music, mLive);
   selectNextItem(music);

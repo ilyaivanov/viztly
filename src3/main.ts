@@ -3,6 +3,9 @@ import { Canvas } from "../src/infra/canvas";
 import * as t from "./tree";
 import { tree } from "./initialState";
 import { onKeyDown } from "./keyboard";
+import { load } from "./persistance";
+
+let localTree = tree;
 type Item = t.Item;
 const canvas = new Canvas();
 
@@ -161,13 +164,19 @@ const drawTabConnection = (x1: number, y1: number, x2: number, y2: number) => {
   canvas.ctx.stroke();
 };
 
-updateViews(tree.root);
+updateViews(localTree.root);
 render();
 canvas.onResize = render;
 
 document.addEventListener("keydown", async (e) => {
-  onKeyDown(tree, e);
-  updateViews(tree.root);
+  if (e.ctrlKey && e.code === "KeyL") {
+    load().then((newTree) => {
+      localTree = newTree;
+      updateViews(localTree.root);
+      render();
+    });
+  } else onKeyDown(localTree, e);
+  updateViews(localTree.root);
   render();
 });
 

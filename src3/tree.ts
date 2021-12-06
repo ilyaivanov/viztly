@@ -1,8 +1,17 @@
 export type Item = {
+  id: string;
   title: string;
   children: Item[];
   isOpen: boolean;
   view: "tree" | "board";
+
+  type: string;
+  videoId?: string;
+  playlistId?: string;
+  channelId?: string;
+  image?: string;
+
+  //non-persisted
   parent?: Item;
   isSelected?: boolean;
 };
@@ -17,8 +26,9 @@ const createItem = (
   view: "tree" | "board",
   children: Item[]
 ) => {
-  const isOpen = children.length > 0;
-  const item: Item = { title, isOpen, view: view, children };
+  const isOpen = false;
+  //TODO: ugly hook, reconsider
+  const item: Item = { title, isOpen, view: view, children } as Item;
   children.forEach((c) => (c.parent = item));
   return item;
 };

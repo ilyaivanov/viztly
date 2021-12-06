@@ -1,3 +1,4 @@
+import { save } from "./persistance";
 import * as t from "./tree";
 
 export const onKeyDown = async (tree: t.Tree, e: KeyboardEvent) => {
@@ -31,45 +32,8 @@ export const onKeyDown = async (tree: t.Tree, e: KeyboardEvent) => {
     } else if (tree.selectedItem) t.selectParent(tree, tree.selectedItem);
   } else if (e.code === "ArrowDown") t.selectNextItem(tree);
   else if (e.code === "ArrowUp") t.selectPreviousItem(tree);
-  else if (e.ctrlKey && e.code === "KeyL") {
+  else if (e.ctrlKey && e.code === "KeyS") {
     e.preventDefault();
-    // open file picker
-    const [fileHandle] = await (window as any).showOpenFilePicker({
-      types: [
-        {
-          description: "Sync Data",
-          accept: {
-            "json/*": [".json"],
-          },
-        },
-      ],
-    });
-
-    if (fileHandle.kind === "file") {
-      // get file contents
-      const fileData = await fileHandle.getFile();
-      const t = await fileData.text();
-      console.log(t);
-    } else if (fileHandle.kind === "directory") {
-      // run directory code
-    }
-  } else if (e.ctrlKey && e.code === "KeyS") {
-    e.preventDefault();
-    // open file picker
-    const fileHandle = await (window as any).showSaveFilePicker({
-      suggestedName: "viztly.json",
-      types: [
-        {
-          description: "JSON File",
-          accept: {
-            "json/*": [".json"],
-          },
-        },
-      ],
-    });
-
-    const myFile = await fileHandle.createWritable();
-    await myFile.write("Some content");
-    await myFile.close();
+    save(tree);
   }
 };
