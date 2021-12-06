@@ -1,9 +1,4 @@
-import {
-  createItemTree,
-  createItemBoard,
-  createTree,
-  Tree,
-} from "../src2/core";
+import { createItemTree, createItemBoard, createTree, Tree } from "./tree";
 
 const small = createItemTree("Root", [
   createItemBoard("Board", [
