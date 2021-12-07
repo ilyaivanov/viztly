@@ -13,7 +13,6 @@ export type Item = {
 
   //non-persisted
   parent?: Item;
-  isSelected?: boolean;
 };
 
 export type Tree = {
@@ -88,7 +87,6 @@ export const remove = (item: Item) => {
 };
 
 export const createTree = (root: Item): Tree => {
-  root.children[0].isSelected = true;
   return { root, selectedItem: root.children[0] };
 };
 
@@ -141,9 +139,7 @@ export const selectTabLeft = (tree: Tree) => {
 };
 
 export const selectItem = (tree: Tree, item: Item) => {
-  if (tree.selectedItem) tree.selectedItem.isSelected = false;
   tree.selectedItem = item;
-  tree.selectedItem.isSelected = true;
 };
 
 export const selectParent = (tree: Tree, item: Item) => {

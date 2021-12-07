@@ -64,7 +64,6 @@ const parse = (serializedTree: string): Tree => {
 const serialize = (tree: Tree): string => {
   function replacer(key: keyof Item, value: unknown) {
     if (key == "parent") return undefined;
-    else if (key == "isSelected") return undefined;
     else return value;
   }
   return JSON.stringify(tree.root, replacer as any);

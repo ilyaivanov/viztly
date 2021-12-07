@@ -128,7 +128,7 @@ type ItemView = {
 };
 
 const drawItem = ({ item, x, y, opacity }: ItemView) => {
-  const color = item.isSelected ? "#ACE854" : "white";
+  const color = item == localTree.selectedItem ? "#ACE854" : "white";
   canvas.ctx.globalAlpha = opacity;
 
   if (item.children.length === 0) {

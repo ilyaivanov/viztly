@@ -49,16 +49,10 @@ describe("Having a bit of nested items", () => {
 
   it("root has no parent", () => expect(tree.root.parent).toBeUndefined());
 
-  it("i1 is selected", () =>
-    expect(tree.root.children[0].isSelected).toBe(true));
-
-  it("i2 is not selected", () =>
-    expect(tree.root.children[1].isSelected).toBeFalsy());
+  it("i1 is selected", () => expect(tree.selectedItem!.title).toBe("i1"));
 
   it("selecting next item unselects i1 and selects i1.1", () => {
     selectNextItem(tree);
-    expect(tree.root.children[0].isSelected).toBeFalsy();
-    expect(tree.root.children[0].children[0].isSelected).toBeTruthy();
     expect(tree.selectedItem!.title).toBe("i1.1");
   });
 
