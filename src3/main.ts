@@ -173,14 +173,7 @@ render();
 canvas.onResize = render;
 
 document.addEventListener("keydown", async (e) => {
-  if (e.ctrlKey && e.code === "KeyL") {
-    loadFromFile().then((newTree) => {
-      localTree = newTree;
-      saveToLocalStorage(localTree);
-      updateViews(localTree.root);
-      render();
-    });
-  } else onKeyDown(localTree, e);
+  await onKeyDown(localTree, e);
   saveToLocalStorage(localTree);
   updateViews(localTree.root);
   render();

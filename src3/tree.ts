@@ -49,6 +49,37 @@ export const createItemClosed = (
   return item;
 };
 
+export const removeSelected = (tree: Tree) => {
+  const itemToRemove = tree.selectedItem;
+  const parent = itemToRemove?.parent;
+  if (itemToRemove && parent) {
+    selectPreviousItem(tree);
+    parent.children = parent.children.filter((i) => i !== itemToRemove);
+  }
+};
+export const toggleView = (tree: Tree) => {
+  const s = tree.selectedItem;
+  if (s) {
+    s.view = s.view === "board" ? "tree" : "board";
+  }
+};
+
+export const moveSelectionRight = (tree: Tree) => {
+  if (
+    tree.selectedItem &&
+    !tree.selectedItem.isOpen &&
+    tree.selectedItem.children.length > 0
+  ) {
+    openItem(tree.selectedItem);
+  } else if (tree.selectedItem) selectFirstChild(tree, tree.selectedItem);
+};
+
+export const moveSelectionLeft = (tree: Tree) => {
+  if (tree.selectedItem && tree.selectedItem.isOpen) {
+    closeItem(tree.selectedItem);
+  } else if (tree.selectedItem) selectParent(tree, tree.selectedItem);
+};
+
 export const remove = (item: Item) => {
   const parent = item.parent;
   if (parent) {
