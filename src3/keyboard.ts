@@ -1,4 +1,4 @@
-import { save } from "./persistance";
+import { saveToFile } from "./persistance";
 import * as t from "./tree";
 
 export const onKeyDown = async (tree: t.Tree, e: KeyboardEvent) => {
@@ -34,6 +34,6 @@ export const onKeyDown = async (tree: t.Tree, e: KeyboardEvent) => {
   else if (e.code === "ArrowUp") t.selectPreviousItem(tree);
   else if (e.ctrlKey && e.code === "KeyS") {
     e.preventDefault();
-    save(tree);
+    saveToFile(tree);
   }
 };

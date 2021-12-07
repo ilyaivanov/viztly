@@ -1,6 +1,6 @@
 import { createTree, Item, Tree } from "./tree";
 
-export const save = async (tree: Tree) => {
+export const saveToFile = async (tree: Tree) => {
   const fileHandle = await (window as any).showSaveFilePicker({
     suggestedName: "viztly.json",
     types: [
@@ -14,17 +14,11 @@ export const save = async (tree: Tree) => {
   });
 
   const myFile = await fileHandle.createWritable();
-
-  function replacer(key: keyof Item, value: unknown) {
-    if (key == "parent") return undefined;
-    else if (key == "isSelected") return undefined;
-    else return value;
-  }
-  await myFile.write(JSON.stringify(tree.root, replacer as any));
+  await myFile.write(serialize(tree));
   await myFile.close();
 };
 
-export const load = async (): Promise<Tree> => {
+export const loadFromFile = async (): Promise<Tree> => {
   const [fileHandle] = await (window as any).showOpenFilePicker({
     types: [
       {
@@ -38,7 +32,20 @@ export const load = async (): Promise<Tree> => {
 
   const fileData = await fileHandle.getFile();
   const t = await fileData.text();
-  const root: Item = JSON.parse(t);
+  return parse(t);
+};
+
+export const saveToLocalStorage = (tree: Tree) => {
+  localStorage.setItem("viztly:v2", serialize(tree));
+};
+
+export const loadFromLocalStorage = (): Tree | undefined => {
+  const serialized = localStorage.getItem("viztly:v2");
+  return serialized ? parse(serialized) : undefined;
+};
+
+const parse = (serializedTree: string): Tree => {
+  const root: Item = JSON.parse(serializedTree);
 
   const mapItem = (item: Item): Item => {
     const res: Item = item;
@@ -52,4 +59,13 @@ export const load = async (): Promise<Tree> => {
 
   const rootParsed = mapItem(root);
   return createTree(rootParsed);
+};
+
+const serialize = (tree: Tree): string => {
+  function replacer(key: keyof Item, value: unknown) {
+    if (key == "parent") return undefined;
+    else if (key == "isSelected") return undefined;
+    else return value;
+  }
+  return JSON.stringify(tree.root, replacer as any);
 };

@@ -3,9 +3,13 @@ import { Canvas } from "../src/infra/canvas";
 import * as t from "./tree";
 import { tree } from "./initialState";
 import { onKeyDown } from "./keyboard";
-import { load } from "./persistance";
+import {
+  loadFromFile,
+  loadFromLocalStorage,
+  saveToLocalStorage,
+} from "./persistance";
 
-let localTree = tree;
+let localTree = loadFromLocalStorage() || tree;
 type Item = t.Item;
 const canvas = new Canvas();
 
@@ -170,12 +174,14 @@ canvas.onResize = render;
 
 document.addEventListener("keydown", async (e) => {
   if (e.ctrlKey && e.code === "KeyL") {
-    load().then((newTree) => {
+    loadFromFile().then((newTree) => {
       localTree = newTree;
+      saveToLocalStorage(localTree);
       updateViews(localTree.root);
       render();
     });
   } else onKeyDown(localTree, e);
+  saveToLocalStorage(localTree);
   updateViews(localTree.root);
   render();
 });
