@@ -1,30 +1,25 @@
 import { engine } from "../src/infra/animations";
 import { Canvas } from "../src/infra/canvas";
-import * as t from "./tree";
-import { tree } from "./initialState";
 import { onKeyDown } from "./keyboard";
-import {
-  loadFromFile,
-  loadFromLocalStorage,
-  saveToLocalStorage,
-} from "./persistance";
+import { loadFromLocalStorage, saveToLocalStorage } from "./persistance";
+import { isEditing, stopEditing } from "./itemInput";
+import { sp } from "./design";
 
-let localTree = loadFromLocalStorage() || tree;
-type Item = t.Item;
+let localTree = loadFromLocalStorage();
 const canvas = new Canvas();
 
 document.body.appendChild(canvas.el);
 
-const getTreeWidth = (parent: t.Item) => {
+const getTreeWidth = (parent: Item) => {
   let maxWidth = 0;
 
-  const traverse = (item: t.Item) => {
+  const traverse = (item: Item) => {
     const view = map.get(item);
     if (view) {
       const width =
         view.x +
         canvas.ctx.measureText(item.title).width +
-        circleToTextDistance;
+        sp.circleToTextDistance;
       maxWidth = Math.max(width, maxWidth);
     }
     item.isOpen && item.children.forEach(traverse);
@@ -34,21 +29,14 @@ const getTreeWidth = (parent: t.Item) => {
   return maxWidth;
 };
 
-const start = 50;
-const xStep = 20;
-const yStep = 20;
-
-//design
-const fontSize = 14;
-const circleToTextDistance = 8;
-
 const updateViews = (root: Item) => {
   map.clear();
+  console.log("rebulding views map");
 
   //returns height of the list
   const renderList = (x: number, y: number, parent: Item) => {
     let listStart = y;
-    canvas.ctx.font = `${fontSize}px 'Segoe UI', sans-serif`;
+    canvas.ctx.font = `${sp.fontSize}px 'Segoe UI', sans-serif`;
     parent.children.forEach((item) => {
       if (item.view === "tree") listStart += renderTreeAt(x, listStart, item);
       else {
@@ -59,8 +47,8 @@ const updateViews = (root: Item) => {
           item.children.forEach((child, index) => {
             tabHeights.push(
               renderTreeAt(
-                (index == 0 ? x : 0) + xStep + lastTreeWidth,
-                listStart + yStep * 1.4,
+                (index == 0 ? x : 0) + sp.xStep + lastTreeWidth,
+                listStart + sp.yStep * 1.4,
                 child
               )
             );
@@ -68,13 +56,13 @@ const updateViews = (root: Item) => {
           });
           listStart +=
             tabHeights.reduce((val, max) => Math.max(max, val), 0) +
-            yStep * 1.4;
+            sp.yStep * 1.4;
         } else {
-          listStart += yStep;
+          listStart += sp.yStep;
         }
       }
     });
-    return listStart - y + yStep;
+    return listStart - y + sp.yStep;
   };
 
   const renderTreeAt = (
@@ -85,11 +73,11 @@ const updateViews = (root: Item) => {
   ): number => {
     map.set(item, createView(x, y, item));
     if (item.isOpen)
-      return totalHeight + renderList(x + xStep, y + yStep, item);
-    else return totalHeight + yStep;
+      return totalHeight + renderList(x + sp.xStep, y + sp.yStep, item);
+    else return totalHeight + sp.yStep;
   };
 
-  renderList(start, start, root);
+  renderList(sp.start, sp.start, root);
 };
 
 const map = new Map<Item, ItemView>();
@@ -120,13 +108,6 @@ const createView = (x: number, y: number, item: Item): ItemView => ({
   opacity: 1,
 });
 
-type ItemView = {
-  x: number;
-  y: number;
-  opacity: number;
-  item: Item;
-};
-
 const drawItem = ({ item, x, y, opacity }: ItemView) => {
   const color = item == localTree.selectedItem ? "#ACE854" : "white";
   canvas.ctx.globalAlpha = opacity;
@@ -137,13 +118,15 @@ const drawItem = ({ item, x, y, opacity }: ItemView) => {
     canvas.drawCirclePath({ x, y }, 3, color);
   } else canvas.drawCircle({ x, y }, 3, color);
 
-  canvas.ctx.fillStyle = color;
-  canvas.ctx.font = `${fontSize}px 'Segoe UI', sans-serif`;
-  canvas.ctx.fillText(
-    item.title,
-    x + circleToTextDistance,
-    y + 0.32 * fontSize
-  );
+  if (item !== localTree.itemEdited) {
+    canvas.ctx.fillStyle = color;
+    canvas.ctx.font = `${sp.fontSize}px 'Segoe UI', sans-serif`;
+    canvas.ctx.fillText(
+      item.title,
+      x + sp.circleToTextDistance,
+      y + 0.32 * sp.fontSize
+    );
+  }
 };
 
 const drawItemConnection = (x1: number, y1: number, x2: number, y2: number) => {
@@ -173,7 +156,12 @@ render();
 canvas.onResize = render;
 
 document.addEventListener("keydown", async (e) => {
-  await onKeyDown(localTree, e);
+  if (isEditing()) {
+    if (e.code === "Enter" || e.code === "NumpadEnter") stopEditing();
+    return;
+  }
+
+  await onKeyDown(localTree, e, map);
   saveToLocalStorage(localTree);
   updateViews(localTree.root);
   render();

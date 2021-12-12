@@ -1,12 +1,18 @@
+import { sp } from "./design";
+import { renderInputAt } from "./itemInput";
 import { loadFromFile, saveToFile } from "./persistance";
 import * as t from "./tree";
 
-export const onKeyDown = async (tree: t.Tree, e: KeyboardEvent) => {
+export const onKeyDown = async (
+  tree: t.Tree,
+  e: KeyboardEvent,
+  map: Map<Item, ItemView>
+) => {
   const commands = keyMap.filter((entry) => match(entry.key, e));
 
   if (commands.length > 0) {
     const commandEntry = selectBestKey(commands);
-    await commandEntry.command(tree);
+    await commandEntry.command(tree, map);
     if (commandEntry.preventDefault) e.preventDefault();
   }
 };
@@ -14,6 +20,25 @@ export const onKeyDown = async (tree: t.Tree, e: KeyboardEvent) => {
 const loadAndSave = async (tree: t.Tree) => {
   const newTree = await loadFromFile();
   Object.assign(tree, newTree);
+};
+
+const startEdit = (localTree: t.Tree, map: Map<Item, ItemView>) => {
+  if (localTree.selectedItem) {
+    const view = map.get(localTree.selectedItem);
+    if (view) {
+      localTree.itemEdited = localTree.selectedItem;
+      renderInputAt(
+        view.x + sp.circleToTextDistance,
+        view.y - 0.32 * sp.fontSize * 2.5,
+        localTree.selectedItem,
+        (v) => {
+          localTree.itemEdited = undefined;
+          if (localTree.selectedItem) localTree.selectedItem.title = v;
+          //need to re-render here
+        }
+      );
+    }
+  }
 };
 
 const keyMap = [
@@ -27,6 +52,7 @@ const keyMap = [
   { key: "up", command: t.selectPreviousItem },
   { key: "ctrl+s", command: saveToFile, preventDefault: true },
   { key: "ctrl+l", command: loadAndSave, preventDefault: true },
+  { key: "e", command: startEdit, preventDefault: true },
 ];
 
 const match = (key: string, event: KeyboardEvent): boolean => {

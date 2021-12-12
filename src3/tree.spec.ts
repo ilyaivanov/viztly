@@ -8,7 +8,6 @@ import {
   createItemBoard,
   selectTabRight,
   selectTabLeft,
-  Item,
 } from "./tree";
 
 const createOpenItem = (title: string, children?: Item[]): Item => {

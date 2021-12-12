@@ -7,11 +7,15 @@ it("having a two items in a tree while second is selected removing selected remo
   );
 
   selectItem(tree, tree.root.children[1]);
-  onKeyDown(tree, {
-    altKey: true,
-    shiftKey: true,
-    code: "Backspace",
-  } as KeyboardEvent);
+  onKeyDown(
+    tree,
+    {
+      altKey: true,
+      shiftKey: true,
+      code: "Backspace",
+    } as KeyboardEvent,
+    new Map()
+  );
 
   expect(tree.selectedItem!.title).toBe("first");
   expect(tree.root.children.length).toBe(1);
@@ -22,9 +26,7 @@ it("having a two items in a tree while first is selected pressing ArrowDown sele
     createItemTree("Root", [createItemTree("first"), createItemTree("second")])
   );
 
-  onKeyDown(tree, {
-    code: "ArrowDown",
-  } as KeyboardEvent);
+  onKeyDown(tree, { code: "ArrowDown" } as KeyboardEvent, new Map());
 
   expect(tree.selectedItem!.title).toBe("second");
 });

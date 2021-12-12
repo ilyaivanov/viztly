@@ -1,4 +1,5 @@
-import { createTree, Item, Tree } from "./tree";
+import { createTree, Tree } from "./tree";
+import { tree } from "./initialState";
 
 export const saveToFile = async (tree: Tree) => {
   const fileHandle = await (window as any).showSaveFilePicker({
@@ -39,9 +40,9 @@ export const saveToLocalStorage = (tree: Tree) => {
   localStorage.setItem("viztly:v2", serialize(tree));
 };
 
-export const loadFromLocalStorage = (): Tree | undefined => {
+export const loadFromLocalStorage = (): Tree => {
   const serialized = localStorage.getItem("viztly:v2");
-  return serialized ? parse(serialized) : undefined;
+  return serialized ? parse(serialized) : tree;
 };
 
 const parse = (serializedTree: string): Tree => {

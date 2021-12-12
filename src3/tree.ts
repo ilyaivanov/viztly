@@ -1,23 +1,7 @@
-export type Item = {
-  id: string;
-  title: string;
-  children: Item[];
-  isOpen: boolean;
-  view: "tree" | "board";
-
-  type: string;
-  videoId?: string;
-  playlistId?: string;
-  channelId?: string;
-  image?: string;
-
-  //non-persisted
-  parent?: Item;
-};
-
 export type Tree = {
   root: Item;
   selectedItem?: Item;
+  itemEdited?: Item;
 };
 
 const createItem = (
