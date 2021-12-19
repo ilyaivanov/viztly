@@ -6,4 +6,6 @@ export const sp = {
   //design
   fontSize: 14,
   circleToTextDistance: 8,
+
+  selectedCircle: "green",
 };
