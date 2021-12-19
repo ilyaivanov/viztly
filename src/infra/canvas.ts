@@ -24,8 +24,6 @@ export class Canvas {
     const scaleFactor = window.devicePixelRatio;
     this.el.width = this.width * scaleFactor;
     this.el.height = this.height * scaleFactor;
-    this.el.style.width = this.width + "px";
-    this.el.style.height = this.height + "px";
     this.ctx.scale(scaleFactor, scaleFactor);
   };
 
