@@ -1,6 +1,6 @@
-import { Canvas } from "./infra/canvas";
-import { createItem, createTree } from "./domain/items";
-import { forEachView, renderViews } from "./view/views";
+import { Canvas } from "./infra";
+import { createItem, createTree } from "./domain";
+import { forEachView, renderViews } from "./view";
 
 const canvas = new Canvas();
 
