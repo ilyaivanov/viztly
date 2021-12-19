@@ -1,6 +1,6 @@
-import { sp } from "../design";
-import { createItem, createTree } from "../items";
-import { renderViews } from "../views";
+import { sp } from "../view/design";
+import { createItem, createTree } from "../domain/items";
+import { renderViews } from "../view/views";
 import { checkItemAt, checkItemAtIsSelected } from "./utils";
 
 describe("having three nested items", () => {
