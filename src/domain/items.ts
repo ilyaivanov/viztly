@@ -1,6 +1,8 @@
-export const createTree = (children: Item[]): Tree => ({
-  root: createRoot(children),
-});
+export const createTree = (children: Item[]): Tree => {
+  const root = createRoot(children);
+  const selectedItem = root.children[0];
+  return { root, selectedItem };
+};
 
 export const createRoot = (children: Item[]) =>
   createItem("Root", "tree", children);

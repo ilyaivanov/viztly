@@ -1,3 +1,4 @@
+//DOMAIN
 type Item = {
   id: string;
   title: string;
@@ -17,4 +18,9 @@ type Item = {
 
 type Tree = {
   root: Item;
+  selectedItem: Item | undefined;
 };
+
+//VIEW
+
+type F1<T> = (a: T) => void;

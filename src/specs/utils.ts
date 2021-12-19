@@ -1,5 +1,4 @@
-import { sp } from "./design";
-import { Circle, Shape, ShapeType, TextShape, Views } from "./views";
+import { sp } from "../view/design";
 
 //x,y is a coordinate of a circle center, everything else is calculated
 export const checkItemAt = (

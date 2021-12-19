@@ -7,5 +7,5 @@ export const sp = {
   fontSize: 14,
   circleToTextDistance: 8,
 
-  selectedCircle: "green",
+  selectedCircle: "#ACE854",
 };
