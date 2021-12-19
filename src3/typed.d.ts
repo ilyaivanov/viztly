@@ -21,3 +21,7 @@ type Item = {
   //non-persisted
   parent?: Item;
 };
+
+type Tree = {
+  root: Item;
+};
