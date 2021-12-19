@@ -4,6 +4,7 @@
   "description": "",
   "scripts": {
     "start": "npm run dev",
+    "test": "jest",
     "test:watch": "jest --watchAll --detectOpenHandles",
     "dev": "webpack serve --mode development",
     "build": "webpack --mode production",
@@ -17,10 +18,7 @@
   "license": "ISC",
   "jest": {
     "preset": "ts-jest",
-    "testEnvironment": "jsdom",
-    "setupFilesAfterEnv": [
-      "./jest.setup.js"
-    ]
+    "testEnvironment": "jsdom"
   },
   "homepage": "https://github.com/ilyaivanov/vanilla-tree",
   "devDependencies": {

@@ -7,7 +7,7 @@ module.exports = (env, argv) => {
   const isProd = argv.mode === "production";
   return {
     devtool: isProd ? undefined : "inline-source-map",
-    entry: "./src4/main.ts",
+    entry: "./src/main.ts",
     output: {
       path: path.resolve(__dirname, "build"),
       filename: "app.[chunkhash].js",
@@ -20,6 +20,7 @@ module.exports = (env, argv) => {
             loader: "ts-loader",
             options: {
               onlyCompileBundledFiles: true,
+              configFile: "tsconfig.webpack.json",
             },
           },
           exclude: /node_modules/,
