@@ -1,6 +1,7 @@
 import { Canvas } from "./infra";
-import { createItem, createTree } from "./domain";
-import { forEachView, renderViews } from "./view";
+import { createItem } from "./domain";
+import { init, handleKeyDown, forEachShape } from "./app";
+import { createRoot } from "./domain/items";
 
 const canvas = new Canvas();
 
@@ -10,24 +11,29 @@ document.body.appendChild(canvas.el);
 document.body.style.margin = 0 + "";
 document.body.style.backgroundColor = "#1e1e1e";
 
-const tree = createTree([
-  createItem("Item 1", "tree", [createItem("Item 1.1")]),
-  createItem("Item 2", "tree", [
-    createItem("Item 2.1", "tree", [
-      createItem("Item 2.1.1"),
-      createItem("Item 2.2.2"),
+const app = init(
+  createRoot([
+    createItem("Item 1", "tree", [createItem("Item 1.1")]),
+    createItem("Item 2", "tree", [
+      createItem("Item 2.1", "tree", [
+        createItem("Item 2.1.1"),
+        createItem("Item 2.2.2"),
+      ]),
+      createItem("Item 2.2"),
     ]),
-    createItem("Item 2.2"),
-  ]),
-  createItem("Item 3"),
-]);
-
-const views: Views = renderViews(tree, 50, 50);
+    createItem("Item 3"),
+  ])
+);
 
 const render = () => {
   canvas.clear();
-  forEachView(views, drawShape);
+  forEachShape(app, drawShape);
 };
+
+document.addEventListener("keydown", (e) => {
+  handleKeyDown(app, e);
+  render();
+});
 
 const drawShape = (shape: Shape) => {
   if (shape.type === "circle")
