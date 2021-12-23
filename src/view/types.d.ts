@@ -15,6 +15,7 @@ type Circle = {
   x: number;
   y: number;
   r: number;
+  filled: boolean;
   color: string;
 };
 

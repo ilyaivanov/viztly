@@ -2,6 +2,7 @@ import {
   forEachOpenChild,
   getItemAbove,
   getItemBelow,
+  isEmpty,
   needsToBeClosed,
   needsToBeOpened,
 } from "./domain/tree.traversal";
@@ -118,6 +119,7 @@ const renderViews = (
         color,
         x: x,
         y: yOffset,
+        filled: !isEmpty(item),
         r: 3,
       };
       const text: TextShape = {

@@ -37,6 +37,8 @@ export const forEachOpenChild = (item: Item, cb: F1<Item>) => {
 export const needsToBeOpened = (item: Item) =>
   !item.isOpen && item.children.length > 0;
 
+export const isEmpty = (item: Item) => item.children.length === 0;
+
 export const needsToBeClosed = (item: Item) => item.isOpen;
 
 const getLastNestedItem = (item: Item): Item => {

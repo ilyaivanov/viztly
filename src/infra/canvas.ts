@@ -50,12 +50,18 @@ export const setTranslation = (x: number, y: number) => {
   canvas.ctx.translate(x, y);
 };
 
-export const drawCircle = (x: number, y: number, r: number, color: string) => {
-  canvas.ctx.fillStyle = color;
-
-  canvas.ctx.beginPath();
-  canvas.ctx.arc(x, y, r, 0, 2 * Math.PI);
-  canvas.ctx.fill();
+export const drawCircle = (circle: Circle) => {
+  const { ctx } = canvas;
+  ctx.beginPath();
+  ctx.arc(circle.x, circle.y, circle.r, 0, 2 * Math.PI);
+  if (circle.filled) {
+    ctx.fillStyle = circle.color;
+    ctx.fill();
+  } else {
+    ctx.strokeStyle = circle.color;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  }
 };
 
 export const drawText = (
@@ -65,7 +71,7 @@ export const drawText = (
   fontSize: number,
   color: string
 ) => {
-  canvas.ctx.font = `${fontSize}px Segoe UI, Ubuntu`;
+  canvas.ctx.font = `${fontSize}px Segoe UI, Ubuntu, Roboto, sans-serif`;
   canvas.ctx.fillStyle = color;
   canvas.ctx.fillText(text, x, y);
 };

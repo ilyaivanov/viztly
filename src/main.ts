@@ -36,8 +36,7 @@ document.addEventListener("keydown", (e) => {
 });
 
 const drawShape = (shape: Shape) => {
-  if (shape.type === "circle")
-    canvas.drawCircle(shape.x, shape.y, shape.r, shape.color);
+  if (shape.type === "circle") canvas.drawCircle(shape);
   if (shape.type === "text")
     canvas.drawText(shape.x, shape.y, shape.text, shape.fontSize, shape.color);
 };
