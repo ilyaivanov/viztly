@@ -1,6 +1,7 @@
 import { createItem, createRoot } from "../domain/items";
 import { check } from "./utils";
-import { AppContent, init, handleKeyDown, select } from "../app";
+import { AppContent, init, select } from "../app";
+import simulation from "./simulation";
 
 describe("Having three nested items", () => {
   let app: AppContent;
@@ -186,23 +187,3 @@ it("When last is selected going down does nothing", () => {
   simulation.pressDown(app);
   check.itemSelectedHasTitle(app, "Item 2");
 });
-
-const simulation = {
-  pressDown: (app: AppContent) =>
-    handleKeyDown(app, { code: "ArrowDown" } as any),
-
-  pressUp: (app: AppContent) => handleKeyDown(app, { code: "ArrowUp" } as any),
-
-  pressLeft: (app: AppContent) =>
-    handleKeyDown(app, { code: "ArrowLeft" } as any),
-
-  pressRight: (app: AppContent) =>
-    handleKeyDown(app, { code: "ArrowRight" } as any),
-
-  removeSelected: (app: AppContent) =>
-    handleKeyDown(app, {
-      altKey: true,
-      shiftKey: true,
-      code: "Backspace",
-    } as any),
-};

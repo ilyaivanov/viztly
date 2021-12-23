@@ -8,6 +8,13 @@ import {
   needsToBeOpened,
 } from "./domain/tree.traversal";
 import { sp } from "./view/design";
+import {
+  addEventListener,
+  finishEdit,
+  getValue,
+  isEditing,
+  renderInputAt,
+} from "./view/itemInput";
 
 type ItemViews = {
   circle: Circle;
@@ -32,6 +39,10 @@ export const init = (root: Item): AppContent => {
     selectedItem: root.children[0],
   };
   renderViews(app, root, sp.start, sp.start);
+
+  addEventListener("onInputBlur", () => {
+    setValueToSelectedItemFromInput(app);
+  });
   return app;
 };
 
@@ -40,6 +51,15 @@ export const forEachShape = (app: AppContent, cb: F1<Shape>) =>
 
 export const handleKeyDown = (app: AppContent, e: KeyboardEvent) => {
   const { selectedItem } = app;
+
+  if (isEditing()) {
+    if (e.code === "Enter" || e.code === "Escape") {
+      setValueToSelectedItemFromInput(app);
+      finishEdit();
+    }
+    return;
+  }
+
   if (selectedItem) {
     if (e.code === "ArrowDown") changeSelection(app, getItemBelow);
     else if (e.code === "ArrowUp") changeSelection(app, getItemAbove);
@@ -51,6 +71,29 @@ export const handleKeyDown = (app: AppContent, e: KeyboardEvent) => {
       else changeSelection(app, (item) => item.children[0]);
     } else if (e.shiftKey && e.altKey && e.code === "Backspace")
       removeItemFromTree(app, selectedItem);
+    else if (e.code === "KeyE") {
+      const view = app.itemsToViews.get(selectedItem);
+      if (view) {
+        view.text.text = "";
+        renderInputAt(
+          view.text.x,
+          view.circle.y - sp.fontSize * 0.32 * 2.5,
+          selectedItem.title
+        );
+      }
+      e.preventDefault();
+    }
+  }
+};
+
+const setValueToSelectedItemFromInput = (app: AppContent) => {
+  if (app.selectedItem) {
+    const newTitle = getValue();
+    const view = app.itemsToViews.get(app.selectedItem);
+    if (view) {
+      view.text.text = newTitle || "";
+      app.selectedItem.title = newTitle || "";
+    }
   }
 };
 

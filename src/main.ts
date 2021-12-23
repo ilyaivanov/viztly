@@ -3,6 +3,9 @@ import { createItem } from "./domain";
 import { init, handleKeyDown, forEachShape } from "./app";
 import { createRoot } from "./domain/items";
 
+//TODO: think about how to gracefully remove dependency from main to itemInput
+import * as input from "./view/itemInput";
+
 const el = canvas.createFullscreenCanvas();
 
 el.style.display = "block";
@@ -42,4 +45,6 @@ const drawShape = (shape: Shape) => {
 };
 
 canvas.addEventListener("resize", render);
+input.addEventListener("onInputBlur", render);
+
 render();

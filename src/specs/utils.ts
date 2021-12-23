@@ -70,9 +70,46 @@ const getClosestShape = (
 const getDistance = (x1: number, y1: number, x2: number, y2: number): number =>
   Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
 
+type InputProps = {
+  top: number;
+  left: number;
+  text: string;
+};
+
 export const check = {
   itemSelectedHasTitle: (app: AppContent, title: string) =>
     expect(app.selectedItem!.title).toBe(title),
+
+  input: (inputProps: InputProps) => {
+    const el = document.getElementById("main-input") as HTMLInputElement;
+    if (el) {
+      if (
+        el.style.top !== inputProps.top + "px" ||
+        el.style.left !== inputProps.left + "px"
+      )
+        throw new Error(
+          `Input has invalid position. Expected ${inputProps.left}px, ${inputProps.top}px; but received ${el.style.left}, ${el.style.top}`
+        );
+
+      if (el.value !== inputProps.text)
+        throw new Error(
+          `Input has invalid value. Expected ${inputProps.text}; but received ${el.value}`
+        );
+    } else {
+      throw new Error(
+        `Can't find an input element. Searched for #main-input element in the body.`
+      );
+    }
+  },
+
+  inputRemoved: () => {
+    const el = document.getElementById("main-input") as HTMLInputElement;
+    if (el) {
+      throw new Error(
+        "Input was expected to be removed from body, but found at #main-input"
+      );
+    }
+  },
 
   itemSelected: (views: Views, gridX: number, gridY: number) =>
     checkItemAtIsSelected(views, toX(gridX), toY(gridY)),
@@ -98,7 +135,9 @@ export const check = {
 
     const coords = `${toX(gridX)},${toY(gridY)}`;
     if (!circle) throw new Error(`Can't find circle at ${coords}`);
-    (Object.keys(props) as (keyof Circle)[]).forEach((key) => {
+    const propsKeys = Object.keys(props) as (keyof Circle)[];
+
+    propsKeys.forEach((key) => {
       const given = circle[key];
       const expected = props[key];
       if (expected !== given) {
