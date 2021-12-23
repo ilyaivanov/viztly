@@ -146,6 +146,7 @@ const updateExistingItemPositions = (app: AppContent, x: number, y: number) => {
     item.children.forEach((item) => {
       const view = app.itemsToViews.get(item);
       if (view) {
+        // duplicated from renderViews
         view.circle.x = x;
         view.circle.y = yOffset;
         view.text.x = x + sp.circleToTextDistance;
