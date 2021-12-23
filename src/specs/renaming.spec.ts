@@ -27,7 +27,7 @@ describe(`When pressing 'e' while focusing on Item 1`, () => {
     check.itemExistsAt(app.views, 1, 1, "New Title");
     check.itemSelectedHasTitle(app, "New Title");
 
-    check.inputRemoved();
+    check.inputDoesNotExist();
   });
 
   it("bluring on text input removes it from the DOM", () => {
@@ -36,7 +36,7 @@ describe(`When pressing 'e' while focusing on Item 1`, () => {
     check.itemExistsAt(app.views, 1, 1, "Item 1");
     check.itemSelectedHasTitle(app, "Item 1");
 
-    check.inputRemoved();
+    check.inputDoesNotExist();
   });
 
   it("pressing down or up should not change selection", () => {

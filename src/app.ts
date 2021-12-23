@@ -1,4 +1,4 @@
-import { removeItem } from "./domain/items";
+import { addItemAfter, createItem, removeItem } from "./domain/items";
 import {
   forEachOpenChild,
   getItemAbove,
@@ -16,7 +16,7 @@ import {
   renderInputAt,
 } from "./view/itemInput";
 
-type ItemViews = {
+type ItemView = {
   circle: Circle;
   text: TextShape;
 };
@@ -28,7 +28,7 @@ export type AppContent = {
 
   //view state
   views: Views;
-  itemsToViews: Map<Item, ItemViews>;
+  itemsToViews: Map<Item, ItemView>;
 };
 
 export const init = (root: Item): AppContent => {
@@ -75,16 +75,30 @@ export const handleKeyDown = (app: AppContent, e: KeyboardEvent) => {
       const view = app.itemsToViews.get(selectedItem);
       if (view) {
         view.text.text = "";
-        renderInputAt(
-          view.text.x,
-          view.circle.y - sp.fontSize * 0.32 * 2.5,
-          selectedItem.title
-        );
+        viewInput(view, selectedItem.title);
       }
       e.preventDefault();
+    } else if (e.code === "Enter") {
+      const newItem: Item = createItem("");
+      const view = app.itemsToViews.get(selectedItem);
+      if (view) {
+        addItemAfter(selectedItem, newItem);
+        const newItemView = renderItem(
+          app,
+          newItem,
+          view.circle.x,
+          view.circle.y + sp.yStep
+        );
+        updateExistingItemPositions(app, sp.start, sp.start);
+        changeSelection(app, () => newItem);
+        viewInput(newItemView, newItem.title);
+      }
     }
   }
 };
+
+const viewInput = (view: ItemView, value: string) =>
+  renderInputAt(view.text.x, view.circle.y - sp.fontSize * 0.32 * 2.5, value);
 
 const setValueToSelectedItemFromInput = (app: AppContent) => {
   if (app.selectedItem) {
@@ -163,26 +177,7 @@ const renderViews = (
   let yOffset = y;
   const renderViewsInner = (item: Item, x: number) => {
     item.children.forEach((item) => {
-      const color = app.selectedItem === item ? sp.selectedCircle : "white";
-      const circle: Circle = {
-        type: "circle",
-        color,
-        x: x,
-        y: yOffset,
-        filled: !isEmpty(item),
-        r: 3,
-      };
-      const text: TextShape = {
-        type: "text",
-        color,
-        x: x + sp.circleToTextDistance,
-        y: yOffset + 0.32 * sp.fontSize,
-        text: item.title,
-        fontSize: sp.fontSize,
-      };
-      app.views.add(circle);
-      app.views.add(text);
-      app.itemsToViews.set(item, { circle, text });
+      renderItem(app, item, x, yOffset);
       yOffset += sp.yStep;
       if (item.isOpen && item.children.length > 0) {
         renderViewsInner(item, x + sp.xStep);
@@ -190,6 +185,36 @@ const renderViews = (
     });
   };
   renderViewsInner(itemFocused, x);
+};
+
+const renderItem = (
+  app: AppContent,
+  item: Item,
+  x: number,
+  y: number
+): ItemView => {
+  const color = app.selectedItem === item ? sp.selectedCircle : "white";
+  const circle: Circle = {
+    type: "circle",
+    color,
+    x: x,
+    y: y,
+    filled: !isEmpty(item),
+    r: 3,
+  };
+  const text: TextShape = {
+    type: "text",
+    color,
+    x: x + sp.circleToTextDistance,
+    y: y + 0.32 * sp.fontSize,
+    text: item.title,
+    fontSize: sp.fontSize,
+  };
+  app.views.add(circle);
+  app.views.add(text);
+  const view: ItemView = { circle, text };
+  app.itemsToViews.set(item, view);
+  return view;
 };
 
 const updateExistingItemPositions = (app: AppContent, x: number, y: number) => {

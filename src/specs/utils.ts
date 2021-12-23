@@ -17,7 +17,7 @@ const checkItemAt = (views: Views, x: number, y: number, title?: string) => {
       `Couldn't find text for item at ${textX},${textY}. Closest text at ${text.x},${text.y}`
     );
 
-  if (title && text.text !== title)
+  if (typeof title === "string" && text.text !== title)
     throw new Error(
       `Found text at correct position, but text has wrong title. Expected: '${title}', given: '${text.text}'`
     );
@@ -102,7 +102,7 @@ export const check = {
     }
   },
 
-  inputRemoved: () => {
+  inputDoesNotExist: () => {
     const el = document.getElementById("main-input") as HTMLInputElement;
     if (el) {
       throw new Error(

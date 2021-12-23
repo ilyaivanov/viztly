@@ -43,3 +43,15 @@ const removeChild = (parent: Item, item: Item) => {
   parent.children = parent.children.filter((c) => c !== item);
   parent.isOpen = parent.children.length !== 0;
 };
+
+export const addItemAfter = (item: Item, itemToAdd: Item) => {
+  const parent = item.parent;
+
+  if (parent) addChildAt(parent, itemToAdd, parent.children.indexOf(item) + 1);
+};
+
+const addChildAt = (parent: Item, item: Item, index: number) => {
+  parent.children.splice(index, 0, item);
+  item.parent = parent;
+  parent.isOpen = true;
+};
