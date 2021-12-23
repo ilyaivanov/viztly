@@ -85,6 +85,51 @@ describe("Having three nested items", () => {
       });
     });
   });
+
+  describe("selecting Item 1.1 and then removing it", () => {
+    beforeEach(() => {
+      simulation.pressRight(app);
+      simulation.removeSelected(app);
+    });
+
+    it("removes Item 1.1", () =>
+      check.notContainItemTitle(app.views, "Item 1.1"));
+
+    it("selectes Item 1", () => check.itemSelected(app.views, 1, 1));
+
+    it("moves Item 1.2 to 1,2 position", () =>
+      check.itemExistsAt(app.views, 2, 2, "Item 1.2"));
+  });
+
+  describe("selecting Item 1 and then removing it", () => {
+    beforeEach(() => {
+      simulation.removeSelected(app);
+    });
+
+    it("removes Item 1, Item 1.1 and Item 1.2", () => {
+      check.notContainItemTitle(app.views, "Item 1");
+      check.notContainItemTitle(app.views, "Item 1.1");
+      check.notContainItemTitle(app.views, "Item 1.2");
+    });
+
+    it("moves Item 2 to 1,1 position", () =>
+      check.itemExistsAt(app.views, 1, 1, "Item 2"));
+
+    it("selects Item 2", () => check.itemSelected(app.views, 1, 1));
+  });
+
+  it("Removing Item 1.1 and Item 1.2 updates circle of Item 1 to empty", () => {
+    simulation.pressDown(app);
+    simulation.pressDown(app);
+    check.itemSelectedHasTitle(app, "Item 1.2");
+
+    check.circleAtHas(app.views, 1, 1, { filled: true });
+
+    simulation.removeSelected(app);
+    simulation.removeSelected(app);
+
+    check.circleAtHas(app.views, 1, 1, { filled: false });
+  });
 });
 
 describe("Having a very deep tree of items", () => {
@@ -153,4 +198,11 @@ const simulation = {
 
   pressRight: (app: AppContent) =>
     handleKeyDown(app, { code: "ArrowRight" } as any),
+
+  removeSelected: (app: AppContent) =>
+    handleKeyDown(app, {
+      altKey: true,
+      shiftKey: true,
+      code: "Backspace",
+    } as any),
 };

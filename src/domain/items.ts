@@ -1,3 +1,5 @@
+import { isRoot } from "./tree.traversal";
+
 export const createRoot = (children: Item[]) =>
   createItem("Root", "tree", children);
 
@@ -16,4 +18,28 @@ export const createItem = (
   };
   children.forEach((c) => (c.parent = item));
   return item;
+};
+
+export const removeItem = (item: Item): Item | undefined => {
+  let selectedItem: Item | undefined;
+  const parent = item.parent;
+  if (parent) {
+    const index = parent.children.indexOf(item);
+    if (index > 0) selectedItem = parent.children[index - 1];
+    else {
+      if (isRoot(parent)) {
+        selectedItem = parent.children[index + 1];
+      } else {
+        selectedItem = parent;
+        parent.isOpen = parent.children.length > 1;
+      }
+    }
+    removeChild(parent, item);
+  }
+  return selectedItem;
+};
+
+const removeChild = (parent: Item, item: Item) => {
+  parent.children = parent.children.filter((c) => c !== item);
+  parent.isOpen = parent.children.length !== 0;
 };

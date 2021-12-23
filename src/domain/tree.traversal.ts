@@ -62,7 +62,4 @@ const getFollowingItem = (item: Item): Item | undefined => {
 };
 
 const isLast = (item: Item): boolean => !getFollowingItem(item);
-const isRoot = (item: Item) => {
-  !item.parent; //?
-  return !item.parent;
-};
+export const isRoot = (item: Item) => !item.parent;

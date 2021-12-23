@@ -1,3 +1,4 @@
+import { removeItem } from "./domain/items";
 import {
   forEachOpenChild,
   getItemAbove,
@@ -14,10 +15,13 @@ type ItemViews = {
 };
 
 export type AppContent = {
-  views: Views;
-  itemsToViews: Map<Item, ItemViews>;
+  //domain state
   root: Item;
   selectedItem: Item | undefined;
+
+  //view state
+  views: Views;
+  itemsToViews: Map<Item, ItemViews>;
 };
 
 export const init = (root: Item): AppContent => {
@@ -45,19 +49,14 @@ export const handleKeyDown = (app: AppContent, e: KeyboardEvent) => {
     } else if (e.code === "ArrowRight") {
       if (needsToBeOpened(selectedItem)) openItem(app, selectedItem);
       else changeSelection(app, (item) => item.children[0]);
-    }
+    } else if (e.shiftKey && e.altKey && e.code === "Backspace")
+      removeItemFromTree(app, selectedItem);
   }
 };
 
 const closeItem = (app: AppContent, item: Item) => {
   item.isOpen = false;
-  forEachOpenChild(item, (child) => {
-    const view = app.itemsToViews.get(child);
-    if (view) {
-      app.views.delete(view.circle);
-      app.views.delete(view.text);
-    }
-  });
+  forEachOpenChild(item, (child) => removeAllItemViews(app, child));
   updateExistingItemPositions(app, sp.start, sp.start);
 };
 
@@ -67,6 +66,14 @@ const openItem = (app: AppContent, item: Item) => {
   if (view) {
     renderViews(app, item, view.circle.x + sp.xStep, view.circle.y + sp.yStep);
   }
+  updateExistingItemPositions(app, sp.start, sp.start);
+};
+
+const removeItemFromTree = (app: AppContent, item: Item) => {
+  const newSelection = removeItem(item);
+  removeAllItemViews(app, item);
+  forEachOpenChild(item, (child) => removeAllItemViews(app, child));
+  changeSelection(app, () => newSelection);
   updateExistingItemPositions(app, sp.start, sp.start);
 };
 
@@ -151,6 +158,9 @@ const updateExistingItemPositions = (app: AppContent, x: number, y: number) => {
         // duplicated from renderViews
         view.circle.x = x;
         view.circle.y = yOffset;
+
+        view.circle.filled = !isEmpty(item);
+
         view.text.x = x + sp.circleToTextDistance;
         view.text.y = yOffset + 0.32 * sp.fontSize;
       }
@@ -161,4 +171,12 @@ const updateExistingItemPositions = (app: AppContent, x: number, y: number) => {
     });
   };
   updateItemPositions(app.root, x);
+};
+
+const removeAllItemViews = (app: AppContent, item: Item) => {
+  const view = app.itemsToViews.get(item);
+  if (view) {
+    app.views.delete(view.circle);
+    app.views.delete(view.text);
+  }
 };

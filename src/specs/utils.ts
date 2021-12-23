@@ -73,25 +73,42 @@ const getDistance = (x1: number, y1: number, x2: number, y2: number): number =>
 export const check = {
   itemSelectedHasTitle: (app: AppContent, title: string) =>
     expect(app.selectedItem!.title).toBe(title),
+
   itemSelected: (views: Views, gridX: number, gridY: number) =>
-    checkItemAtIsSelected(
-      views,
-      sp.start + sp.xStep * (gridX - 1),
-      sp.start + +sp.yStep * (gridY - 1)
-    ),
+    checkItemAtIsSelected(views, toX(gridX), toY(gridY)),
+
   itemUnselected: (views: Views, gridX: number, gridY: number) =>
-    checkItemAtIsNotSelected(
-      views,
-      sp.start + sp.xStep * (gridX - 1),
-      sp.start + +sp.yStep * (gridY - 1)
-    ),
+    checkItemAtIsNotSelected(views, toX(gridX), toY(gridY)),
+
   itemExistsAt: (views: Views, gridX: number, gridY: number, title: string) =>
-    checkItemAt(
+    checkItemAt(views, toX(gridX), toY(gridY), title),
+
+  circleAtHas: (
+    views: Views,
+    gridX: number,
+    gridY: number,
+    props: Partial<Circle>
+  ) => {
+    const circle = getClosestShape(
       views,
-      sp.start + sp.xStep * (gridX - 1),
-      sp.start + +sp.yStep * (gridY - 1),
-      title
-    ),
+      "circle",
+      toX(gridX),
+      toY(gridY)
+    ) as Circle;
+
+    const coords = `${toX(gridX)},${toY(gridY)}`;
+    if (!circle) throw new Error(`Can't find circle at ${coords}`);
+    (Object.keys(props) as (keyof Circle)[]).forEach((key) => {
+      const given = circle[key];
+      const expected = props[key];
+      if (expected !== given) {
+        throw new Error(
+          `Expected ${key} of circle at ${coords} to be ${expected}, but was ${given}`
+        );
+      }
+    });
+  },
+
   notContainItemTitle: (views: Views, title: string) => {
     const v = Array.from(views.values()).find(
       (v) => v.type === "text" && v.text == title
@@ -104,3 +121,6 @@ export const check = {
     }
   },
 };
+
+const toX = (gridX: number) => sp.start + sp.xStep * (gridX - 1);
+const toY = (gridY: number) => sp.start + sp.yStep * (gridY - 1);
