@@ -17,8 +17,8 @@ const onBlur = () => {
 
 export const finishEdit = () => {
   if (input) {
-    input.remove();
     input.removeEventListener("blur", onBlur);
+    input.remove();
     input = undefined;
   }
 };
