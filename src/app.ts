@@ -1,4 +1,10 @@
-import { getItemAbove, getItemBelow } from "./domain/tree.traversal";
+import {
+  forEachOpenChild,
+  getItemAbove,
+  getItemBelow,
+  needsToBeClosed,
+  needsToBeOpened,
+} from "./domain/tree.traversal";
 import { sp } from "./view/design";
 
 type ItemViews = {
@@ -20,7 +26,7 @@ export const init = (root: Item): AppContent => {
     views: new Set(),
     selectedItem: root.children[0],
   };
-  renderViews(app, root, 50, 50);
+  renderViews(app, root, sp.start, sp.start);
   return app;
 };
 
@@ -28,11 +34,39 @@ export const forEachShape = (app: AppContent, cb: F1<Shape>) =>
   app.views.forEach(cb);
 
 export const handleKeyDown = (app: AppContent, e: KeyboardEvent) => {
-  if (e.code === "ArrowDown") {
-    changeSelection(app, getItemBelow);
-  } else if (e.code === "ArrowUp") {
-    changeSelection(app, getItemAbove);
+  const { selectedItem } = app;
+  if (selectedItem) {
+    if (e.code === "ArrowDown") changeSelection(app, getItemBelow);
+    else if (e.code === "ArrowUp") changeSelection(app, getItemAbove);
+    else if (e.code === "ArrowLeft") {
+      if (needsToBeClosed(selectedItem)) closeItem(app, selectedItem);
+      else changeSelection(app, (item) => item.parent);
+    } else if (e.code === "ArrowRight") {
+      if (needsToBeOpened(selectedItem)) openItem(app, selectedItem);
+      else changeSelection(app, (item) => item.children[0]);
+    }
   }
+};
+
+const closeItem = (app: AppContent, item: Item) => {
+  item.isOpen = false;
+  forEachOpenChild(item, (child) => {
+    const view = app.itemsToViews.get(child);
+    if (view) {
+      app.views.delete(view.circle);
+      app.views.delete(view.text);
+    }
+  });
+  updateExistingItemPositions(app, sp.start, sp.start);
+};
+
+const openItem = (app: AppContent, item: Item) => {
+  item.isOpen = true;
+  const view = app.itemsToViews.get(item);
+  if (view) {
+    renderViews(app, item, view.circle.x + sp.xStep, view.circle.y + sp.yStep);
+  }
+  updateExistingItemPositions(app, sp.start, sp.start);
 };
 
 const changeSelection = (
@@ -104,4 +138,24 @@ const renderViews = (
     });
   };
   renderViewsInner(itemFocused, x);
+};
+
+const updateExistingItemPositions = (app: AppContent, x: number, y: number) => {
+  let yOffset = y;
+  const updateItemPositions = (item: Item, x: number) => {
+    item.children.forEach((item) => {
+      const view = app.itemsToViews.get(item);
+      if (view) {
+        view.circle.x = x;
+        view.circle.y = yOffset;
+        view.text.x = x + sp.circleToTextDistance;
+        view.text.y = yOffset + 0.32 * sp.fontSize;
+      }
+      yOffset += sp.yStep;
+      if (item.isOpen && item.children.length > 0) {
+        updateItemPositions(item, x + sp.xStep);
+      }
+    });
+  };
+  updateItemPositions(app.root, x);
 };

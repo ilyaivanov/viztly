@@ -8,8 +8,12 @@ describe("Having three nested items", () => {
   beforeEach(() => {
     app = init(
       createRoot([
-        createItem("Item 1", "tree", [createItem("Item 1.1")]),
-        createItem("Item 2"),
+        createItem("Item 1", "tree", [
+          createItem("Item 1.1"),
+          createItem("Item 1.2"),
+        ]),
+        createItem("Item 2", "tree", [createItem("Item 2.1")]),
+        createItem("Item 3"),
       ])
     );
   });
@@ -20,8 +24,8 @@ describe("Having three nested items", () => {
   it("should have an Item 1.1 at 50+1,50+1", () =>
     check.itemExistsAt(app.views, 2, 2, "Item 1.1"));
 
-  it("should have an Item 2 at 50,50+2", () =>
-    check.itemExistsAt(app.views, 1, 3, "Item 2"));
+  it("should have an Item 2 at 50,50+3", () =>
+    check.itemExistsAt(app.views, 1, 4, "Item 2"));
 
   it("Item 1 is selected", () => check.itemSelected(app.views, 1, 1));
 
@@ -33,6 +37,53 @@ describe("Having three nested items", () => {
     check.itemSelectedHasTitle(app, "Item 1.1");
     check.itemUnselected(app.views, 1, 1);
     check.itemSelected(app.views, 2, 2);
+  });
+
+  it("when Item 1.2 is selected going left selects parent", () => {
+    select(app, app.root.children[0].children[1]);
+
+    simulation.pressLeft(app);
+
+    check.itemSelectedHasTitle(app, "Item 1");
+    check.itemUnselected(app.views, 2, 3);
+  });
+
+  describe("when Item 1 is selected going left", () => {
+    beforeEach(() => {
+      check.itemExistsAt(app.views, 1, 4, "Item 2");
+      check.itemExistsAt(app.views, 2, 5, "Item 2.1");
+      check.itemExistsAt(app.views, 1, 6, "Item 3");
+
+      simulation.pressLeft(app);
+    });
+    it("closes that item", () => {
+      check.notContainItemTitle(app.views, "Item 1.1");
+      check.notContainItemTitle(app.views, "Item 1.2");
+
+      check.itemExistsAt(app.views, 1, 2, "Item 2");
+      check.itemExistsAt(app.views, 2, 3, "Item 2.1");
+      check.itemExistsAt(app.views, 1, 4, "Item 3");
+    });
+
+    describe("going right", () => {
+      beforeEach(() => simulation.pressRight(app));
+
+      it("opens that item", () => {
+        check.itemExistsAt(app.views, 2, 2, "Item 1.1");
+        check.itemExistsAt(app.views, 2, 3, "Item 1.2");
+        check.itemExistsAt(app.views, 1, 4, "Item 2");
+        check.itemExistsAt(app.views, 2, 5, "Item 2.1");
+        check.itemExistsAt(app.views, 1, 6, "Item 3");
+      });
+
+      describe("going right again", () => {
+        beforeEach(() => simulation.pressRight(app));
+
+        it("selected child (Item 1.1)", () => {
+          check.itemSelected(app.views, 2, 2);
+        });
+      });
+    });
   });
 });
 
@@ -96,4 +147,10 @@ const simulation = {
     handleKeyDown(app, { code: "ArrowDown" } as any),
 
   pressUp: (app: AppContent) => handleKeyDown(app, { code: "ArrowUp" } as any),
+
+  pressLeft: (app: AppContent) =>
+    handleKeyDown(app, { code: "ArrowLeft" } as any),
+
+  pressRight: (app: AppContent) =>
+    handleKeyDown(app, { code: "ArrowRight" } as any),
 };

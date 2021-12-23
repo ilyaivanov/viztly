@@ -76,20 +76,31 @@ export const check = {
   itemSelected: (views: Views, gridX: number, gridY: number) =>
     checkItemAtIsSelected(
       views,
-      50 + sp.xStep * (gridX - 1),
-      50 + +sp.yStep * (gridY - 1)
+      sp.start + sp.xStep * (gridX - 1),
+      sp.start + +sp.yStep * (gridY - 1)
     ),
   itemUnselected: (views: Views, gridX: number, gridY: number) =>
     checkItemAtIsNotSelected(
       views,
-      50 + sp.xStep * (gridX - 1),
-      50 + +sp.yStep * (gridY - 1)
+      sp.start + sp.xStep * (gridX - 1),
+      sp.start + +sp.yStep * (gridY - 1)
     ),
   itemExistsAt: (views: Views, gridX: number, gridY: number, title: string) =>
     checkItemAt(
       views,
-      50 + sp.xStep * (gridX - 1),
-      50 + +sp.yStep * (gridY - 1),
+      sp.start + sp.xStep * (gridX - 1),
+      sp.start + +sp.yStep * (gridY - 1),
       title
     ),
+  notContainItemTitle: (views: Views, title: string) => {
+    const v = Array.from(views.values()).find(
+      (v) => v.type === "text" && v.text == title
+    ) as TextShape | undefined;
+    if (v) {
+      const { x, y } = v;
+      throw new Error(
+        `Expected views not to have ${title}, but found at ${x},${y}`
+      );
+    }
+  },
 };

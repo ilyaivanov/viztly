@@ -1,11 +1,3 @@
-const getLastNestedItem = (item: Item): Item => {
-  if (item.isOpen && item.children) {
-    const { children } = item;
-    return getLastNestedItem(children[children.length - 1]);
-  }
-  return item;
-};
-
 export const getItemAbove = (item: Item): Item | undefined => {
   const parent = item.parent;
   if (parent) {
@@ -32,6 +24,29 @@ export const getItemBelow = (item: Item): Item | undefined => {
   }
 };
 
+export const forEachOpenChild = (item: Item, cb: F1<Item>) => {
+  const traverse = (children: Item[]) => {
+    children.forEach((c) => {
+      cb(c);
+      if (c.isOpen && c.children.length > 0) forEachOpenChild(c, cb);
+    });
+  };
+  traverse(item.children);
+};
+
+export const needsToBeOpened = (item: Item) =>
+  !item.isOpen && item.children.length > 0;
+
+export const needsToBeClosed = (item: Item) => item.isOpen;
+
+const getLastNestedItem = (item: Item): Item => {
+  if (item.isOpen && item.children) {
+    const { children } = item;
+    return getLastNestedItem(children[children.length - 1]);
+  }
+  return item;
+};
+
 //this always returns following item without going down to children
 const getFollowingItem = (item: Item): Item | undefined => {
   const parent = item.parent;
@@ -44,7 +59,7 @@ const getFollowingItem = (item: Item): Item | undefined => {
   }
 };
 
-export const isLast = (item: Item): boolean => !getFollowingItem(item);
+const isLast = (item: Item): boolean => !getFollowingItem(item);
 const isRoot = (item: Item) => {
   !item.parent; //?
   return !item.parent;
