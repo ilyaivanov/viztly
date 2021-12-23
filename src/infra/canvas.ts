@@ -1,57 +1,71 @@
-export class Canvas {
+type CanvasState = {
   el: HTMLCanvasElement;
-  public ctx: CanvasRenderingContext2D;
-  width: number = 0;
-  height: number = 0;
+  ctx: CanvasRenderingContext2D;
 
-  constructor() {
-    this.el = document.createElement("canvas");
-    this.ctx = this.el.getContext("2d")!;
-    this.updateHeight();
-    window.addEventListener("resize", () => {
-      this.updateHeight();
-      this.onResize && this.onResize();
-    });
-  }
+  // later I will need cached canvas dimensions for scrollbars, modals, etc
+  width: number;
+  height: number;
+};
 
-  clear = () => this.ctx.clearRect(-20000, -20000, 40000, 40000);
+let canvas: CanvasState;
 
-  onResize?: () => void;
-
-  updateHeight = () => {
-    this.width = window.innerWidth;
-    this.height = window.innerHeight;
-    const scaleFactor = window.devicePixelRatio;
-    this.el.width = this.width * scaleFactor;
-    this.el.height = this.height * scaleFactor;
-    this.ctx.scale(scaleFactor, scaleFactor);
+export const createFullscreenCanvas = (): HTMLCanvasElement => {
+  const el = document.createElement("canvas");
+  canvas = {
+    el,
+    ctx: el.getContext("2d")!,
+    width: 0,
+    height: 0,
   };
+  updateHeight();
+  window.addEventListener("resize", () => {
+    updateHeight();
+    resizeCbs.forEach((cb) => cb());
+  });
+  return el;
+};
 
-  setTranslation = (x: number, y: number) => {
-    this.ctx.resetTransform();
+let resizeCbs: A[] = [];
 
-    const scaleFactor = window.devicePixelRatio;
-    this.ctx.scale(scaleFactor, scaleFactor);
-    this.ctx.translate(x, y);
-  };
+export const addEventListener = (event: "resize", cb: A) => {
+  if (event === "resize") resizeCbs.push(cb);
+};
 
-  drawCircle = (x: number, y: number, r: number, color: string) => {
-    this.ctx.fillStyle = color;
+export const clear = () => canvas.ctx.clearRect(-20000, -20000, 40000, 40000);
 
-    this.ctx.beginPath();
-    this.ctx.arc(x, y, r, 0, 2 * Math.PI);
-    this.ctx.fill();
-  };
+export const updateHeight = () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const scaleFactor = window.devicePixelRatio;
+  canvas.el.width = canvas.width * scaleFactor;
+  canvas.el.height = canvas.height * scaleFactor;
+  canvas.ctx.scale(scaleFactor, scaleFactor);
+};
 
-  drawText = (
-    x: number,
-    y: number,
-    text: string,
-    fontSize: number,
-    color: string
-  ) => {
-    this.ctx.font = `${fontSize}px Segoe UI, Ubuntu`;
-    this.ctx.fillStyle = color;
-    this.ctx.fillText(text, x, y);
-  };
-}
+export const setTranslation = (x: number, y: number) => {
+  canvas.ctx.resetTransform();
+
+  const scaleFactor = window.devicePixelRatio;
+  canvas.ctx.scale(scaleFactor, scaleFactor);
+  canvas.ctx.translate(x, y);
+};
+
+export const drawCircle = (x: number, y: number, r: number, color: string) => {
+  canvas.ctx.fillStyle = color;
+
+  canvas.ctx.beginPath();
+  canvas.ctx.arc(x, y, r, 0, 2 * Math.PI);
+  canvas.ctx.fill();
+};
+
+export const drawText = (
+  x: number,
+  y: number,
+  text: string,
+  fontSize: number,
+  color: string
+) => {
+  canvas.ctx.font = `${fontSize}px Segoe UI, Ubuntu`;
+  canvas.ctx.fillStyle = color;
+  canvas.ctx.fillText(text, x, y);
+};

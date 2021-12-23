@@ -15,5 +15,6 @@ type Item = {
   parent?: Item;
 };
 
+type A = () => void;
 type F1<T> = (a: T) => void;
 type F2<Tin, Tout> = (a: Tin) => Tout;

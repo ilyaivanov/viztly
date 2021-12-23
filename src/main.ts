@@ -1,12 +1,12 @@
-import { Canvas } from "./infra";
+import { canvas } from "./infra";
 import { createItem } from "./domain";
 import { init, handleKeyDown, forEachShape } from "./app";
 import { createRoot } from "./domain/items";
 
-const canvas = new Canvas();
+const el = canvas.createFullscreenCanvas();
 
-canvas.el.style.display = "block";
-document.body.appendChild(canvas.el);
+el.style.display = "block";
+document.body.appendChild(el);
 
 document.body.style.margin = 0 + "";
 document.body.style.backgroundColor = "#1e1e1e";
@@ -42,5 +42,5 @@ const drawShape = (shape: Shape) => {
     canvas.drawText(shape.x, shape.y, shape.text, shape.fontSize, shape.color);
 };
 
-canvas.onResize = render;
+canvas.addEventListener("resize", render);
 render();
