@@ -1,6 +1,6 @@
 import { createItem, createRoot } from "../domain/items";
-import { check } from "./utils";
 import { AppContent, init, select } from "../app";
+import { check } from "./utils";
 import simulation from "./simulation";
 
 describe("Having three nested items", () => {
@@ -18,15 +18,6 @@ describe("Having three nested items", () => {
       ])
     );
   });
-
-  it("should have an Item 1 at 50,50", () =>
-    check.itemExistsAt(app.views, 1, 1, "Item 1"));
-
-  it("should have an Item 1.1 at 50+1,50+1", () =>
-    check.itemExistsAt(app.views, 2, 2, "Item 1.1"));
-
-  it("should have an Item 2 at 50,50+3", () =>
-    check.itemExistsAt(app.views, 1, 4, "Item 2"));
 
   it("Item 1 is selected", () => check.itemSelected(app.views, 1, 1));
 

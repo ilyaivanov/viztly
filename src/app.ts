@@ -14,7 +14,7 @@ export type AppContent = {
   root: Item;
   selectedItem: Item | undefined;
 
-  //view state
+  //view (canvas) state
   views: Views;
   itemsToViews: Map<Item, ItemView>;
 };
@@ -22,9 +22,10 @@ export type AppContent = {
 export const init = (root: Item): AppContent => {
   const app: AppContent = {
     root,
+    selectedItem: root.children[0],
+
     itemsToViews: new Map(),
     views: new Set(),
-    selectedItem: root.children[0],
   };
   renderViews(app, root, sp.start, sp.start);
 
