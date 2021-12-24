@@ -1,5 +1,5 @@
 import { createItem, createRoot } from "../domain/items";
-import { itemAtv2 } from "./check2";
+import { itemAt } from "./itemCheck";
 import { AppContent, init } from "../app";
 
 describe("Having three nested items", () => {
@@ -19,11 +19,11 @@ describe("Having three nested items", () => {
   });
 
   it("should have an Item 1 at 1,1", () =>
-    itemAtv2(app, 1, 1, { title: "Item 1" }));
+    itemAt(app, 1, 1, { title: "Item 1" }));
 
   it("should have an Item 1.1 at 2,2", () =>
-    itemAtv2(app, 2, 2, { title: "Item 1.1" }));
+    itemAt(app, 2, 2, { title: "Item 1.1" }));
 
   it("should have an Item 2 at 1,4", () =>
-    itemAtv2(app, 1, 4, { title: "Item 2" }));
+    itemAt(app, 1, 4, { title: "Item 2" }));
 });

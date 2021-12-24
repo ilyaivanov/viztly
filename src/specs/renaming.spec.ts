@@ -1,5 +1,6 @@
 import { createItem, createRoot } from "../domain/items";
-import { check } from "./check";
+import { itemAt } from "./itemCheck";
+import { inputDoesNotExist, checkInput } from "./inputCheck";
 import { AppContent, init } from "../app";
 import { sp } from "../view/design";
 import simulation from "./simulation";
@@ -12,7 +13,7 @@ describe(`When pressing 'e' while focusing on Item 1`, () => {
   });
 
   it("an input should be rendered at text coordinates", () => {
-    check.input({
+    checkInput({
       left: 50 + sp.circleToTextDistance,
       top: 50 - sp.fontSize * 0.32 * 2.5,
       text: "Item 1",
@@ -24,28 +25,28 @@ describe(`When pressing 'e' while focusing on Item 1`, () => {
 
     simulation.hitEnter(app);
 
-    check.itemAt(app, 1, 1, { title: "New Title", isSelected: true });
+    itemAt(app, 1, 1, { title: "New Title", isSelected: true });
 
-    check.inputDoesNotExist();
+    inputDoesNotExist();
   });
 
   it("bluring on text input removes it from the DOM", () => {
     simulation.blurOnInput();
 
-    check.itemAt(app, 1, 1, { title: "Item 1", isSelected: true });
+    itemAt(app, 1, 1, { title: "Item 1", isSelected: true });
 
-    check.inputDoesNotExist();
+    inputDoesNotExist();
   });
 
   it("pressing down or up should not change selection", () => {
     simulation.selectDown(app);
-    check.itemAt(app, 1, 1, { title: "", isSelected: true });
+    itemAt(app, 1, 1, { title: "", isSelected: true });
 
     simulation.selectUp(app);
-    check.itemAt(app, 1, 1, { title: "", isSelected: true });
+    itemAt(app, 1, 1, { title: "", isSelected: true });
 
     simulation.selectLeft(app);
     simulation.selectLeft(app);
-    check.itemAt(app, 1, 1, { title: "", isSelected: true });
+    itemAt(app, 1, 1, { title: "", isSelected: true });
   });
 });

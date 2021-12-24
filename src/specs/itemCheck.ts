@@ -8,7 +8,7 @@ type VerificationProps = {
   isCircleFilled?: boolean;
 };
 
-export const itemAtv2 = (
+export const itemAt = (
   app: AppContent,
   gridX: number,
   gridY: number,
@@ -73,13 +73,6 @@ const throwUnexpectedColor = (view: ItemView, expectedColor: string) => {
 const throwShouldNotExist = (view: ItemView) =>
   throwError(
     `Expected '${view.text.text}' at ${formatViewPosition(view)} not to exist`
-  );
-
-const throwShouldNotHaveTitle = (view: ItemView) =>
-  throwError(
-    `Expected '${view.text.text}' at ${formatViewPosition(
-      view
-    )} to have a different title`
   );
 
 const throwNotFoundItemViewAt = (
