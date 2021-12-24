@@ -25,6 +25,7 @@ export const finishEdit = () => {
 
 export const renderInputAt = (x: number, y: number, title: string) => {
   input = document.createElement("input");
+  input.autocomplete = "off";
   input.id = "main-input";
   input.style.left = x + "px";
   input.style.top = y + "px";
