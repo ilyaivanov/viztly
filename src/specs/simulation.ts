@@ -1,29 +1,34 @@
 import { AppContent, handleKeyDown } from "../app";
 
 export default {
-  pressDown: (app: AppContent) =>
-    handleKeyDown(app, { code: "ArrowDown" } as any),
+  swapDown: (app: AppContent) =>
+    handleKeyDown(app, altShiftKeyDown("ArrowDown")),
 
-  pressUp: (app: AppContent) => handleKeyDown(app, { code: "ArrowUp" } as any),
+  swapUp: (app: AppContent) => handleKeyDown(app, altShiftKeyDown("ArrowUp")),
 
-  pressLeft: (app: AppContent) =>
-    handleKeyDown(app, { code: "ArrowLeft" } as any),
+  swapLeft: (app: AppContent) =>
+    handleKeyDown(app, altShiftKeyDown("ArrowLeft")),
 
-  pressRight: (app: AppContent) =>
-    handleKeyDown(app, { code: "ArrowRight" } as any),
+  swapRight: (app: AppContent) =>
+    handleKeyDown(app, altShiftKeyDown("ArrowRight")),
+
+  selectDown: (app: AppContent) =>
+    handleKeyDown(app, singleKeyDown("ArrowDown")),
+
+  selectUp: (app: AppContent) => handleKeyDown(app, singleKeyDown("ArrowUp")),
+
+  selectLeft: (app: AppContent) =>
+    handleKeyDown(app, singleKeyDown("ArrowLeft")),
+
+  selectRight: (app: AppContent) =>
+    handleKeyDown(app, singleKeyDown("ArrowRight")),
 
   removeSelected: (app: AppContent) =>
-    handleKeyDown(app, {
-      altKey: true,
-      shiftKey: true,
-      code: "Backspace",
-    } as any),
+    handleKeyDown(app, altShiftKeyDown("Backspace")),
 
-  startRename: (app: AppContent) =>
-    handleKeyDown(app, new KeyboardEvent("keydown", { code: "KeyE" })),
+  startRename: (app: AppContent) => handleKeyDown(app, singleKeyDown("KeyE")),
 
-  hitEnter: (app: AppContent) =>
-    handleKeyDown(app, new KeyboardEvent("keydown", { code: "Enter" })),
+  hitEnter: (app: AppContent) => handleKeyDown(app, singleKeyDown("Enter")),
 
   setValueToInput: (text: string) => {
     const el = document.getElementById("main-input") as HTMLInputElement;
@@ -41,3 +46,9 @@ export default {
     }
   },
 };
+
+const singleKeyDown = (code: KeyboardKey): KeyboardEvent =>
+  new KeyboardEvent("keydown", { code });
+
+const altShiftKeyDown = (code: KeyboardKey): KeyboardEvent =>
+  new KeyboardEvent("keydown", { code, altKey: true, shiftKey: true });

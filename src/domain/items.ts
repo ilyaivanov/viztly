@@ -39,9 +39,13 @@ export const removeItem = (item: Item): Item | undefined => {
   return selectedItem;
 };
 
-const removeChild = (parent: Item, item: Item) => {
+export const removeChild = (parent: Item, item: Item) => {
   parent.children = parent.children.filter((c) => c !== item);
   parent.isOpen = parent.children.length !== 0;
+};
+export const removeChildAt = (parent: Item, index: number) => {
+  parent.children.splice(index, 1);
+  updateIsOpenFlag(parent);
 };
 
 export const addItemAfter = (item: Item, itemToAdd: Item) => {
@@ -50,8 +54,12 @@ export const addItemAfter = (item: Item, itemToAdd: Item) => {
   if (parent) addChildAt(parent, itemToAdd, parent.children.indexOf(item) + 1);
 };
 
-const addChildAt = (parent: Item, item: Item, index: number) => {
+export const addChildAt = (parent: Item, item: Item, index: number) => {
   parent.children.splice(index, 0, item);
   item.parent = parent;
-  parent.isOpen = true;
+  updateIsOpenFlag(parent);
+};
+
+const updateIsOpenFlag = (item: Item) => {
+  item.isOpen = item.children.length !== 0;
 };

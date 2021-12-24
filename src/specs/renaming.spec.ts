@@ -40,14 +40,14 @@ describe(`When pressing 'e' while focusing on Item 1`, () => {
   });
 
   it("pressing down or up should not change selection", () => {
-    simulation.pressDown(app);
+    simulation.selectDown(app);
     check.itemSelectedHasTitle(app, "Item 1");
 
-    simulation.pressUp(app);
+    simulation.selectUp(app);
     check.itemSelectedHasTitle(app, "Item 1");
 
-    simulation.pressLeft(app);
-    simulation.pressLeft(app);
+    simulation.selectLeft(app);
+    simulation.selectLeft(app);
     check.itemSelectedHasTitle(app, "Item 1");
   });
 });

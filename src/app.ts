@@ -1,20 +1,8 @@
 import { addItemAfter, createItem, removeItem } from "./domain/items";
-import {
-  forEachOpenChild,
-  getItemAbove,
-  getItemBelow,
-  isEmpty,
-  needsToBeClosed,
-  needsToBeOpened,
-} from "./domain/tree.traversal";
+import * as movement from "./domain/tree.movement";
+import * as traversal from "./domain/tree.traversal";
+import * as input from "./view/itemInput";
 import { sp } from "./view/design";
-import {
-  addEventListener,
-  finishEdit,
-  getValue,
-  isEditing,
-  renderInputAt,
-} from "./view/itemInput";
 
 type ItemView = {
   circle: Circle;
@@ -40,7 +28,7 @@ export const init = (root: Item): AppContent => {
   };
   renderViews(app, root, sp.start, sp.start);
 
-  addEventListener("onInputBlur", () => {
+  input.addEventListener("onInputBlur", () => {
     setValueToSelectedItemFromInput(app);
   });
   return app;
@@ -51,34 +39,43 @@ export const forEachShape = (app: AppContent, cb: F1<Shape>) =>
 
 export const handleKeyDown = (app: AppContent, e: KeyboardEvent) => {
   const { selectedItem } = app;
+  const code = e.code as KeyboardKey;
 
-  if (isEditing()) {
+  if (input.isEditing()) {
     if (e.code === "Enter" || e.code === "Escape") {
       setValueToSelectedItemFromInput(app);
-      finishEdit();
+      input.finishEdit();
     }
     return;
   }
 
   if (selectedItem) {
-    if (e.code === "ArrowDown") changeSelection(app, getItemBelow);
-    else if (e.code === "ArrowUp") changeSelection(app, getItemAbove);
-    else if (e.code === "ArrowLeft") {
-      if (needsToBeClosed(selectedItem)) closeItem(app, selectedItem);
+    if (code === "ArrowDown") {
+      if (e.altKey && e.shiftKey) applyMovement(app, movement.moveItemDown);
+      else changeSelection(app, traversal.getItemBelow);
+    } else if (code === "ArrowUp") {
+      if (e.altKey && e.shiftKey) applyMovement(app, movement.moveItemUp);
+      else changeSelection(app, traversal.getItemAbove);
+    } else if (code === "ArrowLeft") {
+      if (e.altKey && e.shiftKey) applyMovement(app, movement.moveItemLeft);
+      else if (traversal.needsToBeClosed(selectedItem))
+        closeItem(app, selectedItem);
       else changeSelection(app, (item) => item.parent);
-    } else if (e.code === "ArrowRight") {
-      if (needsToBeOpened(selectedItem)) openItem(app, selectedItem);
+    } else if (code === "ArrowRight") {
+      if (e.altKey && e.shiftKey) applyMovement(app, movement.moveItemRight);
+      else if (traversal.needsToBeOpened(selectedItem))
+        openItem(app, selectedItem);
       else changeSelection(app, (item) => item.children[0]);
-    } else if (e.shiftKey && e.altKey && e.code === "Backspace")
+    } else if (e.shiftKey && e.altKey && code === "Backspace")
       removeItemFromTree(app, selectedItem);
-    else if (e.code === "KeyE") {
+    else if (code === "KeyE") {
       const view = app.itemsToViews.get(selectedItem);
       if (view) {
         view.text.text = "";
         viewInput(view, selectedItem.title);
       }
       e.preventDefault();
-    } else if (e.code === "Enter") {
+    } else if (code === "Enter") {
       const newItem: Item = createItem("");
       const view = app.itemsToViews.get(selectedItem);
       if (view) {
@@ -98,11 +95,15 @@ export const handleKeyDown = (app: AppContent, e: KeyboardEvent) => {
 };
 
 const viewInput = (view: ItemView, value: string) =>
-  renderInputAt(view.text.x, view.circle.y - sp.fontSize * 0.32 * 2.5, value);
+  input.renderInputAt(
+    view.text.x,
+    view.circle.y - sp.fontSize * 0.32 * 2.5,
+    value
+  );
 
 const setValueToSelectedItemFromInput = (app: AppContent) => {
   if (app.selectedItem) {
-    const newTitle = getValue();
+    const newTitle = input.getValue();
     const view = app.itemsToViews.get(app.selectedItem);
     if (view) {
       view.text.text = newTitle || "";
@@ -111,9 +112,16 @@ const setValueToSelectedItemFromInput = (app: AppContent) => {
   }
 };
 
+const applyMovement = (app: AppContent, movingFn: F1<Item>) => {
+  if (app.selectedItem) {
+    movingFn(app.selectedItem);
+    updateExistingItemPositions(app, sp.start, sp.start);
+  }
+};
+
 const closeItem = (app: AppContent, item: Item) => {
   item.isOpen = false;
-  forEachOpenChild(item, (child) => removeAllItemViews(app, child));
+  traversal.forEachOpenChild(item, (child) => removeAllItemViews(app, child));
   updateExistingItemPositions(app, sp.start, sp.start);
 };
 
@@ -129,7 +137,7 @@ const openItem = (app: AppContent, item: Item) => {
 const removeItemFromTree = (app: AppContent, item: Item) => {
   const newSelection = removeItem(item);
   removeAllItemViews(app, item);
-  forEachOpenChild(item, (child) => removeAllItemViews(app, child));
+  traversal.forEachOpenChild(item, (child) => removeAllItemViews(app, child));
   changeSelection(app, () => newSelection);
   updateExistingItemPositions(app, sp.start, sp.start);
 };
@@ -199,7 +207,7 @@ const renderItem = (
     color,
     x: x,
     y: y,
-    filled: !isEmpty(item),
+    filled: !traversal.isEmpty(item),
     r: 3,
   };
   const text: TextShape = {
@@ -227,7 +235,7 @@ const updateExistingItemPositions = (app: AppContent, x: number, y: number) => {
         view.circle.x = x;
         view.circle.y = yOffset;
 
-        view.circle.filled = !isEmpty(item);
+        view.circle.filled = !traversal.isEmpty(item);
 
         view.text.x = x + sp.circleToTextDistance;
         view.text.y = yOffset + 0.32 * sp.fontSize;

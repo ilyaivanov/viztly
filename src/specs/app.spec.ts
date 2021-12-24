@@ -33,7 +33,7 @@ describe("Having three nested items", () => {
   it("pressing down selects Item 2", () => {
     check.itemUnselected(app.views, 2, 2);
 
-    simulation.pressDown(app);
+    simulation.selectDown(app);
 
     check.itemSelectedHasTitle(app, "Item 1.1");
     check.itemUnselected(app.views, 1, 1);
@@ -43,7 +43,7 @@ describe("Having three nested items", () => {
   it("when Item 1.2 is selected going left selects parent", () => {
     select(app, app.root.children[0].children[1]);
 
-    simulation.pressLeft(app);
+    simulation.selectLeft(app);
 
     check.itemSelectedHasTitle(app, "Item 1");
     check.itemUnselected(app.views, 2, 3);
@@ -55,7 +55,7 @@ describe("Having three nested items", () => {
       check.itemExistsAt(app.views, 2, 5, "Item 2.1");
       check.itemExistsAt(app.views, 1, 6, "Item 3");
 
-      simulation.pressLeft(app);
+      simulation.selectLeft(app);
     });
     it("closes that item", () => {
       check.notContainItemTitle(app.views, "Item 1.1");
@@ -67,7 +67,7 @@ describe("Having three nested items", () => {
     });
 
     describe("going right", () => {
-      beforeEach(() => simulation.pressRight(app));
+      beforeEach(() => simulation.selectRight(app));
 
       it("opens that item", () => {
         check.itemExistsAt(app.views, 2, 2, "Item 1.1");
@@ -78,7 +78,7 @@ describe("Having three nested items", () => {
       });
 
       describe("going right again", () => {
-        beforeEach(() => simulation.pressRight(app));
+        beforeEach(() => simulation.selectRight(app));
 
         it("selected child (Item 1.1)", () => {
           check.itemSelected(app.views, 2, 2);
@@ -89,7 +89,7 @@ describe("Having three nested items", () => {
 
   describe("selecting Item 1.1 and then removing it", () => {
     beforeEach(() => {
-      simulation.pressRight(app);
+      simulation.selectRight(app);
       simulation.removeSelected(app);
     });
 
@@ -120,8 +120,8 @@ describe("Having three nested items", () => {
   });
 
   it("Removing Item 1.1 and Item 1.2 updates circle of Item 1 to empty", () => {
-    simulation.pressDown(app);
-    simulation.pressDown(app);
+    simulation.selectDown(app);
+    simulation.selectDown(app);
     check.itemSelectedHasTitle(app, "Item 1.2");
 
     check.circleAtHas(app.views, 1, 1, { filled: true });
@@ -152,7 +152,7 @@ describe("Having a very deep tree of items", () => {
 
     check.itemSelectedHasTitle(app, "Item 1.1.1.1");
 
-    simulation.pressDown(app);
+    simulation.selectDown(app);
 
     check.itemSelectedHasTitle(app, "Item 2");
   });
@@ -162,7 +162,7 @@ describe("Having a very deep tree of items", () => {
 
     check.itemSelectedHasTitle(app, "Item 2");
 
-    simulation.pressUp(app);
+    simulation.selectUp(app);
 
     check.itemSelectedHasTitle(app, "Item 1.1.1.1");
   });
@@ -173,7 +173,7 @@ it("When root is selected going up does nothing", () => {
 
   check.itemSelectedHasTitle(app, "Item 1");
 
-  simulation.pressUp(app);
+  simulation.selectUp(app);
 
   check.itemSelectedHasTitle(app, "Item 1");
 });
@@ -184,6 +184,6 @@ it("When last is selected going down does nothing", () => {
   select(app, app.root.children[1]);
   check.itemSelectedHasTitle(app, "Item 2");
 
-  simulation.pressDown(app);
+  simulation.selectDown(app);
   check.itemSelectedHasTitle(app, "Item 2");
 });

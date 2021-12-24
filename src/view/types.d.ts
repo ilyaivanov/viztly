@@ -36,3 +36,12 @@ type MultiLine = {
   rotation: number;
   color: string;
 };
+
+type KeyboardKey =
+  | "ArrowDown"
+  | "ArrowUp"
+  | "ArrowLeft"
+  | "ArrowRight"
+  | "Enter"
+  | "KeyE"
+  | "Backspace";
