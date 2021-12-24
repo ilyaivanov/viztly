@@ -50,27 +50,26 @@ export const setTranslation = (x: number, y: number) => {
   canvas.ctx.translate(x, y);
 };
 
-export const drawCircle = (circle: Circle) => {
+export const drawShape = (shape: Shape) => {
+  if (shape.type === "circle") drawCircle(shape);
+  if (shape.type === "text") drawText(shape);
+};
+
+const drawCircle = ({ x, y, r, color, filled }: Circle) => {
   const { ctx } = canvas;
   ctx.beginPath();
-  ctx.arc(circle.x, circle.y, circle.r, 0, 2 * Math.PI);
-  if (circle.filled) {
-    ctx.fillStyle = circle.color;
+  ctx.arc(x, y, r, 0, 2 * Math.PI);
+  if (filled) {
+    ctx.fillStyle = color;
     ctx.fill();
   } else {
-    ctx.strokeStyle = circle.color;
+    ctx.strokeStyle = color;
     ctx.lineWidth = 1.5;
     ctx.stroke();
   }
 };
 
-export const drawText = (
-  x: number,
-  y: number,
-  text: string,
-  fontSize: number,
-  color: string
-) => {
+const drawText = ({ x, y, text, fontSize, color }: TextShape) => {
   canvas.ctx.font = `${fontSize}px Segoe UI, Ubuntu, Roboto, sans-serif`;
   canvas.ctx.fillStyle = color;
   canvas.ctx.fillText(text, x, y);

@@ -30,19 +30,13 @@ const app = init(
 
 const render = () => {
   canvas.clear();
-  forEachShape(app, drawShape);
+  forEachShape(app, canvas.drawShape);
 };
 
 document.addEventListener("keydown", (e) => {
   handleKeyDown(app, e);
   render();
 });
-
-const drawShape = (shape: Shape) => {
-  if (shape.type === "circle") canvas.drawCircle(shape);
-  if (shape.type === "text")
-    canvas.drawText(shape.x, shape.y, shape.text, shape.fontSize, shape.color);
-};
 
 canvas.addEventListener("resize", render);
 input.addEventListener("onInputBlur", render);
