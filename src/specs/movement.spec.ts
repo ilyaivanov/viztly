@@ -1,7 +1,7 @@
 import { AppContent, init } from "../app";
 import { createItem, createRoot } from "../domain/items";
 import simulation from "./simulation";
-import { check } from "./utils";
+import { check } from "./check";
 
 describe("Having two consecutive items", () => {
   let app: AppContent;

@@ -1,5 +1,5 @@
 import { createItem, createRoot } from "../domain/items";
-import { check } from "./utils";
+import { check } from "./check";
 import { AppContent, init } from "../app";
 import { sp } from "../view/design";
 import simulation from "./simulation";

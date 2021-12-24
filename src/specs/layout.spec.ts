@@ -1,5 +1,5 @@
 import { createItem, createRoot } from "../domain/items";
-import { check } from "./utils";
+import { check } from "./check";
 import { AppContent, init } from "../app";
 
 describe("Having three nested items", () => {

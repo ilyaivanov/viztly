@@ -1,6 +1,8 @@
-type Shape = TextShape | Circle | Rectangle | MultiLine;
+type Shape = TextShape | Circle;
 type Views = Set<Shape>;
+
 type ShapeType = "text" | "circle";
+
 type TextShape = {
   type: "text";
   x: number;
@@ -16,24 +18,6 @@ type Circle = {
   y: number;
   r: number;
   filled: boolean;
-  color: string;
-};
-
-type Rectangle = {
-  type: "rectangle";
-  x: number;
-  y: number;
-  height: number;
-  width: number;
-  rotation: number;
-  color: string;
-};
-
-type MultiLine = {
-  type: "multiline";
-  xs: number[];
-  ys: number[];
-  rotation: number;
   color: string;
 };
 

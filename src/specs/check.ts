@@ -163,3 +163,29 @@ export const check = {
 
 const toX = (gridX: number) => sp.start + sp.xStep * (gridX - 1);
 const toY = (gridY: number) => sp.start + sp.yStep * (gridY - 1);
+
+type ItemCheckProps = {
+  //these are used to locate item on the canvas state
+  gridX?: number;
+  gridY?: number;
+  title?: string;
+
+  //these are props to check
+  x?: number;
+  y?: number;
+  textX?: number;
+  textY?: number;
+  shouldNotExist?: boolean;
+  isSelected?: boolean;
+  circleFilled?: boolean;
+};
+
+const itemCheck = (views: Views, props: ItemCheckProps) => {};
+
+// Examples
+//     check.itemSelectedHasTitle(app, "Item 1.1.1.1");
+//     check.circleAtHas(app.views, 1, 1, { filled: true });
+//     check.itemExistsAt(app.views, 1, 1, "Item 2"));
+//     check.notContainItemTitle(app.views, "Item 1.2");
+//     check.itemSelected(app.views, 2, 2);
+//     check.itemUnselected(app.views, 2, 3);

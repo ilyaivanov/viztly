@@ -1,7 +1,7 @@
 import { createItem, createRoot } from "../domain/items";
 import { AppContent, init } from "../app";
 import simulation from "./simulation";
-import { check } from "./utils";
+import { check } from "./check";
 
 describe(`When pressing 'e' while focusing on Item 1`, () => {
   let app: AppContent;
