@@ -4,11 +4,6 @@ import * as traversal from "./domain/tree.traversal";
 import * as input from "./view/itemInput";
 import { sp } from "./view/design";
 
-type ItemView = {
-  circle: Circle;
-  text: TextShape;
-};
-
 export type AppContent = {
   //domain state
   root: Item;
@@ -255,5 +250,6 @@ const removeAllItemViews = (app: AppContent, item: Item) => {
   if (view) {
     app.views.delete(view.circle);
     app.views.delete(view.text);
+    app.itemsToViews.delete(item);
   }
 };

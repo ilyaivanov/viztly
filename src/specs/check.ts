@@ -49,14 +49,15 @@ const getClosestShape = (
   views: Views,
   type: ShapeType,
   x: number,
-  y: number
+  y: number,
+  maxDistance = 0.1
 ): Shape | undefined => {
   let distance = Number.POSITIVE_INFINITY;
   let shapeFound: Shape | undefined;
   const check = (shape: Shape) => {
     if (shape.type === type) {
       const d = getDistance(x, y, shape.x, shape.y);
-      if (d < distance) {
+      if (d < distance && d < maxDistance) {
         distance = d;
         shapeFound = shape;
       }
@@ -159,18 +160,23 @@ export const check = {
       );
     }
   },
+  itemAt: (
+    app: AppContent,
+    gridX: number,
+    gridY: number,
+    props: ItemCheckProps
+  ) => itemAt(app, gridX, gridY, props),
 };
 
 const toX = (gridX: number) => sp.start + sp.xStep * (gridX - 1);
 const toY = (gridY: number) => sp.start + sp.yStep * (gridY - 1);
+const toGridX = (x: number) => (x - sp.start) / sp.xStep + 1;
+const toGridY = (y: number) => (y - sp.start) / sp.yStep + 1;
 
 type ItemCheckProps = {
-  //these are used to locate item on the canvas state
   gridX?: number;
   gridY?: number;
   title?: string;
-
-  //these are props to check
   x?: number;
   y?: number;
   textX?: number;
@@ -180,12 +186,110 @@ type ItemCheckProps = {
   circleFilled?: boolean;
 };
 
-const itemCheck = (views: Views, props: ItemCheckProps) => {};
+const itemAt = (
+  app: AppContent,
+  gridX: number,
+  gridY: number,
+  props: ItemCheckProps
+) => {
+  const x = toX(gridX);
+  const y = toY(gridY);
+  const circle = getClosestShape(app.views, "circle", x, y) as Circle;
+  if (circle) {
+    const pair = findItemViewByCircle(app, circle);
 
-// Examples
+    if (pair) {
+      const itemView = pair[1];
+      if (props.shouldNotExist) {
+        throw new Error(
+          `Expected '${
+            itemView.text.text
+          }' not to exist, but found at ${formatViewPosition(itemView)}`
+        );
+      }
+      if (isDefined(props.title) && props.title !== itemView.text.text) {
+        throw new Error(
+          `Item at ${x},${y} expected to have title '${props.title}', but was '${itemView.text.text}'`
+        );
+      }
+      if (isDefined(props.isSelected))
+        checkItemIsSelected(itemView, props.isSelected);
+    } else {
+      throw new Error(
+        `Can't find [Item, ItemView] pair by circle at app.itemsToView Map. (found circle thought)`
+      );
+    }
+  } else {
+    if (!props.shouldNotExist) {
+      if (isDefined(props.title)) {
+        const pair = findItemViewByText(app, props.title);
+        if (pair) {
+          const itemView = pair[1];
+          throw new Error(
+            `Can't find any item at ${x},${y}, found item '${
+              props.title
+            }' at ${formatViewPosition(itemView)})`
+          );
+        }
+      } else {
+        throw new Error(`Can't find any item at ${x},${y}`);
+      }
+    }
+  }
+};
+
+const findItemViewByCircle = (
+  app: AppContent,
+  circle: Circle
+): [Item, ItemView] | undefined => {
+  const pair = Array.from(app.itemsToViews.entries()).find(
+    ([_, itemView]) => itemView.circle == circle
+  );
+
+  if (pair) return pair;
+};
+const findItemViewByText = (
+  app: AppContent,
+  text: string
+): [Item, ItemView] | undefined => {
+  const pair = Array.from(app.itemsToViews.entries()).find(
+    ([_, itemView]) => itemView.text.text === text
+  );
+
+  if (pair) return pair;
+};
+
+const checkItemIsSelected = (view: ItemView, isSelected: boolean) => {
+  const { circle, text } = view;
+  const expectedColor = isSelected ? sp.selectedCircle : sp.regularColor;
+  if (circle.color !== expectedColor || text.color !== expectedColor) {
+    const p = formatViewPosition(view);
+    throw new Error(
+      `Expected item at ${p} to have color ${expectedColor}, but circle is ${circle.color} and text is ${text.color}`
+    );
+  }
+};
+
+const formatViewPosition = (view: ItemView) => {
+  const { circle } = view;
+  return `${circle.x},${circle.y} (${toGridX(circle.x)},${toGridY(circle.y)})`;
+};
+
+const itemWithTitle = (
+  app: AppContent,
+  title: string,
+  props: ItemCheckProps
+) => {};
+
+const itemSelected = (app: AppContent, props: ItemCheckProps) => {};
+
+// Examples of current usage
 //     check.itemSelectedHasTitle(app, "Item 1.1.1.1");
+//     check.notContainItemTitle(app.views, "Item 1.2");
+
 //     check.circleAtHas(app.views, 1, 1, { filled: true });
 //     check.itemExistsAt(app.views, 1, 1, "Item 2"));
-//     check.notContainItemTitle(app.views, "Item 1.2");
 //     check.itemSelected(app.views, 2, 2);
 //     check.itemUnselected(app.views, 2, 3);
+
+const isDefined = <T>(a: T | undefined): a is T => typeof a !== "undefined";

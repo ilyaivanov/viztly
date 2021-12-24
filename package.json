@@ -5,7 +5,7 @@
   "scripts": {
     "start": "npm run dev",
     "test": "jest",
-    "test:watch": "jest --watchAll --detectOpenHandles",
+    "test:watch": "jest --watchAll",
     "dev": "webpack serve --mode development",
     "build": "webpack --mode production",
     "deploy": "npm run build && bash firebase-deploy.sh"

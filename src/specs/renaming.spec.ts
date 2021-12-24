@@ -24,8 +24,7 @@ describe(`When pressing 'e' while focusing on Item 1`, () => {
 
     simulation.hitEnter(app);
 
-    check.itemExistsAt(app.views, 1, 1, "New Title");
-    check.itemSelectedHasTitle(app, "New Title");
+    check.itemAt(app, 1, 1, { title: "New Title", isSelected: true });
 
     check.inputDoesNotExist();
   });
@@ -33,21 +32,20 @@ describe(`When pressing 'e' while focusing on Item 1`, () => {
   it("bluring on text input removes it from the DOM", () => {
     simulation.blurOnInput();
 
-    check.itemExistsAt(app.views, 1, 1, "Item 1");
-    check.itemSelectedHasTitle(app, "Item 1");
+    check.itemAt(app, 1, 1, { title: "Item 1", isSelected: true });
 
     check.inputDoesNotExist();
   });
 
   it("pressing down or up should not change selection", () => {
     simulation.selectDown(app);
-    check.itemSelectedHasTitle(app, "Item 1");
+    check.itemAt(app, 1, 1, { title: "", isSelected: true });
 
     simulation.selectUp(app);
-    check.itemSelectedHasTitle(app, "Item 1");
+    check.itemAt(app, 1, 1, { title: "", isSelected: true });
 
     simulation.selectLeft(app);
     simulation.selectLeft(app);
-    check.itemSelectedHasTitle(app, "Item 1");
+    check.itemAt(app, 1, 1, { title: "", isSelected: true });
   });
 });

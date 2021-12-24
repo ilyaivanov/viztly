@@ -29,3 +29,8 @@ type KeyboardKey =
   | "Enter"
   | "KeyE"
   | "Backspace";
+
+type ItemView = {
+  circle: Circle;
+  text: TextShape;
+};

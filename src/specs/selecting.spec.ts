@@ -1,6 +1,6 @@
 import { createItem, createRoot } from "../domain/items";
 import { AppContent, init, select } from "../app";
-import { check } from "./check";
+import { itemAtv2 } from "./check2";
 import simulation from "./simulation";
 
 describe("Having three nested items", () => {
@@ -19,16 +19,15 @@ describe("Having three nested items", () => {
     );
   });
 
-  it("Item 1 is selected", () => check.itemSelected(app.views, 1, 1));
+  it("Item 1 is selected", () => itemAtv2(app, 1, 1, { isSelected: true }));
 
   it("pressing down selects Item 2", () => {
-    check.itemUnselected(app.views, 2, 2);
+    itemAtv2(app, 2, 2, { isSelected: false });
 
     simulation.selectDown(app);
 
-    check.itemSelectedHasTitle(app, "Item 1.1");
-    check.itemUnselected(app.views, 1, 1);
-    check.itemSelected(app.views, 2, 2);
+    itemAtv2(app, 1, 1, { title: "Item 1", isSelected: false });
+    itemAtv2(app, 2, 2, { title: "Item 1.1", isSelected: true });
   });
 
   it("when Item 1.2 is selected going left selects parent", () => {
@@ -36,44 +35,40 @@ describe("Having three nested items", () => {
 
     simulation.selectLeft(app);
 
-    check.itemSelectedHasTitle(app, "Item 1");
-    check.itemUnselected(app.views, 2, 3);
+    itemAtv2(app, 1, 1, { title: "Item 1", isSelected: true });
+    itemAtv2(app, 2, 2, { title: "Item 1.1", isSelected: false });
   });
 
   describe("when Item 1 is selected going left", () => {
     beforeEach(() => {
-      check.itemExistsAt(app.views, 1, 4, "Item 2");
-      check.itemExistsAt(app.views, 2, 5, "Item 2.1");
-      check.itemExistsAt(app.views, 1, 6, "Item 3");
+      itemAtv2(app, 1, 4, { title: "Item 2" });
+      itemAtv2(app, 2, 5, { title: "Item 2.1" });
+      itemAtv2(app, 1, 6, { title: "Item 3" });
 
       simulation.selectLeft(app);
     });
-    it("closes that item", () => {
-      check.notContainItemTitle(app.views, "Item 1.1");
-      check.notContainItemTitle(app.views, "Item 1.2");
-
-      check.itemExistsAt(app.views, 1, 2, "Item 2");
-      check.itemExistsAt(app.views, 2, 3, "Item 2.1");
-      check.itemExistsAt(app.views, 1, 4, "Item 3");
+    it("closes that item and moves all items after up", () => {
+      itemAtv2(app, 1, 2, { title: "Item 2" });
+      itemAtv2(app, 2, 3, { title: "Item 2.1" });
+      itemAtv2(app, 1, 4, { title: "Item 3" });
     });
 
     describe("going right", () => {
       beforeEach(() => simulation.selectRight(app));
 
       it("opens that item", () => {
-        check.itemExistsAt(app.views, 2, 2, "Item 1.1");
-        check.itemExistsAt(app.views, 2, 3, "Item 1.2");
-        check.itemExistsAt(app.views, 1, 4, "Item 2");
-        check.itemExistsAt(app.views, 2, 5, "Item 2.1");
-        check.itemExistsAt(app.views, 1, 6, "Item 3");
+        itemAtv2(app, 2, 2, { title: "Item 1.1" });
+        itemAtv2(app, 2, 3, { title: "Item 1.2" });
+        itemAtv2(app, 1, 4, { title: "Item 2" });
+        itemAtv2(app, 2, 5, { title: "Item 2.1" });
+        itemAtv2(app, 1, 6, { title: "Item 3" });
       });
 
       describe("going right again", () => {
         beforeEach(() => simulation.selectRight(app));
 
-        it("selected child (Item 1.1)", () => {
-          check.itemSelected(app.views, 2, 2);
-        });
+        it("selected child (Item 1.1)", () =>
+          itemAtv2(app, 2, 2, { title: "Item 1.1", isSelected: true }));
       });
     });
   });
@@ -84,13 +79,10 @@ describe("Having three nested items", () => {
       simulation.removeSelected(app);
     });
 
-    it("removes Item 1.1", () =>
-      check.notContainItemTitle(app.views, "Item 1.1"));
+    it("selectes Item 1", () =>
+      itemAtv2(app, 1, 1, { title: "Item 1", isSelected: true }));
 
-    it("selectes Item 1", () => check.itemSelected(app.views, 1, 1));
-
-    it("moves Item 1.2 to 1,2 position", () =>
-      check.itemExistsAt(app.views, 2, 2, "Item 1.2"));
+    it("moves Item 1.2 up", () => itemAtv2(app, 2, 2, { title: "Item 1.2" }));
   });
 
   describe("selecting Item 1 and then removing it", () => {
@@ -98,29 +90,24 @@ describe("Having three nested items", () => {
       simulation.removeSelected(app);
     });
 
-    it("removes Item 1, Item 1.1 and Item 1.2", () => {
-      check.notContainItemTitle(app.views, "Item 1");
-      check.notContainItemTitle(app.views, "Item 1.1");
-      check.notContainItemTitle(app.views, "Item 1.2");
-    });
-
     it("moves Item 2 to 1,1 position", () =>
-      check.itemExistsAt(app.views, 1, 1, "Item 2"));
+      itemAtv2(app, 1, 1, { title: "Item 2" }));
 
-    it("selects Item 2", () => check.itemSelected(app.views, 1, 1));
+    it("selects Item 2", () =>
+      itemAtv2(app, 1, 1, { title: "Item 2", isSelected: true }));
   });
 
   it("Removing Item 1.1 and Item 1.2 updates circle of Item 1 to empty", () => {
     simulation.selectDown(app);
     simulation.selectDown(app);
-    check.itemSelectedHasTitle(app, "Item 1.2");
+    itemAtv2(app, 2, 3, { title: "Item 1.2", isSelected: true });
 
-    check.circleAtHas(app.views, 1, 1, { filled: true });
+    itemAtv2(app, 1, 1, { isCircleFilled: true });
 
     simulation.removeSelected(app);
     simulation.removeSelected(app);
 
-    check.circleAtHas(app.views, 1, 1, { filled: false });
+    itemAtv2(app, 1, 1, { isCircleFilled: false });
   });
 });
 
@@ -141,40 +128,40 @@ describe("Having a very deep tree of items", () => {
   it("when a very nest item is selected going down selects parents of next child", () => {
     select(app, app.root.children[0].children[0].children[0].children[0]);
 
-    check.itemSelectedHasTitle(app, "Item 1.1.1.1");
+    itemAtv2(app, 4, 4, { title: "Item 1.1.1.1", isSelected: true });
 
     simulation.selectDown(app);
 
-    check.itemSelectedHasTitle(app, "Item 2");
+    itemAtv2(app, 1, 5, { title: "Item 2", isSelected: true });
   });
 
   it("when Item 2 is selsected going above selects Item 1.1.1.1", () => {
     select(app, app.root.children[1]);
 
-    check.itemSelectedHasTitle(app, "Item 2");
+    itemAtv2(app, 1, 5, { title: "Item 2", isSelected: true });
 
     simulation.selectUp(app);
 
-    check.itemSelectedHasTitle(app, "Item 1.1.1.1");
+    itemAtv2(app, 4, 4, { title: "Item 1.1.1.1", isSelected: true });
   });
 });
 
 it("When root is selected going up does nothing", () => {
   const app = init(createRoot([createItem("Item 1"), createItem("Item 2")]));
 
-  check.itemSelectedHasTitle(app, "Item 1");
+  itemAtv2(app, 1, 1, { title: "Item 1", isSelected: true });
 
   simulation.selectUp(app);
 
-  check.itemSelectedHasTitle(app, "Item 1");
+  itemAtv2(app, 1, 1, { title: "Item 1", isSelected: true });
 });
 
 it("When last is selected going down does nothing", () => {
   const app = init(createRoot([createItem("Item 1"), createItem("Item 2")]));
 
   select(app, app.root.children[1]);
-  check.itemSelectedHasTitle(app, "Item 2");
+  itemAtv2(app, 1, 2, { title: "Item 2", isSelected: true });
 
   simulation.selectDown(app);
-  check.itemSelectedHasTitle(app, "Item 2");
+  itemAtv2(app, 1, 2, { title: "Item 2", isSelected: true });
 });

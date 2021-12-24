@@ -8,4 +8,5 @@ export const sp = {
   circleToTextDistance: 8,
 
   selectedCircle: "#ACE854",
+  regularColor: "white",
 };
