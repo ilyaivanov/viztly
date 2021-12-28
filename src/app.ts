@@ -227,7 +227,6 @@ const renderViews = (
   const renderViewsInner = (item: Item, x: number) => {
     item.children.forEach((item) => {
       renderItem(app, item, x, yOffset);
-      app.pageHeight = yOffset + sp.start;
       yOffset += sp.yStep;
       if (item.isOpen && item.children.length > 0) {
         renderViewsInner(item, x + sp.xStep);
@@ -235,6 +234,7 @@ const renderViews = (
     });
   };
   renderViewsInner(itemFocused, x);
+  app.pageHeight = yOffset - sp.yStep + sp.start;
 };
 
 const renderItem = (
@@ -244,27 +244,27 @@ const renderItem = (
   y: number
 ): ItemView => {
   const color = app.selectedItem === item ? sp.selectedCircle : "white";
-  const circle: Circle = {
-    type: "circle",
-    color,
-    x: x,
-    y: y,
-    filled: !traversal.isEmpty(item),
-    r: 3,
+  const text = item.title;
+  const view: ItemView = {
+    circle: { type: "circle", color, x: 0, y: 0, filled: false, r: 3 },
+    text: { type: "text", color, x: 0, y: 0, text, fontSize: sp.fontSize },
   };
-  const text: TextShape = {
-    type: "text",
-    color,
-    x: x + sp.circleToTextDistance,
-    y: y + 0.32 * sp.fontSize,
-    text: item.title,
-    fontSize: sp.fontSize,
-  };
-  app.views.add(circle);
-  app.views.add(text);
-  const view: ItemView = { circle, text };
+  app.views.add(view.circle);
+  app.views.add(view.text);
+  updateItemView(view, item, x, y);
+  updateScrollbar(app);
   app.itemsToViews.set(item, view);
   return view;
+};
+
+const updateItemView = (view: ItemView, item: Item, x: number, y: number) => {
+  view.circle.x = x;
+  view.circle.y = y;
+
+  view.circle.filled = !traversal.isEmpty(item);
+
+  view.text.x = x + sp.circleToTextDistance;
+  view.text.y = y + 0.32 * sp.fontSize;
 };
 
 const updateExistingItemPositions = (app: AppContent, x: number, y: number) => {
@@ -272,23 +272,15 @@ const updateExistingItemPositions = (app: AppContent, x: number, y: number) => {
   const updateItemPositions = (item: Item, x: number) => {
     item.children.forEach((item) => {
       const view = app.itemsToViews.get(item);
-      if (view) {
-        // duplicated from renderViews
-        view.circle.x = x;
-        view.circle.y = yOffset;
-
-        view.circle.filled = !traversal.isEmpty(item);
-
-        view.text.x = x + sp.circleToTextDistance;
-        view.text.y = yOffset + 0.32 * sp.fontSize;
-      }
+      if (view) updateItemView(view, item, x, yOffset);
       yOffset += sp.yStep;
-      if (item.isOpen && item.children.length > 0) {
+      if (item.isOpen && item.children.length > 0)
         updateItemPositions(item, x + sp.xStep);
-      }
     });
   };
   updateItemPositions(app.root, x);
+  app.pageHeight = yOffset - sp.yStep + sp.start;
+  updateScrollbar(app);
 };
 
 const removeAllItemViews = (app: AppContent, item: Item) => {
