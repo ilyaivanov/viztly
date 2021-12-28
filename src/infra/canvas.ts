@@ -7,7 +7,7 @@ type CanvasState = {
   height: number;
 };
 
-let canvas: CanvasState;
+export let canvas: CanvasState;
 
 export const createFullscreenCanvas = (): HTMLCanvasElement => {
   const el = document.createElement("canvas");
@@ -73,4 +73,9 @@ const drawText = ({ x, y, text, fontSize, color }: TextShape) => {
   canvas.ctx.font = `${fontSize}px Segoe UI, Ubuntu, Roboto, sans-serif`;
   canvas.ctx.fillStyle = color;
   canvas.ctx.fillText(text, x, y);
+};
+
+export const drawRect = ({ x, y, width, height, color }: Rectangle) => {
+  canvas.ctx.fillStyle = color;
+  canvas.ctx.fillRect(x, y, width, height);
 };

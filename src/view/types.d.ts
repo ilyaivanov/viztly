@@ -1,7 +1,7 @@
-type Shape = TextShape | Circle;
+type Shape = TextShape | Circle | Rectangle;
 type Views = Set<Shape>;
 
-type ShapeType = "text" | "circle";
+type ShapeType = "text" | "circle" | "rectangle";
 
 type TextShape = {
   type: "text";
@@ -18,6 +18,15 @@ type Circle = {
   y: number;
   r: number;
   filled: boolean;
+  color: string;
+};
+
+type Rectangle = {
+  type: "rectangle";
+  x: number;
+  y: number;
+  width: number;
+  height: number;
   color: string;
 };
 

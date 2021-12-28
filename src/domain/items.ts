@@ -1,17 +1,17 @@
 import { isRoot } from "./tree.traversal";
 
-export const createRoot = (children: Item[]) =>
-  createItem("Root", "tree", children);
+export const list = (prefix: string, count: number): Item[] =>
+  Array.from(new Array(count)).map((_, index) =>
+    createItem(`${prefix} ${index + 1}`)
+  );
 
-export const createItem = (
-  title: string,
-  view: "tree" | "board" = "tree",
-  children: Item[] = []
-) => {
+export const createRoot = (children: Item[]) => createItem("Root", children);
+
+export const createItem = (title: string, children: Item[] = []) => {
   const item: Item = {
     title,
     isOpen: children.length > 0,
-    view: view,
+    view: "tree",
     children,
     type: "folder",
     id: Math.random() + "",

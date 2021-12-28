@@ -8,11 +8,8 @@ describe("Having three nested items", () => {
   beforeEach(() => {
     app = init(
       createRoot([
-        createItem("Item 1", "tree", [
-          createItem("Item 1.1"),
-          createItem("Item 1.2"),
-        ]),
-        createItem("Item 2", "tree", [createItem("Item 2.1")]),
+        createItem("Item 1", [createItem("Item 1.1"), createItem("Item 1.2")]),
+        createItem("Item 2", [createItem("Item 2.1")]),
         createItem("Item 3"),
       ])
     );

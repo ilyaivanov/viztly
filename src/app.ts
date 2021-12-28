@@ -3,6 +3,7 @@ import * as movement from "./domain/tree.movement";
 import * as traversal from "./domain/tree.traversal";
 import * as input from "./view/itemInput";
 import { sp } from "./view/design";
+import { canvas } from "./infra";
 
 export type AppContent = {
   //domain state
@@ -12,6 +13,13 @@ export type AppContent = {
   //view (canvas) state
   views: Views;
   itemsToViews: Map<Item, ItemView>;
+
+  pageHeight: number;
+  pageOffset: number;
+
+  ui: {
+    scrollbar: Rectangle;
+  };
 };
 
 export const init = (root: Item): AppContent => {
@@ -21,17 +29,42 @@ export const init = (root: Item): AppContent => {
 
     itemsToViews: new Map(),
     views: new Set(),
+    pageHeight: 0,
+    pageOffset: 0,
+    ui: {
+      scrollbar: {
+        color: "white",
+        x: 0,
+        y: 0,
+        height: 0,
+        width: 10,
+        type: "rectangle",
+      },
+    },
   };
   renderViews(app, root, sp.start, sp.start);
-
+  updateScrollbar(app);
   input.addEventListener("onInputBlur", () => {
     setValueToSelectedItemFromInput(app);
   });
   return app;
 };
 
+export const updateScrollbar = (app: AppContent) => {
+  app.ui.scrollbar.height = Math.pow(canvas.canvas.height, 2) / app.pageHeight;
+  app.ui.scrollbar.x = canvas.canvas.width - app.ui.scrollbar.width;
+  app.ui.scrollbar.y = app.pageOffset * (canvas.canvas.height / app.pageHeight);
+};
+
+const setPageOffset = (app: AppContent, offset: number) => {
+  app.pageOffset = clampScrollPosition(app, offset);
+  updateScrollbar(app);
+};
 export const forEachShape = (app: AppContent, cb: F1<Shape>) =>
   app.views.forEach(cb);
+
+export const handleWheelEvent = (app: AppContent, deltaY: number) =>
+  setPageOffset(app, app.pageOffset + deltaY);
 
 export const handleKeyDown = (app: AppContent, e: KeyboardEvent) => {
   const { selectedItem } = app;
@@ -167,10 +200,22 @@ export const select = (app: AppContent, item?: Item) => {
     if (views) {
       views.circle.color = sp.selectedCircle;
       views.text.color = sp.selectedCircle;
+
+      const circleY = views.circle.y;
+      if (!isYPointOnScreen(app, circleY)) {
+        const targetScreenPosition = circleY - canvas.canvas.height / 2;
+        setPageOffset(app, targetScreenPosition);
+      }
     }
   }
   app.selectedItem = item;
 };
+
+const isYPointOnScreen = (app: AppContent, y: number) =>
+  y >= app.pageOffset && y <= app.pageOffset + canvas.canvas.height;
+
+const clampScrollPosition = (app: AppContent, offset: number) =>
+  clampNumber(offset, 0, app.pageHeight - canvas.canvas.height);
 
 const renderViews = (
   app: AppContent,
@@ -182,6 +227,7 @@ const renderViews = (
   const renderViewsInner = (item: Item, x: number) => {
     item.children.forEach((item) => {
       renderItem(app, item, x, yOffset);
+      app.pageHeight = yOffset + sp.start;
       yOffset += sp.yStep;
       if (item.isOpen && item.children.length > 0) {
         renderViewsInner(item, x + sp.xStep);
@@ -253,3 +299,6 @@ const removeAllItemViews = (app: AppContent, item: Item) => {
     app.itemsToViews.delete(item);
   }
 };
+
+const clampNumber = (v: number, min: number, max: number) =>
+  Math.min(Math.max(v, min), max);
