@@ -145,6 +145,7 @@ const applyMovement = (app: AppContent, movingFn: F1<Item>) => {
   if (app.selectedItem) {
     movingFn(app.selectedItem);
     updateExistingItemPositions(app, sp.start, sp.start);
+    centerOnSelectedIfOutOfViewport(app);
   }
 };
 
@@ -171,7 +172,7 @@ const removeItemFromTree = (app: AppContent, item: Item) => {
   updateExistingItemPositions(app, sp.start, sp.start);
 };
 
-const changeSelection = (
+export const changeSelection = (
   app: AppContent,
   getNextItem: F2<Item, Item | undefined>
 ) => {
@@ -181,6 +182,7 @@ const changeSelection = (
     if (next) {
       unselect(app, selectedItem);
       select(app, next);
+      centerOnSelectedIfOutOfViewport(app);
     }
   }
 };
@@ -193,14 +195,21 @@ const unselect = (app: AppContent, item: Item) => {
   }
 };
 
-//select is used directly only from tests,
-export const select = (app: AppContent, item?: Item) => {
+const select = (app: AppContent, item?: Item) => {
   if (item) {
     const views = app.itemsToViews.get(item);
     if (views) {
       views.circle.color = sp.selectedCircle;
       views.text.color = sp.selectedCircle;
+    }
+  }
+  app.selectedItem = item;
+};
 
+const centerOnSelectedIfOutOfViewport = (app: AppContent) => {
+  if (app.selectedItem) {
+    const views = app.itemsToViews.get(app.selectedItem);
+    if (views) {
       const circleY = views.circle.y;
       if (!isYPointOnScreen(app, circleY)) {
         const targetScreenPosition = circleY - canvas.canvas.height / 2;
@@ -208,7 +217,6 @@ export const select = (app: AppContent, item?: Item) => {
       }
     }
   }
-  app.selectedItem = item;
 };
 
 const isYPointOnScreen = (app: AppContent, y: number) =>

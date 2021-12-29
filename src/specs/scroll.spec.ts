@@ -1,6 +1,7 @@
 import { createRoot, list } from "../domain/items";
-import { AppContent, handleWheelEvent, init, select } from "../app";
+import { AppContent, handleWheelEvent, init } from "../app";
 import { sp } from "../view/design";
+import simulation from "./simulation";
 
 jest.mock("../infra", () => ({
   canvas: {
@@ -49,7 +50,7 @@ describe("Having a long list of items and a canvas of height 500px", () => {
 it("Having 100 items and canvas of height 500px selecting item out of viewport centers on that item", () => {
   const app = init(createRoot(list("Item", 100)));
 
-  select(app, app.root.children[50]);
+  simulation.select(app, app.root.children[50]);
 
   const view = app.itemsToViews.get(app.root.children[50])!;
 

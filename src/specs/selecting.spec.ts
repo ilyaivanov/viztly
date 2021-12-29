@@ -1,5 +1,5 @@
 import { createItem, createRoot } from "../domain/items";
-import { AppContent, init, select } from "../app";
+import { AppContent, changeSelection, init } from "../app";
 import { itemAt } from "./itemCheck";
 import simulation from "./simulation";
 
@@ -28,7 +28,7 @@ describe("Having three nested items", () => {
   });
 
   it("when Item 1.2 is selected going left selects parent", () => {
-    select(app, app.root.children[0].children[1]);
+    simulation.select(app, app.root.children[0].children[1]);
 
     simulation.selectLeft(app);
 
@@ -123,7 +123,10 @@ describe("Having a very deep tree of items", () => {
     );
   });
   it("when a very nest item is selected going down selects parents of next child", () => {
-    select(app, app.root.children[0].children[0].children[0].children[0]);
+    simulation.select(
+      app,
+      app.root.children[0].children[0].children[0].children[0]
+    );
 
     itemAt(app, 4, 4, { title: "Item 1.1.1.1", isSelected: true });
 
@@ -133,7 +136,7 @@ describe("Having a very deep tree of items", () => {
   });
 
   it("when Item 2 is selsected going above selects Item 1.1.1.1", () => {
-    select(app, app.root.children[1]);
+    simulation.select(app, app.root.children[1]);
 
     itemAt(app, 1, 5, { title: "Item 2", isSelected: true });
 
@@ -156,7 +159,7 @@ it("When root is selected going up does nothing", () => {
 it("When last is selected going down does nothing", () => {
   const app = init(createRoot([createItem("Item 1"), createItem("Item 2")]));
 
-  select(app, app.root.children[1]);
+  simulation.select(app, app.root.children[1]);
   itemAt(app, 1, 2, { title: "Item 2", isSelected: true });
 
   simulation.selectDown(app);

@@ -1,4 +1,4 @@
-import { AppContent, handleKeyDown } from "../app";
+import { AppContent, changeSelection, handleKeyDown } from "../app";
 
 export default {
   swapDown: (app: AppContent) =>
@@ -45,6 +45,8 @@ export default {
       throw new Error(`Can't find input with #main-input in document body`);
     }
   },
+
+  select: (app: AppContent, item: Item) => changeSelection(app, () => item),
 };
 
 const singleKeyDown = (code: KeyboardKey): KeyboardEvent =>
