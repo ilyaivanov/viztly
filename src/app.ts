@@ -22,9 +22,7 @@ export type AppContent = {
   pageHeight: number;
   pageOffset: number;
 
-  ui: {
-    scrollbar: Rectangle;
-  };
+  ui: { scrollbar: Rectangle };
 };
 
 export const init = (root: Item): AppContent => {
@@ -65,6 +63,7 @@ const setPageOffset = (app: AppContent, offset: number) => {
   app.pageOffset = clampScrollPosition(app, offset);
   updateScrollbar(app);
 };
+
 export const forEachShape = (app: AppContent, cb: F1<Shape>) =>
   app.views.forEach(cb);
 
@@ -158,6 +157,7 @@ const closeItem = (app: AppContent, item: Item) => {
   item.isOpen = false;
   traversal.forEachOpenChild(item, (child) => removeAllItemViews(app, child));
   updateExistingItemPositions(app, sp.start, sp.start);
+  updateOpenLine(app, item);
 };
 
 const openItem = (app: AppContent, item: Item) => {
@@ -167,6 +167,7 @@ const openItem = (app: AppContent, item: Item) => {
     renderViews(app, item, view.circle.x + sp.xStep, view.circle.y + sp.yStep);
   }
   updateExistingItemPositions(app, sp.start, sp.start);
+  updateOpenLine(app, item);
 };
 
 const removeItemFromTree = (app: AppContent, item: Item) => {
@@ -272,18 +273,33 @@ const renderItem = (
 
 const updateExistingItemPositions = (app: AppContent, x: number, y: number) => {
   let yOffset = y;
+  const openItems = new Set<Item>();
   const updateItemPositions = (item: Item, x: number) => {
     item.children.forEach((item) => {
       const view = app.itemsToViews.get(item);
-      if (view) updateItemPosition(app, view, item, x, yOffset);
+      if (item.isOpen) openItems.add(item);
+      if (view) updateItemPosition(view, item, x, yOffset);
       yOffset += sp.yStep;
       if (item.isOpen && item.children.length > 0)
         updateItemPositions(item, x + sp.xStep);
     });
   };
   updateItemPositions(app.root, x);
+  openItems.forEach((i) => updateOpenItemLines(app, i));
   app.pageHeight = yOffset - sp.yStep + sp.start;
   updateScrollbar(app);
+};
+
+const updateOpenLine = (app: AppContent, item: Item) => {
+  const view = app.itemsToViews.get(item);
+  if (view && view.openLine) {
+    if (!item.isOpen) {
+      view.openLine.x2 = view.openLine.x1;
+      view.openLine.y2 = view.openLine.y1;
+    } else {
+      updateOpenItemLines(app, item);
+    }
+  }
 };
 
 const removeAllItemViews = (app: AppContent, item: Item) => {

@@ -11,6 +11,7 @@ export const createItemViewAt = (
 ): ItemView => {
   const color = app.selectedItem === item ? sp.selectedCircle : sp.regularColor;
   const text = item.title;
+
   const childLine: Line | undefined =
     item.parent && !isRoot(item.parent)
       ? { type: "line", color: sp.line, x1: 0, y1: 0, x2: 0, y2: 0, width: 2 }
@@ -19,18 +20,19 @@ export const createItemViewAt = (
   const openLine: Line | undefined = item.isOpen
     ? { type: "line", color: sp.line, x1: 0, y1: 0, x2: 0, y2: 0, width: 2 }
     : undefined;
+
   const view: ItemView = {
     circle: { type: "circle", color, x: 0, y: 0, filled: false, r: 3 },
     text: { type: "text", color, x: 0, y: 0, text, fontSize: sp.fontSize },
     childLine,
     openLine,
   };
-  updateItemPosition(app, view, item, x, y);
+
+  updateItemPosition(view, item, x, y);
   return view;
 };
 
 export const updateItemPosition = (
-  app: AppContent,
   view: ItemView,
   item: Item,
   x: number,
