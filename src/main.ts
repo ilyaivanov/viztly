@@ -37,7 +37,7 @@ const app = init(
 const render = () => {
   canvas.clear();
   canvas.setTranslation(0, 0);
-  canvas.drawRect(app.ui.scrollbar);
+  canvas.drawShape(app.ui.scrollbar);
   canvas.setTranslation(0, -app.pageOffset);
   forEachShape(app, canvas.drawShape);
 };

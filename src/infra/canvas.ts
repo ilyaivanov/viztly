@@ -52,7 +52,9 @@ export const setTranslation = (x: number, y: number) => {
 
 export const drawShape = (shape: Shape) => {
   if (shape.type === "circle") drawCircle(shape);
-  if (shape.type === "text") drawText(shape);
+  else if (shape.type === "text") drawText(shape);
+  else if (shape.type === "rectangle") drawRect(shape);
+  else if (shape.type === "line") drawLine(shape);
 };
 
 const drawCircle = ({ x, y, r, color, filled }: Circle) => {
@@ -75,7 +77,16 @@ const drawText = ({ x, y, text, fontSize, color }: TextShape) => {
   canvas.ctx.fillText(text, x, y);
 };
 
-export const drawRect = ({ x, y, width, height, color }: Rectangle) => {
+const drawRect = ({ x, y, width, height, color }: Rectangle) => {
   canvas.ctx.fillStyle = color;
   canvas.ctx.fillRect(x, y, width, height);
+};
+
+const drawLine = ({ x1, y1, x2, y2, width, color }: Line) => {
+  canvas.ctx.strokeStyle = color;
+  canvas.ctx.lineWidth = width;
+  canvas.ctx.beginPath();
+  canvas.ctx.moveTo(x1, y1);
+  canvas.ctx.lineTo(x2, y2);
+  canvas.ctx.stroke();
 };

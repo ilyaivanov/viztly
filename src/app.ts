@@ -4,6 +4,11 @@ import * as traversal from "./domain/tree.traversal";
 import * as input from "./view/itemInput";
 import { sp } from "./view/design";
 import { canvas } from "./infra";
+import {
+  createItemViewAt,
+  updateItemPosition,
+  updateOpenItemLines,
+} from "./view/itemView";
 
 export type AppContent = {
   //domain state
@@ -232,9 +237,11 @@ const renderViews = (
   y: number
 ) => {
   let yOffset = y;
+  const openItems = new Set<Item>();
   const renderViewsInner = (item: Item, x: number) => {
     item.children.forEach((item) => {
       renderItem(app, item, x, yOffset);
+      if (item.isOpen) openItems.add(item);
       yOffset += sp.yStep;
       if (item.isOpen && item.children.length > 0) {
         renderViewsInner(item, x + sp.xStep);
@@ -243,6 +250,7 @@ const renderViews = (
   };
   renderViewsInner(itemFocused, x);
   app.pageHeight = yOffset - sp.yStep + sp.start;
+  openItems.forEach((i) => updateOpenItemLines(app, i));
 };
 
 const renderItem = (
@@ -251,28 +259,15 @@ const renderItem = (
   x: number,
   y: number
 ): ItemView => {
-  const color = app.selectedItem === item ? sp.selectedCircle : "white";
-  const text = item.title;
-  const view: ItemView = {
-    circle: { type: "circle", color, x: 0, y: 0, filled: false, r: 3 },
-    text: { type: "text", color, x: 0, y: 0, text, fontSize: sp.fontSize },
-  };
-  app.views.add(view.circle);
+  const view = createItemViewAt(app, item, x, y);
+  //this determines order of items
+  if (view.childLine) app.views.add(view.childLine);
+  if (view.openLine) app.views.add(view.openLine);
   app.views.add(view.text);
-  updateItemView(view, item, x, y);
+  app.views.add(view.circle);
   updateScrollbar(app);
   app.itemsToViews.set(item, view);
   return view;
-};
-
-const updateItemView = (view: ItemView, item: Item, x: number, y: number) => {
-  view.circle.x = x;
-  view.circle.y = y;
-
-  view.circle.filled = !traversal.isEmpty(item);
-
-  view.text.x = x + sp.circleToTextDistance;
-  view.text.y = y + 0.32 * sp.fontSize;
 };
 
 const updateExistingItemPositions = (app: AppContent, x: number, y: number) => {
@@ -280,7 +275,7 @@ const updateExistingItemPositions = (app: AppContent, x: number, y: number) => {
   const updateItemPositions = (item: Item, x: number) => {
     item.children.forEach((item) => {
       const view = app.itemsToViews.get(item);
-      if (view) updateItemView(view, item, x, yOffset);
+      if (view) updateItemPosition(app, view, item, x, yOffset);
       yOffset += sp.yStep;
       if (item.isOpen && item.children.length > 0)
         updateItemPositions(item, x + sp.xStep);
@@ -296,6 +291,8 @@ const removeAllItemViews = (app: AppContent, item: Item) => {
   if (view) {
     app.views.delete(view.circle);
     app.views.delete(view.text);
+    if (view.childLine) app.views.delete(view.childLine);
+    if (view.openLine) app.views.delete(view.openLine);
     app.itemsToViews.delete(item);
   }
 };

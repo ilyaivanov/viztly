@@ -1,7 +1,7 @@
-type Shape = TextShape | Circle | Rectangle;
+type Shape = TextShape | Circle | Rectangle | Line;
 type Views = Set<Shape>;
 
-type ShapeType = "text" | "circle" | "rectangle";
+type ShapeType = "text" | "circle" | "rectangle" | "line";
 
 type TextShape = {
   type: "text";
@@ -30,6 +30,16 @@ type Rectangle = {
   color: string;
 };
 
+type Line = {
+  type: "line";
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  width: number;
+  color: string;
+};
+
 type KeyboardKey =
   | "ArrowDown"
   | "ArrowUp"
@@ -42,4 +52,6 @@ type KeyboardKey =
 type ItemView = {
   circle: Circle;
   text: TextShape;
+  childLine?: Line;
+  openLine?: Line;
 };
