@@ -54,9 +54,14 @@ export const init = (root: Item): AppContent => {
 };
 
 export const updateScrollbar = (app: AppContent) => {
-  app.ui.scrollbar.height = Math.pow(canvas.canvas.height, 2) / app.pageHeight;
-  app.ui.scrollbar.x = canvas.canvas.width - app.ui.scrollbar.width;
-  app.ui.scrollbar.y = app.pageOffset * (canvas.canvas.height / app.pageHeight);
+  const canvasHeight = canvas.canvas.height;
+  if (canvasHeight < app.pageHeight) {
+    app.ui.scrollbar.height = Math.pow(canvasHeight, 2) / app.pageHeight;
+    app.ui.scrollbar.x = canvas.canvas.width - app.ui.scrollbar.width;
+    app.ui.scrollbar.y = app.pageOffset * (canvasHeight / app.pageHeight);
+  } else {
+    app.ui.scrollbar.height = 0;
+  }
 };
 
 const setPageOffset = (app: AppContent, offset: number) => {
@@ -251,6 +256,7 @@ const renderViews = (
   };
   renderViewsInner(itemFocused, x);
   app.pageHeight = yOffset - sp.yStep + sp.start;
+  updateScrollbar(app);
   openItems.forEach((i) => updateOpenItemLines(app, i));
 };
 
@@ -266,7 +272,6 @@ const renderItem = (
   if (view.openLine) app.views.add(view.openLine);
   app.views.add(view.text);
   app.views.add(view.circle);
-  updateScrollbar(app);
   app.itemsToViews.set(item, view);
   return view;
 };
