@@ -4,10 +4,24 @@ import { animatePosition } from "../src/infra/animations";
 import { sp } from "../src/view/design";
 import { on, AppEvents, getFocused } from "./tree";
 
+type ItemView = {
+  circle: Circle;
+  text: TextShape;
+  textMinimap: TextShape;
+  childLine?: Line;
+  openLine?: Line;
+};
+
 let itemToViews: Map<Item, ItemView> = new Map();
+export const treeShapes = new Set<Shape>();
+const addViewShapes = (itemView: ItemView) =>
+  Object.values(itemView).forEach((s) => treeShapes.add(s));
+const removeViewShapes = (itemView: ItemView) =>
+  Object.values(itemView).forEach((s) => treeShapes.delete(s));
 
 export const init = (focused: Item) => {
   viewItemChildren(focused, sp.start, sp.start);
+  initMinimap();
 };
 
 export const subscribe = () => {
@@ -41,7 +55,6 @@ const unselect = (item: Item) => {
 
 const toggleItem = (item: Item) => {
   const view = itemToViews.get(item);
-  const shapes = canvas.canvas.shapes;
   const isOpened = item.isOpen;
   if (view) {
     if (isOpened) {
@@ -51,7 +64,7 @@ const toggleItem = (item: Item) => {
       const removeItem = (item: Item) => {
         const itemView = itemToViews.get(item);
         if (itemView) {
-          Object.values(itemView).forEach((s) => shapes.delete(s));
+          removeViewShapes(itemView);
           itemToViews.delete(item);
         }
       };
@@ -63,13 +76,12 @@ const toggleItem = (item: Item) => {
 
 const viewItemChildren = (item: Item, xStart: number, yStart: number) => {
   let yOffset = yStart;
-  const shapes = canvas.canvas.shapes;
+
   const res: Shape[] = [];
   const step = (item: Item, level: number) => {
     const x = level * sp.xStep + xStart;
     const itemView = createItemView(item, x, yOffset);
-    shapes.add(itemView.circle);
-    shapes.add(itemView.text);
+    addViewShapes(itemView);
     itemToViews.set(item, itemView);
     yOffset += sp.yStep;
     if (item.isOpen && item.children.length > 0)
@@ -98,6 +110,14 @@ const updatePositions = (item: Item) => {
 };
 
 const createItemView = (item: Item, x: number, y: number): ItemView => {
+  const text: TextShape = {
+    type: "text",
+    x: 0,
+    y: 0,
+    color: "white",
+    fontSize: sp.fontSize,
+    text: item.title,
+  };
   const view: ItemView = {
     circle: {
       type: "circle",
@@ -105,16 +125,10 @@ const createItemView = (item: Item, x: number, y: number): ItemView => {
       x: 0,
       color: "white",
       filled: item.children.length > 0,
-      r: 3.2,
+      r: sp.circleR,
     },
-    text: {
-      type: "text",
-      x: 0,
-      y: 0,
-      color: "white",
-      fontSize: sp.fontSize,
-      text: item.title,
-    },
+    text,
+    textMinimap: scaleTextToMinimap(text),
   };
   setItemViewPosition(view, x, y, false);
   return view;
@@ -134,12 +148,60 @@ const setItemViewPosition = (
     itemView.circle.y = y;
     itemView.text.x = textX;
     itemView.text.y = textY;
+    itemView.textMinimap.x = scaleTextXToMinimap(textX);
+    console.log(scaleTextXToMinimap(textY));
+    itemView.textMinimap.y = scaleTextYToMinimap(textY);
     return;
   }
 
   if (itemView.circle.x !== x || itemView.circle.y !== y)
     animatePosition(itemView.circle, x, y);
 
-  if (itemView.text.x !== textX || itemView.text.y !== textY)
+  if (itemView.text.x !== textX || itemView.text.y !== textY) {
     animatePosition(itemView.text, textX, textY);
+    animatePosition(
+      itemView.textMinimap,
+      scaleTextXToMinimap(textX),
+      scaleTextYToMinimap(textY)
+    );
+  }
 };
+
+//minimap
+const MINIMAP_SCALE = 10;
+const initMinimap = () => {
+  const c = canvas.canvas;
+  const shapes = c.shapes;
+  const minimapWidth = c.width / MINIMAP_SCALE;
+  shapes.add({
+    type: "rectangle",
+    x: canvas.canvas.width - minimapWidth,
+    y: 0,
+    width: minimapWidth,
+    height: canvas.canvas.height,
+    color: "rgba(255,255,255,0.03)",
+  });
+
+  shapes.add({
+    type: "rectangle",
+    x: canvas.canvas.width - minimapWidth,
+    y: 0,
+    width: minimapWidth,
+    height: canvas.canvas.height / MINIMAP_SCALE,
+    color: "rgba(255,255,255,0.1)",
+  });
+};
+
+const scaleTextToMinimap = (shape: TextShape): TextShape => ({
+  ...shape,
+  x: scaleTextXToMinimap(shape.x),
+  y: scaleTextYToMinimap(shape.y),
+  fontSize: shape.fontSize / MINIMAP_SCALE,
+});
+
+const scaleTextXToMinimap = (x: number) => {
+  const c = canvas.canvas;
+  return c.width - c.width / MINIMAP_SCALE + x / MINIMAP_SCALE;
+};
+
+const scaleTextYToMinimap = (y: number) => y / MINIMAP_SCALE;

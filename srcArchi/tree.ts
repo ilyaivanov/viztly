@@ -48,9 +48,10 @@ export const goLeft = () => {
   }
 };
 export const goRight = () => {
-  if (tree.selectedItem && !tree.selectedItem.isOpen) {
-    tree.selectedItem.isOpen = true;
-    trigger("item-toggled", tree.selectedItem);
+  const selected = tree.selectedItem;
+  if (selected && !selected.isOpen && selected.children.length > 0) {
+    selected.isOpen = true;
+    trigger("item-toggled", selected);
   }
 };
 

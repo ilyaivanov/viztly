@@ -2,7 +2,7 @@ import { isRoot } from "./tree.traversal";
 
 export const list = (prefix: string, count: number): Item[] =>
   Array.from(new Array(count)).map((_, index) =>
-    createItem(`${prefix} ${index + 1}`)
+    createItem(`${prefix}${index + 1}`)
   );
 
 export const createRoot = (children: Item[]) => createItem("Root", children);
