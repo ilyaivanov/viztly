@@ -9,8 +9,8 @@ export class SpringAnimated implements Animated {
   private last: number;
 
   // { stiffness: 0.02, damping: 2, invertedMass: 0.2 },
-  stiffness = 0.03;
-  damping = 1.8;
+  stiffness = 0.035;
+  damping = 2;
   invertedMass = 0.28;
 
   onTick?: (val: number, ended: boolean) => void;

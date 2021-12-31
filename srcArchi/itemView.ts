@@ -2,99 +2,51 @@ import { isRoot } from "../src/domain/tree.traversal";
 import { canvas } from "../src/infra";
 import { animatePosition } from "../src/infra/animations";
 import { sp } from "../src/view/design";
+import { isSelected } from "./tree";
 
-export type ItemView = {
-  circle: Circle;
-  text: TextShape;
-  textMinimap: TextShape;
-  childLine: Line;
+export type ItemView2 = {
+  opacity: number;
+
+  x: number;
+  y: number;
+
+  //while y is holding animated value, targetY is holding targeted value,
+  //so that other elements can calculate proper position while animation is running
+  targetY: number;
+  lastChildOffset: number;
+  item: Item;
 };
 
-export const createItemView = (item: Item, x: number, y: number): ItemView => {
-  const text: TextShape = {
-    type: "text",
-    x: 0,
-    y: 0,
-    color: "white",
-    fontSize: sp.fontSize,
-    text: item.title,
-  };
-  //Property order here determines draw order at canvas (because of Object.values(itemView)).
-  //I need to think about better solution
-  const view: ItemView = {
-    childLine: {
-      start: { x: 0, y: 0 },
-      end: { x: 0, y: 0 },
-      color: sp.line,
-      type: "line",
-      width: 2,
-    },
-    circle: {
-      type: "circle",
-      y: 0,
-      x: 0,
-      color: "white",
-      filled: item.children.length > 0,
-      r: sp.circleR,
-    },
-    text,
-    textMinimap: scaleTextToMinimap(text),
-  };
-  setItemViewPosition(view, x, y, false);
-  return view;
-};
+export const draw = ({ item, x, y, opacity, lastChildOffset }: ItemView2) => {
+  const c = canvas;
 
-export const setItemViewPosition = (
-  itemView: ItemView,
-  x: number,
-  y: number,
-  isAnimating = true
-) => {
+  c.canvas.ctx.globalAlpha = opacity;
+
+  if (item.parent && !isRoot(item.parent))
+    c.drawLine(x, y, x - sp.xStep, y, sp.line, 2);
+
+  if (lastChildOffset) c.drawLine(x, y, x, y + lastChildOffset, sp.line, 2);
+
+  const color = isSelected(item) ? sp.selectedCircle : sp.regularColor;
+  c.drawCircle(x, y, sp.circleR, color, item.children.length > 0);
   const textX = x + sp.circleToTextDistance;
   const textY = y + 0.32 * sp.fontSize;
-
-  if (!isAnimating) {
-    itemView.circle.x = x;
-    itemView.circle.y = y;
-    itemView.text.x = textX;
-    itemView.text.y = textY;
-    itemView.textMinimap.x = scaleTextXToMinimap(textX);
-    itemView.textMinimap.y = scaleTextYToMinimap(textY);
-    itemView.childLine.start.x = x;
-    itemView.childLine.start.y = y;
-    itemView.childLine.end.x = x - sp.xStep;
-    itemView.childLine.end.y = y;
-    return;
-  }
-
-  if (itemView.circle.x !== x || itemView.circle.y !== y) {
-    animatePosition(itemView.circle, x, y);
-    if (itemView.childLine) {
-      animatePosition(itemView.childLine.start, x, y);
-      animatePosition(itemView.childLine.end, x - sp.xStep, y);
-    }
-  }
-
-  if (itemView.text.x !== textX || itemView.text.y !== textY) {
-    animatePosition(itemView.text, textX, textY);
-    animatePosition(
-      itemView.textMinimap,
-      scaleTextXToMinimap(textX),
-      scaleTextYToMinimap(textY)
-    );
-  }
+  c.drawText(textX, textY, item.title, sp.fontSize, color);
 };
 
-const scaleTextToMinimap = (shape: TextShape): TextShape => ({
-  ...shape,
-  x: scaleTextXToMinimap(shape.x),
-  y: scaleTextYToMinimap(shape.y),
-  fontSize: shape.fontSize / sp.minimapScale,
-});
+export const drawTextOnMinimap = ({ item, x, y, opacity }: ItemView2) => {
+  const c = canvas;
+  c.canvas.ctx.globalAlpha = opacity;
 
-const scaleTextXToMinimap = (x: number) => {
-  const c = canvas.canvas;
-  return c.width - c.width / sp.minimapScale + x / sp.minimapScale;
+  const color = isSelected(item) ? sp.selectedCircle : sp.regularColor;
+  const textX = x + sp.circleToTextDistance;
+  const textY = y + 0.32 * sp.fontSize;
+  const xOffset = canvas.canvas.width - canvas.canvas.width / sp.minimapScale;
+  c.drawText(
+    xOffset + textX / sp.minimapScale,
+    textY / sp.minimapScale,
+    item.title,
+    sp.fontSize / sp.minimapScale,
+    color
+  );
 };
-
-const scaleTextYToMinimap = (y: number) => y / sp.minimapScale;

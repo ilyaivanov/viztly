@@ -2,7 +2,7 @@ import { createItem, createRoot, list } from "../src/domain/items";
 import { canvas, engine } from "../src/infra";
 
 import * as tree from "./tree";
-import { init, subscribe, treeShapes } from "./treeView";
+import { init, subscribe, drawTree } from "./treeView";
 
 const el = canvas.createFullscreenCanvas();
 
@@ -35,7 +35,7 @@ const render = () => {
   canvas.clear();
   canvas.drawShapes();
 
-  treeShapes.forEach(canvas.drawShape);
+  drawTree();
 };
 
 document.addEventListener("keydown", (e) => {

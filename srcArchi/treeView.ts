@@ -2,47 +2,23 @@ import { forEachOpenChild } from "../src/domain/tree.traversal";
 import { canvas } from "../src/infra";
 import { sp } from "../src/view/design";
 import { on, AppEvents, getFocused } from "./tree";
-import { createItemView, ItemView, setItemViewPosition } from "./itemView";
+import { draw, drawTextOnMinimap, ItemView2 } from "./itemView";
+import { animatePosition, spring, springKeyed } from "../src/infra/animations";
 
-let itemToViews: Map<Item, ItemView> = new Map();
-export const treeShapes = new Set<Shape>();
-const addViewShapes = (itemView: ItemView) =>
-  Object.values(itemView).forEach((s) => s && treeShapes.add(s));
-const removeViewShapes = (itemView: ItemView) =>
-  Object.values(itemView).forEach((s) => s && treeShapes.delete(s));
+let itemToViews: Map<Item, ItemView2> = new Map();
+
+export const drawTree = () => {
+  itemToViews.forEach(draw);
+
+  drawMinimap();
+};
 
 export const init = (focused: Item) => {
   viewItemChildren(focused, sp.start, sp.start);
-  initMinimap();
 };
 
 export const subscribe = () => {
-  on("init", (p) => select(p.selectedItem));
-  on("selection-changed", selectionChanged);
   on("item-toggled", toggleItem);
-};
-
-const selectionChanged = ({
-  prev,
-  current,
-}: AppEvents["selection-changed"]) => {
-  unselect(prev);
-  select(current);
-};
-
-const select = (item: Item) => {
-  const view = itemToViews.get(item);
-  if (view) {
-    view.circle.color = sp.selectedCircle;
-    view.text.color = sp.selectedCircle;
-  }
-};
-const unselect = (item: Item) => {
-  const view = itemToViews.get(item);
-  if (view) {
-    view.circle.color = "white";
-    view.text.color = "white";
-  }
 };
 
 const toggleItem = (item: Item) => {
@@ -50,17 +26,26 @@ const toggleItem = (item: Item) => {
   const isOpened = item.isOpen;
   if (view) {
     if (isOpened) {
-      viewItemChildren(item, view.circle.x, view.circle.y);
+      viewItemChildren(item, view.x, view.y);
       updatePositions(getFocused());
+      forEachOpenChild(item, (i) => {
+        const view = itemToViews.get(i);
+        if (view) spring(0, 1, (v) => (view.opacity = v));
+      });
     } else {
-      const removeItem = (item: Item) => {
-        const itemView = itemToViews.get(item);
-        if (itemView) {
-          removeViewShapes(itemView);
-          itemToViews.delete(item);
+      forEachOpenChild(item, (i) => {
+        const view = itemToViews.get(i);
+        if (view) {
+          animatePosition(view, view.x - sp.xStep, view.y, () => {
+            //checking if this animating view is still under item
+            if (itemToViews.get(i) === view) itemToViews.delete(i);
+          });
+          spring(1, 0, (v) => (view.opacity = v));
         }
-      };
-      forEachOpenChild(item, removeItem);
+      });
+      if (view) {
+        spring(view.lastChildOffset, 0, (v) => (view.lastChildOffset = v));
+      }
       updatePositions(getFocused());
     }
   }
@@ -72,14 +57,26 @@ const viewItemChildren = (item: Item, xStart: number, yStart: number) => {
   const res: Shape[] = [];
   const step = (item: Item, level: number) => {
     const x = level * sp.xStep + xStart;
-    const itemView = createItemView(item, x, yOffset);
 
-    itemToViews.set(item, itemView);
+    const view: ItemView2 = {
+      opacity: 1,
+      x,
+      targetY: yOffset,
+      y: yOffset,
+      item,
+      lastChildOffset: 0,
+    };
+    itemToViews.set(item, view);
+
     yOffset += sp.yStep;
     if (item.isOpen && item.children.length > 0) {
       item.children.forEach((c) => step(c, level + 1));
+
+      const lastChildView = itemToViews.get(
+        item.children[item.children.length - 1]
+      );
+      if (lastChildView) view.lastChildOffset = lastChildView.y - view.y + 1;
     }
-    addViewShapes(itemView);
   };
 
   item.children.forEach((c) => step(c, 0));
@@ -93,11 +90,19 @@ const updatePositions = (item: Item) => {
     const x = level * sp.xStep + sp.start;
     const itemView = itemToViews.get(item);
 
-    if (itemView) setItemViewPosition(itemView, x, yOffset);
+    if (itemView && (itemView.x !== x || itemView.y !== yOffset)) {
+      itemView.targetY = yOffset;
+      animatePosition(itemView, x, yOffset);
+    }
 
     yOffset += sp.yStep;
     if (item.isOpen && item.children.length > 0) {
       item.children.forEach((c) => step(c, level + 1));
+      const lastChildView = itemToViews.get(
+        item.children[item.children.length - 1]
+      );
+      if (itemView && lastChildView)
+        itemView.lastChildOffset = lastChildView.targetY - itemView.targetY + 1;
     }
   };
 
@@ -105,25 +110,24 @@ const updatePositions = (item: Item) => {
 };
 
 //minimap
-const initMinimap = () => {
-  const c = canvas.canvas;
-  const shapes = c.shapes;
-  const minimapWidth = c.width / sp.minimapScale;
-  shapes.add({
-    type: "rectangle",
-    x: canvas.canvas.width - minimapWidth,
-    y: 0,
-    width: minimapWidth,
-    height: canvas.canvas.height,
-    color: "rgba(255,255,255,0.03)",
-  });
+const drawMinimap = () => {
+  const c = canvas;
+  c.canvas.ctx.globalAlpha = 1;
 
-  shapes.add({
-    type: "rectangle",
-    x: canvas.canvas.width - minimapWidth,
-    y: 0,
-    width: minimapWidth,
-    height: canvas.canvas.height / sp.minimapScale,
-    color: "rgba(255,255,255,0.1)",
-  });
+  const minimapWidth = c.canvas.width / sp.minimapScale;
+  c.drawRect(
+    canvas.canvas.width - minimapWidth,
+    0,
+    minimapWidth,
+    canvas.canvas.height,
+    "rgba(255,255,255,0.03)"
+  );
+  c.drawRect(
+    canvas.canvas.width - minimapWidth,
+    0,
+    minimapWidth,
+    canvas.canvas.height / sp.minimapScale,
+    "rgba(255,255,255,0.1)"
+  );
+  itemToViews.forEach(drawTextOnMinimap);
 };

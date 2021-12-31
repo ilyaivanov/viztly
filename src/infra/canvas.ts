@@ -54,13 +54,30 @@ export const setTranslation = (x: number, y: number) => {
 export const drawShapes = () => canvas.shapes.forEach(drawShape);
 
 export const drawShape = (shape: Shape) => {
-  if (shape.type === "circle") drawCircle(shape);
-  else if (shape.type === "text") drawText(shape);
-  else if (shape.type === "rectangle") drawRect(shape);
-  else if (shape.type === "line") drawLine(shape);
+  if (shape.type === "circle")
+    drawCircle(shape.x, shape.y, shape.r, shape.color, shape.filled);
+  else if (shape.type === "text")
+    drawText(shape.x, shape.y, shape.text, shape.fontSize, shape.color);
+  else if (shape.type === "rectangle")
+    drawRect(shape.x, shape.y, shape.width, shape.height, shape.color);
+  else if (shape.type === "line")
+    drawLine(
+      shape.start.x,
+      shape.start.y,
+      shape.end.x,
+      shape.end.y,
+      shape.color,
+      shape.width
+    );
 };
 
-const drawCircle = ({ x, y, r, color, filled }: Circle) => {
+export const drawCircle = (
+  x: number,
+  y: number,
+  r: number,
+  color: string,
+  filled = true
+) => {
   const { ctx } = canvas;
   ctx.beginPath();
   const lineWidth = 1.5;
@@ -74,22 +91,41 @@ const drawCircle = ({ x, y, r, color, filled }: Circle) => {
   }
 };
 
-const drawText = ({ x, y, text, fontSize, color }: TextShape) => {
+export const drawText = (
+  x: number,
+  y: number,
+  text: string,
+  fontSize: number,
+  color: string
+) => {
   canvas.ctx.font = `${fontSize}px Segoe UI, Ubuntu, Roboto, sans-serif`;
   canvas.ctx.fillStyle = color;
   canvas.ctx.fillText(text, x, y);
 };
 
-const drawRect = ({ x, y, width, height, color }: Rectangle) => {
+export const drawRect = (
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  color: string
+) => {
   canvas.ctx.fillStyle = color;
   canvas.ctx.fillRect(x, y, width, height);
 };
 
-const drawLine = ({ start, end, width, color }: Line) => {
+export const drawLine = (
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+  color: string,
+  width: number
+) => {
   canvas.ctx.strokeStyle = color;
   canvas.ctx.lineWidth = width;
   canvas.ctx.beginPath();
-  canvas.ctx.moveTo(start.x, start.y);
-  canvas.ctx.lineTo(end.x, end.y);
+  canvas.ctx.moveTo(x1, y1);
+  canvas.ctx.lineTo(x2, y2);
   canvas.ctx.stroke();
 };

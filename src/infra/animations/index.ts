@@ -63,25 +63,28 @@ export const springKeyed = (
 export const animatePosition = (
   position: { x: number; y: number },
   x: number,
-  y: number
+  y: number,
+  isDone: () => void = () => undefined
 ) => {
   const xStart = position.x;
   const yStart = position.y;
-  const yDiff = Math.abs(yStart - position.y);
-  const xDiff = Math.abs(xStart - position.x);
+  const yDiff = Math.abs(yStart - y);
+  const xDiff = Math.abs(xStart - x);
   if (xDiff > yDiff) {
-    springKeyed(position, xStart, x, (v) => {
+    springKeyed(position, xStart, x, (v, done) => {
       const xNormalized = Math.abs(xStart - v) / Math.abs(x - xStart); //0..1
       const yInterpolated = yStart + (y - yStart) * xNormalized;
       position.x = v;
       position.y = yInterpolated;
+      if (done) isDone();
     });
   } else {
-    springKeyed(position, yStart, y, (v) => {
+    springKeyed(position, yStart, y, (v, done) => {
       const yNormalized = Math.abs(yStart - v) / Math.abs(y - yStart); //0..1
       const xInterpolated = xStart + (x - xStart) * yNormalized;
       position.y = v;
       position.x = xInterpolated;
+      if (done) isDone();
     });
   }
 };

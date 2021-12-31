@@ -28,6 +28,7 @@ export const createTree = (root: Item) => {
 };
 
 export const getFocused = () => tree.root;
+export const isSelected = (item: Item) => tree.selectedItem === item;
 
 //actions
 export const goDown = () => changeSelection(getItemBelow);
