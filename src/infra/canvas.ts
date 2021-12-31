@@ -85,11 +85,11 @@ const drawRect = ({ x, y, width, height, color }: Rectangle) => {
   canvas.ctx.fillRect(x, y, width, height);
 };
 
-const drawLine = ({ x1, y1, x2, y2, width, color }: Line) => {
+const drawLine = ({ start, end, width, color }: Line) => {
   canvas.ctx.strokeStyle = color;
   canvas.ctx.lineWidth = width;
   canvas.ctx.beginPath();
-  canvas.ctx.moveTo(x1, y1);
-  canvas.ctx.lineTo(x2, y2);
+  canvas.ctx.moveTo(start.x, start.y);
+  canvas.ctx.lineTo(end.x, end.y);
   canvas.ctx.stroke();
 };
