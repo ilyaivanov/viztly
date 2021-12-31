@@ -1,7 +1,7 @@
 type CanvasState = {
   el: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
-
+  shapes: Set<Shape>;
   // later I will need cached canvas dimensions for scrollbars, modals, etc
   width: number;
   height: number;
@@ -16,6 +16,7 @@ export const createFullscreenCanvas = (): HTMLCanvasElement => {
     ctx: el.getContext("2d")!,
     width: 0,
     height: 0,
+    shapes: new Set(),
   };
   updateHeight();
   window.addEventListener("resize", () => {
@@ -49,6 +50,8 @@ export const setTranslation = (x: number, y: number) => {
   canvas.ctx.scale(scaleFactor, scaleFactor);
   canvas.ctx.translate(x, y);
 };
+
+export const drawShapes = () => canvas.shapes.forEach(drawShape);
 
 export const drawShape = (shape: Shape) => {
   if (shape.type === "circle") drawCircle(shape);

@@ -29,15 +29,23 @@ document.body.style.margin = 0 + "";
 document.body.style.backgroundColor = "#1e1e1e";
 
 //VIEW
-const shapes = init(tree.getFocused());
+init(tree.getFocused());
 subscribe();
 tree.init();
 const render = () => {
   canvas.clear();
-  shapes.forEach(canvas.drawShape);
+  canvas.drawShapes();
+  console.log(canvas.canvas.shapes.size);
 };
 
-document.addEventListener("keydown", () => {
+document.addEventListener("keydown", (e) => {
+  const code = e.code as KeyboardKey;
+  if (code === "ArrowDown") tree.selectNextItem();
+  else if (code === "ArrowUp") tree.selectPreviousItem();
+  else if (code === "ArrowLeft") tree.goLeft();
+  else if (code === "ArrowRight") tree.goRight();
+
+  console.log("rendering");
   render();
 });
 
