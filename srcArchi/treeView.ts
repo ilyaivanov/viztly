@@ -1,5 +1,6 @@
 import { forEachOpenChild } from "../src/domain/tree.traversal";
 import { canvas } from "../src/infra";
+import { animatePosition } from "../src/infra/animations";
 import { sp } from "../src/view/design";
 import { on, AppEvents, getFocused } from "./tree";
 
@@ -78,6 +79,7 @@ const viewItemChildren = (item: Item, xStart: number, yStart: number) => {
   item.children.forEach((c) => step(c, 0));
   return res;
 };
+
 const updatePositions = (item: Item) => {
   let yOffset = sp.start;
 
@@ -114,13 +116,30 @@ const createItemView = (item: Item, x: number, y: number): ItemView => {
       text: item.title,
     },
   };
-  setItemViewPosition(view, x, y);
+  setItemViewPosition(view, x, y, false);
   return view;
 };
 
-const setItemViewPosition = (itemView: ItemView, x: number, y: number) => {
-  itemView.circle.x = x;
-  itemView.circle.y = y;
-  itemView.text.x = x + sp.circleToTextDistance;
-  itemView.text.y = y + 0.32 * sp.fontSize;
+const setItemViewPosition = (
+  itemView: ItemView,
+  x: number,
+  y: number,
+  isAnimating = true
+) => {
+  const textX = x + sp.circleToTextDistance;
+  const textY = y + 0.32 * sp.fontSize;
+
+  if (!isAnimating) {
+    itemView.circle.x = x;
+    itemView.circle.y = y;
+    itemView.text.x = textX;
+    itemView.text.y = textY;
+    return;
+  }
+
+  if (itemView.circle.x !== x || itemView.circle.y !== y)
+    animatePosition(itemView.circle, x, y);
+
+  if (itemView.text.x !== textX || itemView.text.y !== textY)
+    animatePosition(itemView.text, textX, textY);
 };

@@ -1,6 +1,5 @@
 import { createItem, createRoot, list } from "../src/domain/items";
 import { canvas, engine } from "../src/infra";
-import { animatePosition } from "../src/infra/animations";
 
 import * as tree from "./tree";
 import { init, subscribe } from "./treeView";
@@ -35,7 +34,6 @@ tree.init();
 const render = () => {
   canvas.clear();
   canvas.drawShapes();
-  console.log(canvas.canvas.shapes.size);
 };
 
 document.addEventListener("keydown", (e) => {
@@ -51,4 +49,5 @@ document.addEventListener("keydown", (e) => {
 
 canvas.addEventListener("resize", render);
 
+engine.onTick = render;
 render();
