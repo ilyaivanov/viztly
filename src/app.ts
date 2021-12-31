@@ -299,8 +299,8 @@ const updateOpenLine = (app: AppContent, item: Item) => {
   const view = app.itemsToViews.get(item);
   if (view && view.openLine) {
     if (!item.isOpen) {
-      view.openLine.x2 = view.openLine.x1;
-      view.openLine.y2 = view.openLine.y1;
+      view.openLine.end.x = view.openLine.start.x;
+      view.openLine.end.y = view.openLine.start.y;
     } else {
       updateOpenItemLines(app, item);
     }

@@ -17,11 +17,23 @@ export const createItemViewAt = (
 
   const childLine: Line | undefined =
     item.parent && !isRoot(item.parent)
-      ? { type: "line", color: sp.line, x1: 0, y1: 0, x2: 0, y2: 0, width: 2 }
+      ? {
+          type: "line",
+          color: sp.line,
+          start: { x: 0, y: 0 },
+          end: { x: 0, y: 0 },
+          width: 2,
+        }
       : undefined;
 
   const openLine: Line | undefined = item.isOpen
-    ? { type: "line", color: sp.line, x1: 0, y1: 0, x2: 0, y2: 0, width: 2 }
+    ? {
+        type: "line",
+        color: sp.line,
+        start: { x: 0, y: 0 },
+        end: { x: 0, y: 0 },
+        width: 2,
+      }
     : undefined;
 
   const view: ItemView = {
@@ -45,10 +57,10 @@ export const updateItemPosition = (
   view.circle.y = y;
 
   if (view.childLine) {
-    view.childLine.x1 = x;
-    view.childLine.y1 = y;
-    view.childLine.x2 = x - sp.xStep;
-    view.childLine.y2 = y;
+    view.childLine.start.x = x;
+    view.childLine.start.y = y;
+    view.childLine.end.x = x - sp.xStep;
+    view.childLine.end.y = y;
   }
 
   view.circle.filled = !traversal.isEmpty(item);
@@ -64,10 +76,10 @@ export const updateOpenItemLines = (app: AppContent, item: Item) => {
       item.children[item.children.length - 1]
     );
     if (lastChild) {
-      view.openLine.x1 = view.circle.x;
-      view.openLine.y1 = view.circle.y;
-      view.openLine.x2 = lastChild.circle.x - sp.xStep;
-      view.openLine.y2 = lastChild.circle.y + 1;
+      view.openLine.start.x = view.circle.x;
+      view.openLine.start.y = view.circle.y;
+      view.openLine.end.x = lastChild.circle.x - sp.xStep;
+      view.openLine.end.y = lastChild.circle.y + 1;
     }
   }
 };
