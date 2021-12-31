@@ -40,8 +40,8 @@ const render = () => {
 
 document.addEventListener("keydown", (e) => {
   const code = e.code as KeyboardKey;
-  if (code === "ArrowDown") tree.selectNextItem();
-  else if (code === "ArrowUp") tree.selectPreviousItem();
+  if (code === "ArrowDown") tree.goDown();
+  else if (code === "ArrowUp") tree.goUp();
   else if (code === "ArrowLeft") tree.goLeft();
   else if (code === "ArrowRight") tree.goRight();
 

@@ -1,4 +1,8 @@
-import { getItemAbove, getItemBelow } from "../src/domain/tree.traversal";
+import {
+  getItemAbove,
+  getItemBelow,
+  isRoot,
+} from "../src/domain/tree.traversal";
 import * as events from "./events";
 
 let tree: Tree;
@@ -26,9 +30,9 @@ export const createTree = (root: Item) => {
 export const getFocused = () => tree.root;
 
 //actions
-export const selectNextItem = () => changeSelection(getItemBelow);
+export const goDown = () => changeSelection(getItemBelow);
 
-export const selectPreviousItem = () => changeSelection(getItemAbove);
+export const goUp = () => changeSelection(getItemAbove);
 
 const changeSelection = (getNextItem: F2<Item, Item | undefined>) => {
   if (tree.selectedItem) {
@@ -42,17 +46,27 @@ const changeSelection = (getNextItem: F2<Item, Item | undefined>) => {
 };
 
 export const goLeft = () => {
-  if (tree.selectedItem && tree.selectedItem.isOpen) {
-    tree.selectedItem.isOpen = false;
-    trigger("item-toggled", tree.selectedItem);
-  }
+  const selected = tree.selectedItem;
+  if (selected && selected.isOpen) close(selected);
+  else if (selected && selected.parent && !isRoot(selected.parent))
+    changeSelection(() => selected.parent);
 };
+
 export const goRight = () => {
   const selected = tree.selectedItem;
-  if (selected && !selected.isOpen && selected.children.length > 0) {
-    selected.isOpen = true;
-    trigger("item-toggled", selected);
-  }
+  if (selected && !selected.isOpen && selected.children.length > 0)
+    open(selected);
+  else if (selected && selected.children.length > 0)
+    changeSelection(() => selected.children[0]);
+};
+
+const open = (item: Item) => {
+  item.isOpen = true;
+  trigger("item-toggled", item);
+};
+const close = (item: Item) => {
+  item.isOpen = false;
+  trigger("item-toggled", item);
 };
 
 //Events
