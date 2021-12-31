@@ -36,7 +36,7 @@ export const init = (root: Item): AppContent => {
     pageOffset: 0,
     ui: {
       scrollbar: {
-        color: "white",
+        color: "rgba(255,255,255,0.3)",
         x: 0,
         y: 0,
         height: 0,

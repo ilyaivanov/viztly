@@ -2,6 +2,9 @@ import * as traversal from "../domain/tree.traversal";
 import { AppContent } from "../app";
 import { sp } from "./design";
 import { isRoot } from "../domain/tree.traversal";
+import { animatePosition } from "../infra/animations";
+
+//itemView consist of individual shapes and operations upon them
 
 export const createItemViewAt = (
   app: AppContent,

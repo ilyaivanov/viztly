@@ -60,14 +60,14 @@ export const drawShape = (shape: Shape) => {
 const drawCircle = ({ x, y, r, color, filled }: Circle) => {
   const { ctx } = canvas;
   ctx.beginPath();
+  const lineWidth = 1.5;
   ctx.arc(x, y, r, 0, 2 * Math.PI);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lineWidth;
+  ctx.stroke();
   if (filled) {
     ctx.fillStyle = color;
     ctx.fill();
-  } else {
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
   }
 };
 

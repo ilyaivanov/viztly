@@ -11,6 +11,7 @@ import { createRoot, list } from "./domain/items";
 
 //TODO: think about how to gracefully remove dependency from main to itemInput
 import * as input from "./view/itemInput";
+import { engine } from "./infra/animations";
 
 const el = canvas.createFullscreenCanvas();
 
@@ -58,5 +59,5 @@ canvas.addEventListener("resize", () => {
 });
 
 input.addEventListener("onInputBlur", render);
-
+engine.onTick = render;
 render();
