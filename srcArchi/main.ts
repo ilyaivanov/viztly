@@ -1,7 +1,9 @@
 import { createItem, createRoot, list } from "../src/domain/items";
 import { canvas, engine } from "../src/infra";
+import { trigger } from "./events";
 
 import * as tree from "./tree";
+import { finishEdit, isEditing } from "./view/itemInput";
 import { init, subscribe, drawTree } from "./view/treeView";
 
 const el = canvas.createFullscreenCanvas();
@@ -40,6 +42,14 @@ const render = () => {
 
 document.addEventListener("keydown", (e) => {
   const code = e.code as KeyboardKey;
+
+  if (isEditing()) {
+    if (e.code === "Enter" || e.code === "NumpadEnter" || e.code === "Escape")
+      finishEdit();
+    render();
+    return;
+  }
+
   if (code === "ArrowDown") {
     if (e.shiftKey && e.altKey) tree.moveSelectedDown();
     else tree.goDown();
@@ -54,8 +64,10 @@ document.addEventListener("keydown", (e) => {
     else tree.goRight();
   } else if (code === "Backspace" && e.altKey && e.shiftKey)
     tree.removeSelected();
-
-  console.log("rendering");
+  else if (code === "KeyE") {
+    tree.startEdit();
+    e.preventDefault();
+  }
   render();
 });
 

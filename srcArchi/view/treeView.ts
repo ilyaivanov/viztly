@@ -4,6 +4,7 @@ import { sp } from "../../src/view/design";
 import { on, AppEvents, getFocused } from "../tree";
 import { draw, drawTextOnMinimap, ItemView2 } from "./itemView";
 import { animatePosition, spring } from "../../src/infra/animations";
+import { renderInputAt } from "./itemInput";
 
 let itemToViews: Map<Item, ItemView2> = new Map();
 
@@ -23,6 +24,22 @@ export const subscribe = () => {
   on("item-removed", (e) => {
     removeChildViewsForItem(e.itemRemoved);
     removeViewForItem(e.itemRemoved);
+  });
+
+  on("item-startEdit", (item) => {
+    const view = itemToViews.get(item);
+    if (view) {
+      view.isTextHidden = true;
+
+      renderInputAt(view.x, view.y, item.title);
+    }
+  });
+  on("item-finishEdit", (item) => {
+    const view = itemToViews.get(item);
+    console.log(item, view);
+    if (view) {
+      delete view.isTextHidden;
+    }
   });
 };
 

@@ -18,6 +18,8 @@ export type AppEvents = {
   "selection-changed": { prev: Item; current: Item };
   "item-toggled": Item;
   "item-moved": Item;
+  "item-startEdit": Item;
+  "item-finishEdit": Item;
   "item-removed": { itemRemoved: Item; itemSelected: Item | undefined };
 };
 export const init = () => {
@@ -49,6 +51,16 @@ export const removeSelected = () => {
     const itemSelected = removeItem(itemRemoved);
     if (itemSelected) changeSelection(() => itemSelected);
     trigger("item-removed", { itemRemoved, itemSelected });
+  }
+};
+
+export const startEdit = () => {
+  if (tree.selectedItem) trigger("item-startEdit", tree.selectedItem);
+};
+export const finishEdit = (newText: string) => {
+  if (tree.selectedItem) {
+    tree.selectedItem.title = newText;
+    trigger("item-finishEdit", tree.selectedItem);
   }
 };
 const changeSelection = (getNextItem: F2<Item, Item | undefined>) => {
