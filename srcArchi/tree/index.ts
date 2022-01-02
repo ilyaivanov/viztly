@@ -2,8 +2,9 @@ import {
   getItemAbove,
   getItemBelow,
   isRoot,
-} from "../src/domain/tree.traversal";
-import * as events from "./events";
+} from "../../src/domain/tree.traversal";
+import * as events from "../events";
+import * as movement from "./tree.movement";
 
 let tree: Tree;
 
@@ -15,6 +16,7 @@ export type AppEvents = {
   init: { selectedItem: Item };
   "selection-changed": { prev: Item; current: Item };
   "item-toggled": Item;
+  "item-moved": Item;
 };
 export const init = () => {
   if (tree.selectedItem) trigger("init", { selectedItem: tree.selectedItem });
@@ -35,6 +37,11 @@ export const goDown = () => changeSelection(getItemBelow);
 
 export const goUp = () => changeSelection(getItemAbove);
 
+export const moveSelectedDown = () => applyMovement(movement.moveItemDown);
+export const moveSelectedUp = () => applyMovement(movement.moveItemUp);
+export const moveSelectedLeft = () => applyMovement(movement.moveItemLeft);
+export const moveSelectedRight = () => applyMovement(movement.moveItemRight);
+
 const changeSelection = (getNextItem: F2<Item, Item | undefined>) => {
   if (tree.selectedItem) {
     const prev = tree.selectedItem;
@@ -43,6 +50,13 @@ const changeSelection = (getNextItem: F2<Item, Item | undefined>) => {
       tree.selectedItem = current;
       trigger("selection-changed", { current, prev });
     }
+  }
+};
+
+const applyMovement = (movement: F1<Item>) => {
+  if (tree.selectedItem) {
+    movement(tree.selectedItem);
+    trigger("item-moved", tree.selectedItem);
   }
 };
 

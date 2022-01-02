@@ -1,8 +1,7 @@
-import { isRoot } from "../src/domain/tree.traversal";
-import { canvas } from "../src/infra";
-import { animatePosition } from "../src/infra/animations";
-import { sp } from "../src/view/design";
-import { isSelected } from "./tree";
+import { isRoot } from "../../src/domain/tree.traversal";
+import { canvas } from "../../src/infra";
+import { sp } from "../../src/view/design";
+import { isSelected } from "../tree";
 
 export type ItemView2 = {
   opacity: number;
@@ -13,6 +12,7 @@ export type ItemView2 = {
   //while y is holding animated value, targetY is holding targeted value,
   //so that other elements can calculate proper position while animation is running
   targetY: number;
+
   lastChildOffset: number;
   item: Item;
 };

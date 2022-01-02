@@ -1,9 +1,9 @@
-import { forEachOpenChild } from "../src/domain/tree.traversal";
-import { canvas } from "../src/infra";
-import { sp } from "../src/view/design";
-import { on, AppEvents, getFocused } from "./tree";
+import { forEachOpenChild } from "../../src/domain/tree.traversal";
+import { canvas } from "../../src/infra";
+import { sp } from "../../src/view/design";
+import { on, AppEvents, getFocused } from "../tree";
 import { draw, drawTextOnMinimap, ItemView2 } from "./itemView";
-import { animatePosition, spring, springKeyed } from "../src/infra/animations";
+import { animatePosition, spring } from "../../src/infra/animations";
 
 let itemToViews: Map<Item, ItemView2> = new Map();
 
@@ -19,6 +19,7 @@ export const init = (focused: Item) => {
 
 export const subscribe = () => {
   on("item-toggled", toggleItem);
+  on("item-moved", () => updatePositions(getFocused()));
 };
 
 const toggleItem = (item: Item) => {
@@ -36,11 +37,13 @@ const toggleItem = (item: Item) => {
       forEachOpenChild(item, (i) => {
         const view = itemToViews.get(i);
         if (view) {
-          animatePosition(view, view.x - sp.xStep, view.y, () => {
-            //checking if this animating view is still under item
-            if (itemToViews.get(i) === view) itemToViews.delete(i);
+          spring(view.x, view.x - sp.xStep, (val, isEnded) => {
+            view.x = val;
+            if (isEnded && itemToViews.get(i) === view) {
+              itemToViews.delete(i);
+            }
           });
-          spring(1, 0, (v) => (view.opacity = v));
+          spring(view.opacity, 0, (v) => (view.opacity = v));
         }
       });
       if (view) {

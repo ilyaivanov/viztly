@@ -2,7 +2,7 @@ import { createItem, createRoot, list } from "../src/domain/items";
 import { canvas, engine } from "../src/infra";
 
 import * as tree from "./tree";
-import { init, subscribe, drawTree } from "./treeView";
+import { init, subscribe, drawTree } from "./view/treeView";
 
 const el = canvas.createFullscreenCanvas();
 
@@ -40,10 +40,19 @@ const render = () => {
 
 document.addEventListener("keydown", (e) => {
   const code = e.code as KeyboardKey;
-  if (code === "ArrowDown") tree.goDown();
-  else if (code === "ArrowUp") tree.goUp();
-  else if (code === "ArrowLeft") tree.goLeft();
-  else if (code === "ArrowRight") tree.goRight();
+  if (code === "ArrowDown") {
+    if (e.shiftKey && e.altKey) tree.moveSelectedDown();
+    else tree.goDown();
+  } else if (code === "ArrowUp") {
+    if (e.shiftKey && e.altKey) tree.moveSelectedUp();
+    else tree.goUp();
+  } else if (code === "ArrowLeft") {
+    if (e.shiftKey && e.altKey) tree.moveSelectedLeft();
+    else tree.goLeft();
+  } else if (code === "ArrowRight") {
+    if (e.shiftKey && e.altKey) tree.moveSelectedRight();
+    else tree.goRight();
+  }
 
   console.log("rendering");
   render();
