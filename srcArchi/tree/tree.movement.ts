@@ -55,7 +55,7 @@ const removeChildAt = (item: Item, index: number) => {
   updateIsOpenFlag(item);
 };
 
-const removeChild = (parent: Item, item: Item) => {
+export const removeChild = (parent: Item, item: Item) => {
   parent.children = parent.children.filter((c) => c !== item);
   updateIsOpenFlag(item);
 };

@@ -52,7 +52,8 @@ document.addEventListener("keydown", (e) => {
   } else if (code === "ArrowRight") {
     if (e.shiftKey && e.altKey) tree.moveSelectedRight();
     else tree.goRight();
-  }
+  } else if (code === "Backspace" && e.altKey && e.shiftKey)
+    tree.removeSelected();
 
   console.log("rendering");
   render();

@@ -20,6 +20,10 @@ export const init = (focused: Item) => {
 export const subscribe = () => {
   on("item-toggled", toggleItem);
   on("item-moved", () => updatePositions(getFocused()));
+  on("item-removed", (e) => {
+    removeChildViewsForItem(e.itemRemoved);
+    removeViewForItem(e.itemRemoved);
+  });
 };
 
 const toggleItem = (item: Item) => {
@@ -34,23 +38,30 @@ const toggleItem = (item: Item) => {
         if (view) spring(0, 1, (v) => (view.opacity = v));
       });
     } else {
-      forEachOpenChild(item, (i) => {
-        const view = itemToViews.get(i);
-        if (view) {
-          spring(view.x, view.x - sp.xStep, (val, isEnded) => {
-            view.x = val;
-            if (isEnded && itemToViews.get(i) === view) {
-              itemToViews.delete(i);
-            }
-          });
-          spring(view.opacity, 0, (v) => (view.opacity = v));
-        }
-      });
-      if (view) {
-        spring(view.lastChildOffset, 0, (v) => (view.lastChildOffset = v));
-      }
-      updatePositions(getFocused());
+      removeChildViewsForItem(item);
     }
+  }
+};
+
+const removeChildViewsForItem = (item: Item) => {
+  const view = itemToViews.get(item);
+  forEachOpenChild(item, removeViewForItem);
+  if (view) {
+    spring(view.lastChildOffset, 0, (v) => (view.lastChildOffset = v));
+  }
+  updatePositions(getFocused());
+};
+
+const removeViewForItem = (item: Item) => {
+  const view = itemToViews.get(item);
+  if (view) {
+    spring(view.x, view.x - sp.xStep, (val, isEnded) => {
+      view.x = val;
+      if (isEnded && itemToViews.get(item) === view) {
+        itemToViews.delete(item);
+      }
+    });
+    spring(view.opacity, 0, (v) => (view.opacity = v));
   }
 };
 
