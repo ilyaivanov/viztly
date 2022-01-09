@@ -11,6 +11,7 @@ export const sp = {
 
   selectedCircle: "#ACE854",
   regularColor: "white",
+  minimapColor: "#DEDEDE",
 
   line: "#3C413D",
   lineSelected: "#638038",

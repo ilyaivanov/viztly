@@ -32,8 +32,7 @@ export const spring = (
   to: number,
   onTick: (currentVal: number, ended: boolean) => void
 ) => {
-  const anim = new SpringAnimated(from);
-  anim.target = to;
+  const anim = new SpringAnimated(from, to);
   anim.onTick = onTick;
   anim.isAnimating = true;
   engine.addAnimation(anim);
@@ -48,12 +47,11 @@ export const springKeyed = (
   const current = engine.getAnim(key);
   if (current) {
     if (current instanceof SpringAnimated) {
-      current.target = to;
+      current.switchTo(from, to);
       current.onTick = onTick;
     }
   } else {
-    const anim = new SpringAnimated(from);
-    anim.target = to;
+    const anim = new SpringAnimated(from, to);
     anim.onTick = onTick;
     anim.isAnimating = true;
     engine.addKeyedAnimation(key, anim);

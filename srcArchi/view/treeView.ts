@@ -1,7 +1,7 @@
 import { forEachOpenChild } from "../../src/domain/tree.traversal";
 import { canvas } from "../../src/infra";
 import { sp } from "../../src/view/design";
-import { on, AppEvents, getFocused } from "../tree";
+import { on, getFocused } from "../tree";
 import { draw, drawTextOnMinimap, ItemView2 } from "./itemView";
 import { animatePosition, spring } from "../../src/infra/animations";
 import { renderInputAt } from "./itemInput";
@@ -9,7 +9,12 @@ import { renderInputAt } from "./itemInput";
 let itemToViews: Map<Item, ItemView2> = new Map();
 
 export const drawTree = () => {
-  itemToViews.forEach(draw);
+  itemToViews.forEach((item) => {
+    const lastChild = item.item.isOpen
+      ? itemToViews.get(item.item.children[item.item.children.length - 1])
+      : undefined;
+    draw(item, lastChild);
+  });
 
   drawMinimap();
 };
@@ -61,11 +66,7 @@ const toggleItem = (item: Item) => {
 };
 
 const removeChildViewsForItem = (item: Item) => {
-  const view = itemToViews.get(item);
   forEachOpenChild(item, removeViewForItem);
-  if (view) {
-    spring(view.lastChildOffset, 0, (v) => (view.lastChildOffset = v));
-  }
   updatePositions(getFocused());
 };
 
@@ -95,18 +96,13 @@ const viewItemChildren = (item: Item, xStart: number, yStart: number) => {
       targetY: yOffset,
       y: yOffset,
       item,
-      lastChildOffset: 0,
+      // lastChildOffset: 0,
     };
     itemToViews.set(item, view);
 
     yOffset += sp.yStep;
     if (item.isOpen && item.children.length > 0) {
       item.children.forEach((c) => step(c, level + 1));
-
-      const lastChildView = itemToViews.get(
-        item.children[item.children.length - 1]
-      );
-      if (lastChildView) view.lastChildOffset = lastChildView.y - view.y + 1;
     }
   };
 
@@ -129,11 +125,6 @@ const updatePositions = (item: Item) => {
     yOffset += sp.yStep;
     if (item.isOpen && item.children.length > 0) {
       item.children.forEach((c) => step(c, level + 1));
-      const lastChildView = itemToViews.get(
-        item.children[item.children.length - 1]
-      );
-      if (itemView && lastChildView)
-        itemView.lastChildOffset = lastChildView.targetY - itemView.targetY + 1;
     }
   };
 
@@ -145,7 +136,7 @@ const drawMinimap = () => {
   const c = canvas;
   c.canvas.ctx.globalAlpha = 1;
 
-  const minimapWidth = c.canvas.width / sp.minimapScale;
+  const minimapWidth = getMinimapWidth();
   c.drawRect(
     canvas.canvas.width - minimapWidth,
     0,
@@ -162,3 +153,6 @@ const drawMinimap = () => {
   );
   itemToViews.forEach(drawTextOnMinimap);
 };
+
+export const getMinimapWidth = () =>
+  Math.min(canvas.canvas.width / sp.minimapScale, 120);
