@@ -2,7 +2,12 @@ import { createItem, createRoot, list } from "./tree/tree.crud";
 import { canvas, engine } from "./infra";
 import * as tree from "./tree";
 import { finishEdit, isEditing } from "./view/itemInput";
-import { init, subscribe, drawTree } from "./view/treeView";
+import {
+  init,
+  subscribe,
+  drawTree,
+  updateSelectedItemInputCoords,
+} from "./view/treeView";
 
 const el = canvas.createFullscreenCanvas();
 
@@ -67,11 +72,19 @@ document.addEventListener("keydown", (e) => {
   else if (code === "KeyE") {
     tree.startEdit();
     e.preventDefault();
+  } else if (code === "Enter") {
+    tree.createItemAfterSelected();
   }
   render();
 });
 
 canvas.addEventListener("resize", render);
 
-engine.onTick = render;
+engine.onTick = () => {
+  render();
+
+  if (isEditing()) {
+    updateSelectedItemInputCoords();
+  }
+};
 render();

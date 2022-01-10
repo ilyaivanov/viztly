@@ -1,10 +1,13 @@
-import { forEachOpenChild } from "../tree/tree.traversal";
+import {
+  forEachOpenChild,
+  getPreviousSiblingOrItemAbove,
+} from "../tree/tree.traversal";
 import { canvas } from "../infra";
 import { sp } from "../design";
-import { on, getFocused } from "../tree";
-import { draw, drawTextOnMinimap, ItemView2 } from "./itemView";
+import { on, getFocused, getSelected } from "../tree";
+import { createItemView, draw, drawTextOnMinimap, ItemView2 } from "./itemView";
 import { animatePosition, spring } from "../infra/animations";
-import { renderInputAt } from "./itemInput";
+import { renderInputAt, updateInputCoords } from "./itemInput";
 
 let itemToViews: Map<Item, ItemView2> = new Map();
 
@@ -26,6 +29,18 @@ export const init = (focused: Item) => {
 export const subscribe = () => {
   on("item-toggled", toggleItem);
   on("item-moved", () => updatePositions(getFocused()));
+  on("item-added", (item) => {
+    const prevItem = getPreviousSiblingOrItemAbove(item);
+    if (prevItem) {
+      const prevView = itemToViews.get(prevItem);
+
+      const view: ItemView2 = prevView
+        ? createItemView(prevView.x, prevView.y, item)
+        : createItemView(0, 0, item);
+      itemToViews.set(item, view);
+      updatePositions(getFocused());
+    }
+  });
   on("item-removed", (e) => {
     removeChildViewsForItem(e.itemRemoved);
     removeViewForItem(e.itemRemoved);
@@ -41,11 +56,16 @@ export const subscribe = () => {
   });
   on("item-finishEdit", (item) => {
     const view = itemToViews.get(item);
-    console.log(item, view);
-    if (view) {
-      delete view.isTextHidden;
-    }
+    if (view) delete view.isTextHidden;
   });
+};
+
+export const updateSelectedItemInputCoords = () => {
+  const s = getSelected();
+  if (s) {
+    const view = itemToViews.get(s);
+    if (view) updateInputCoords(view.x, view.y);
+  }
 };
 
 const toggleItem = (item: Item) => {
@@ -90,13 +110,7 @@ const viewItemChildren = (item: Item, xStart: number, yStart: number) => {
   const step = (item: Item, level: number) => {
     const x = level * sp.xStep + xStart;
 
-    const view: ItemView2 = {
-      opacity: 1,
-      x,
-      y: yOffset,
-      item,
-      // lastChildOffset: 0,
-    };
+    const view = createItemView(x, yOffset, item);
     itemToViews.set(item, view);
 
     yOffset += sp.yStep;

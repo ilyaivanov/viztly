@@ -1,5 +1,5 @@
 import * as events from "../events";
-import { removeItem } from "./tree.crud";
+import { addItemAfter, createItem, removeItem } from "./tree.crud";
 import * as movement from "./tree.movement";
 import * as traversal from "./tree.traversal";
 
@@ -17,6 +17,7 @@ export type AppEvents = {
   "item-startEdit": Item;
   "item-finishEdit": Item;
   "item-removed": { itemRemoved: Item; itemSelected: Item | undefined };
+  "item-added": Item;
 };
 
 export const init = () => {
@@ -31,6 +32,7 @@ export const createTree = (root: Item) => {
 };
 
 export const getFocused = () => tree.root;
+export const getSelected = () => tree.selectedItem;
 export const isSelected = (item: Item) => tree.selectedItem === item;
 
 //actions
@@ -94,6 +96,16 @@ export const goRight = () => {
     open(selected);
   else if (selected && selected.children.length > 0)
     changeSelection(() => selected.children[0]);
+};
+
+export const createItemAfterSelected = () => {
+  if (tree.selectedItem) {
+    const newItem = createItem("");
+    addItemAfter(tree.selectedItem, newItem);
+    changeSelection(() => newItem);
+    trigger("item-added", tree.selectedItem);
+    trigger("item-startEdit", tree.selectedItem);
+  }
 };
 
 const open = (item: Item) => {

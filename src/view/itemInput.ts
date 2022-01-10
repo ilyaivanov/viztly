@@ -42,3 +42,11 @@ export const renderInputAt = (x: number, y: number, title: string) => {
   input.focus();
   input.setSelectionRange(0, 0);
 };
+export const updateInputCoords = (x: number, y: number) => {
+  if (input) {
+    const inputX = x + sp.circleToTextDistance;
+    const inputY = y - sp.fontSize * 0.32 * 2.5;
+    input.style.left = inputX + "px";
+    input.style.top = inputY + "px";
+  }
+};

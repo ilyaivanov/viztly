@@ -53,3 +53,9 @@ export const drawTextOnMinimap = ({ item, x, y, opacity }: ItemView2) => {
     color
   );
 };
+
+export const createItemView = (
+  x: number,
+  y: number,
+  item: Item
+): ItemView2 => ({ opacity: 1, x, y, item });
