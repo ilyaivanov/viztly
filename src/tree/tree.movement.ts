@@ -57,7 +57,7 @@ const removeChildAt = (item: Item, index: number) => {
 
 export const removeChild = (parent: Item, item: Item) => {
   parent.children = parent.children.filter((c) => c !== item);
-  updateIsOpenFlag(item);
+  updateIsOpenFlag(parent);
 };
 
 const addChildAt = (parent: Item, item: Item, index: number) => {
