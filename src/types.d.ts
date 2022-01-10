@@ -18,3 +18,12 @@ type Item = {
 type A = () => void;
 type F1<T> = (a: T) => void;
 type F2<Tin, Tout> = (a: Tin) => Tout;
+
+type KeyboardKey =
+  | "ArrowDown"
+  | "ArrowUp"
+  | "ArrowLeft"
+  | "ArrowRight"
+  | "Enter"
+  | "KeyE"
+  | "Backspace";

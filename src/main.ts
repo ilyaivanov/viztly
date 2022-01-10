@@ -38,8 +38,6 @@ subscribe();
 tree.init();
 const render = () => {
   canvas.clear();
-  canvas.drawShapes();
-
   drawTree();
 };
 

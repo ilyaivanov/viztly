@@ -106,7 +106,6 @@ const removeViewForItem = (item: Item) => {
 const viewItemChildren = (item: Item, xStart: number, yStart: number) => {
   let yOffset = yStart;
 
-  const res: Shape[] = [];
   const step = (item: Item, level: number) => {
     const x = level * sp.xStep + xStart;
 
@@ -120,7 +119,6 @@ const viewItemChildren = (item: Item, xStart: number, yStart: number) => {
   };
 
   item.children.forEach((c) => step(c, 0));
-  return res;
 };
 
 const updatePositions = (item: Item) => {
