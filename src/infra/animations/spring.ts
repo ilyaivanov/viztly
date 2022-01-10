@@ -5,19 +5,24 @@ const precision = 0.1;
 export class SpringAnimated implements Animated {
   isAnimating: boolean = false;
 
-  public target: number;
-  private last: number;
+  public last: number;
 
-  stiffness = 0.06;
-  damping = 4;
-  invertedMass = 0.25;
+  // { stiffness: 0.02, damping: 2, invertedMass: 0.2 },
+  stiffness = 0.035;
+  damping = 2;
+  invertedMass = 0.28;
 
-  onTick?: (val: number) => void;
+  onTick?: (val: number, ended: boolean) => void;
 
-  constructor(public current: number) {
-    this.target = current;
+  constructor(public current: number, public target: number) {
     this.last = current;
   }
+
+  switchTo = (from: number, to: number) => {
+    this.last = from;
+    this.current = from;
+    this.target = to;
+  };
 
   tick = (deltaTime: number) => {
     const { current, target, last, stiffness, damping, invertedMass } = this;
@@ -32,9 +37,10 @@ export class SpringAnimated implements Animated {
       this.isAnimating = false;
       this.current = target;
     } else {
+      this.last = this.current;
       this.current += d;
     }
 
-    this.onTick && this.onTick(this.current);
+    this.onTick && this.onTick(this.current, !this.isAnimating);
   };
 }

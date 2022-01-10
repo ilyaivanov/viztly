@@ -1,83 +1,112 @@
-export class Canvas {
+type CanvasState = {
   el: HTMLCanvasElement;
-  public ctx: CanvasRenderingContext2D;
-  width: number = 0;
-  height: number = 0;
+  ctx: CanvasRenderingContext2D;
+  // later I will need cached canvas dimensions for scrollbars, modals, etc
+  width: number;
+  height: number;
+};
 
-  constructor() {
-    this.el = document.createElement("canvas");
-    this.ctx = this.el.getContext("2d")!;
-    this.updateHeight();
-    window.addEventListener("resize", () => {
-      this.updateHeight();
-      this.onResize && this.onResize();
-    });
+export let canvas: CanvasState;
+
+export const createFullscreenCanvas = (): HTMLCanvasElement => {
+  const el = document.createElement("canvas");
+  canvas = {
+    el,
+    ctx: el.getContext("2d")!,
+    width: 0,
+    height: 0,
+  };
+  updateHeight();
+  window.addEventListener("resize", () => {
+    updateHeight();
+    resizeCbs.forEach((cb) => cb());
+  });
+  return el;
+};
+
+let resizeCbs: A[] = [];
+
+export const addEventListener = (event: "resize", cb: A) => {
+  if (event === "resize") resizeCbs.push(cb);
+};
+
+export const clear = () => canvas.ctx.clearRect(-20000, -20000, 40000, 40000);
+
+export const updateHeight = () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const scaleFactor = window.devicePixelRatio;
+  canvas.el.width = canvas.width * scaleFactor;
+  canvas.el.height = canvas.height * scaleFactor;
+  canvas.ctx.scale(scaleFactor, scaleFactor);
+};
+
+export const setTranslation = (x: number, y: number) => {
+  resetTranslation();
+
+  const scaleFactor = window.devicePixelRatio;
+  canvas.ctx.scale(scaleFactor, scaleFactor);
+  canvas.ctx.translate(x, y);
+};
+export const resetTranslation = () => {
+  canvas.ctx.resetTransform();
+};
+
+export const drawCircle = (
+  x: number,
+  y: number,
+  r: number,
+  color: string,
+  filled = true
+) => {
+  const { ctx } = canvas;
+  ctx.beginPath();
+  const lineWidth = 1.5;
+  ctx.arc(x, y, r, 0, 2 * Math.PI);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lineWidth;
+  ctx.stroke();
+  if (filled) {
+    ctx.fillStyle = color;
+    ctx.fill();
   }
+};
 
-  drawCircle = (center: Vector, r: number, color: string) => {
-    this.ctx.fillStyle = color;
+export const drawText = (
+  x: number,
+  y: number,
+  text: string,
+  fontSize: number,
+  color: string
+) => {
+  canvas.ctx.font = `${fontSize}px Segoe UI, Ubuntu, Roboto, sans-serif`;
+  canvas.ctx.fillStyle = color;
+  canvas.ctx.fillText(text, x, y);
+};
 
-    this.ctx.beginPath();
-    this.ctx.arc(center.x, center.y, r, 0, 2 * Math.PI);
-    this.ctx.fill();
-  };
+export const drawRect = (
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  color: string
+) => {
+  canvas.ctx.fillStyle = color;
+  canvas.ctx.fillRect(x, y, width, height);
+};
 
-  drawCirclePath = (center: Vector, r: number, color: string) => {
-    this.ctx.strokeStyle = color;
-    this.ctx.lineWidth = 1.3;
-
-    this.ctx.beginPath();
-    this.ctx.arc(center.x, center.y, r, 0, 2 * Math.PI);
-    this.ctx.stroke();
-  };
-
-  drawRect = (
-    topLeft: Vector,
-    width: number,
-    height: number,
-    color: string
-  ) => {
-    this.ctx.fillStyle = color;
-
-    this.ctx.fillRect(topLeft.x, topLeft.y, width, height);
-  };
-
-  drawLine = (p1: Vector, p2: Vector, stroke: number, color: string) => {
-    this.ctx.strokeStyle = color;
-
-    this.ctx.lineWidth = stroke;
-    this.ctx.beginPath();
-    this.ctx.moveTo(p1.x, p1.y);
-    this.ctx.lineTo(p2.x, p2.y);
-    this.ctx.stroke();
-  };
-
-  clear = () => this.ctx.clearRect(-20000, -20000, 40000, 40000);
-
-  drawText = (at: Vector, text: string, fontSize: number, color: string) => {
-    this.ctx.font = `${fontSize}px Segoe UI`;
-    this.ctx.fillStyle = color;
-    this.ctx.fillText(text, at.x, at.y);
-  };
-
-  onResize?: () => void;
-
-  updateHeight = () => {
-    this.width = window.innerWidth;
-    this.height = window.innerHeight;
-    const scaleFactor = window.devicePixelRatio;
-    this.el.width = this.width * scaleFactor;
-    this.el.height = this.height * scaleFactor;
-    this.el.style.width = this.width + "px";
-    this.el.style.height = this.height + "px";
-    this.ctx.scale(scaleFactor, scaleFactor);
-  };
-
-  setTranslation = (x: number, y: number) => {
-    this.ctx.resetTransform();
-
-    const scaleFactor = window.devicePixelRatio;
-    this.ctx.scale(scaleFactor, scaleFactor);
-    this.ctx.translate(x, y);
-  };
-}
+export const drawLine = (
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+  color: string,
+  width: number
+) => {
+  canvas.ctx.strokeStyle = color;
+  canvas.ctx.lineWidth = width;
+  canvas.ctx.beginPath();
+  canvas.ctx.moveTo(x1, y1);
+  canvas.ctx.lineTo(x2, y2);
+  canvas.ctx.stroke();
+};

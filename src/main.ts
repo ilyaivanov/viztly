@@ -1,49 +1,72 @@
-import { engine } from "./infra/animations";
-import { Canvas } from "./infra/canvas";
-import { updateInputCoordinates } from "./views/itemInput";
-import { TreeView } from "./controllers/treeView";
-import Scrollbar from "./controllers/scrollbar";
+import { createItem, createRoot, list } from "./tree/tree.crud";
+import { canvas, engine } from "./infra";
+import * as tree from "./tree";
+import * as input from "./view/itemInput";
+import {
+  init,
+  subscribe,
+  drawTree,
+  updateSelectedItemInputCoords,
+  getPageHeight,
+} from "./view/treeView";
+import { appendToOffset } from "./view/scrollbar";
+import { onKeyDown } from "./keyboard";
 
-import * as stateReader from "./stateReader";
-import KeyboardHandler from "./controllers/keyboard";
-import Tree from "./itemTree/tree";
+const el = canvas.createFullscreenCanvas();
 
-const canvas = new Canvas();
+tree.createTree(
+  createRoot([
+    createItem("Item 1", list("Item 1.", 10)),
+    createItem("Item 2"),
+    createItem("Item 3", [
+      createItem("Item 3.1", list("Item 3.1.", 20)),
+      createItem("Item 3.2", list("Item 3.2.", 10)),
+    ]),
+    createItem("Big", list("Big child ", 50)),
+    createItem("Item 4", [
+      createItem("Item 4.1.", list("Item 4.1.", 10)),
+      createItem("Item 4.2.", list("Item 4.2.", 10)),
+      createItem("Item 4.3.", list("Item 4.3.", 10)),
+    ]),
+    createItem("Item 5", list("Item 5.", 5)),
+    createItem("Item 6"),
+    createItem("Item 7"),
+  ])
+);
 
-const root = stateReader.load();
+el.style.display = "block";
+document.body.appendChild(el);
 
-const onKeyHandled = () => {
-  stateReader.save(root);
-  treeView.updateRows();
-  render();
-};
+document.body.style.margin = 0 + "";
+document.body.style.backgroundColor = "#1e1e1e";
 
-const tree = new Tree(root);
-const treeView = new TreeView(tree);
-const scrollbar = new Scrollbar(canvas, treeView);
-const input = new KeyboardHandler(tree, treeView, scrollbar, onKeyHandled);
-
-canvas.onResize = () => render();
-
+//VIEW
+init(tree.getFocused());
+subscribe();
+tree.init();
 const render = () => {
   canvas.clear();
-  canvas.setTranslation(0, -scrollbar.transformY);
-
-  treeView.draw(canvas);
-
-  canvas.setTranslation(0, 0);
-  scrollbar.draw();
-
-  const item = treeView.itemToRows.get(tree.selectedNode);
-  if (item) updateInputCoordinates(item, scrollbar);
+  drawTree();
 };
 
-document.addEventListener("wheel", (e) => {
-  scrollbar.translateBy(e.deltaY);
+//when blured finishEdit is called from input, which won't re-render items
+tree.on("item-finishEdit", render);
+
+document.addEventListener("keydown", (e) => {
+  onKeyDown(e);
   render();
 });
 
-render();
-document.body.appendChild(canvas.el);
+document.addEventListener("wheel", (e) => {
+  appendToOffset(e.deltaY, getPageHeight());
+  render();
+});
 
-engine.onTick = render;
+canvas.addEventListener("resize", render);
+
+engine.onTick = () => {
+  render();
+
+  if (input.isEditing()) updateSelectedItemInputCoords();
+};
+render();

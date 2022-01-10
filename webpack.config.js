@@ -20,6 +20,7 @@ module.exports = (env, argv) => {
             loader: "ts-loader",
             options: {
               onlyCompileBundledFiles: true,
+              configFile: "tsconfig.webpack.json",
             },
           },
           exclude: /node_modules/,
