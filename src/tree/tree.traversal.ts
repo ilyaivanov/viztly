@@ -10,17 +10,18 @@ export const getItemAbove = (item: Item): Item | undefined => {
 };
 
 // //this goes down into children
-export const getItemBelow = (item: Item): Item | undefined => {
-  if (item.isOpen && item.children) return item.children![0];
+export const getItemBelow = (item: Item): Item | undefined =>
+  item.isOpen && item.children ? item.children![0] : getFollowingItem(item);
 
-  const followingItem = getFollowingItem(item);
-  if (followingItem) return followingItem;
-  else {
-    let parent = item.parent;
-    while (parent && isLast(parent)) {
-      parent = parent.parent;
-    }
-    if (parent) return getFollowingItem(parent);
+export const getNextSiblingOrItemBelow = (item: Item): Item | undefined =>
+  getFollowingSibling(item) || getFollowingItem(item);
+
+export const getPreviousSiblingOrItemAbove = (item: Item): Item | undefined => {
+  const items = item.parent?.children;
+  if (items) {
+    const index = items.indexOf(item);
+    if (index > 0) return items[index - 1];
+    else return getItemAbove(item);
   }
 };
 
@@ -50,10 +51,9 @@ const getLastNestedItem = (item: Item): Item => {
 };
 
 //this always returns following item without going down to children
-const getFollowingItem = (item: Item): Item | undefined => {
-  const parent = item.parent;
-  if (parent) {
-    const context: Item[] = parent.children!;
+const getFollowingSibling = (item: Item): Item | undefined => {
+  const context = item.parent?.children;
+  if (context) {
     const index = context.indexOf(item);
     if (index < context.length - 1) {
       return context[index + 1];
@@ -61,5 +61,17 @@ const getFollowingItem = (item: Item): Item | undefined => {
   }
 };
 
-const isLast = (item: Item): boolean => !getFollowingItem(item);
+const getFollowingItem = (item: Item): Item | undefined => {
+  const followingItem = getFollowingSibling(item);
+  if (followingItem) return followingItem;
+  else {
+    let parent = item.parent;
+    while (parent && isLast(parent)) {
+      parent = parent.parent;
+    }
+    if (parent) return getFollowingSibling(parent);
+  }
+};
+
+const isLast = (item: Item): boolean => !getFollowingSibling(item);
 export const isRoot = (item: Item) => !item.parent;

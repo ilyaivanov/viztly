@@ -1,7 +1,7 @@
-import { getItemAbove, getItemBelow, isRoot } from "./tree.traversal";
 import * as events from "../events";
 import { removeItem } from "./tree.crud";
 import * as movement from "./tree.movement";
+import * as traversal from "./tree.traversal";
 
 let tree: Tree;
 
@@ -34,9 +34,6 @@ export const getFocused = () => tree.root;
 export const isSelected = (item: Item) => tree.selectedItem === item;
 
 //actions
-export const goDown = () => changeSelection(getItemBelow);
-
-export const goUp = () => changeSelection(getItemAbove);
 
 export const moveSelectedDown = () => applyMovement(movement.moveItemDown);
 export const moveSelectedUp = () => applyMovement(movement.moveItemUp);
@@ -78,10 +75,16 @@ const applyMovement = (movement: F1<Item>) => {
   }
 };
 
+export const goDown = () => changeSelection(traversal.getItemBelow);
+export const goUp = () => changeSelection(traversal.getItemAbove);
+export const goToNextSibling = () =>
+  changeSelection(traversal.getNextSiblingOrItemBelow);
+export const goToPreviousSibling = () =>
+  changeSelection(traversal.getPreviousSiblingOrItemAbove);
 export const goLeft = () => {
   const selected = tree.selectedItem;
   if (selected && selected.isOpen) close(selected);
-  else if (selected && selected.parent && !isRoot(selected.parent))
+  else if (selected && selected.parent && !traversal.isRoot(selected.parent))
     changeSelection(() => selected.parent);
 };
 

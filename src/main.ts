@@ -50,9 +50,11 @@ document.addEventListener("keydown", (e) => {
 
   if (code === "ArrowDown") {
     if (e.shiftKey && e.altKey) tree.moveSelectedDown();
+    else if (e.altKey && e.ctrlKey) tree.goToNextSibling();
     else tree.goDown();
   } else if (code === "ArrowUp") {
     if (e.shiftKey && e.altKey) tree.moveSelectedUp();
+    else if (e.altKey && e.ctrlKey) tree.goToPreviousSibling();
     else tree.goUp();
   } else if (code === "ArrowLeft") {
     if (e.shiftKey && e.altKey) tree.moveSelectedLeft();
