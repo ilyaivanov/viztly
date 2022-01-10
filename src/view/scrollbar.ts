@@ -58,7 +58,7 @@ export const appendToOffset = (delta: number, pageHeight: number) => {
 export const centerOnItem = (view: ItemView2, pageHeight: number) => {
   spring(
     canvasOffset,
-    clampOffset(view.y - canvas.canvas.height / 2, pageHeight),
+    clampOffset(view.targetY - canvas.canvas.height / 2, pageHeight),
     (v) => {
       canvasOffset = v;
     }
@@ -66,7 +66,8 @@ export const centerOnItem = (view: ItemView2, pageHeight: number) => {
 };
 
 export const isItemOnScreen = (view: ItemView2) =>
-  view.y >= canvasOffset && view.y <= canvasOffset + canvas.canvas.height;
+  view.targetY >= canvasOffset &&
+  view.targetY <= canvasOffset + canvas.canvas.height;
 
 const clampOffset = (offset: number, pageHeight: number) =>
   numbers.clamp(offset, 0, pageHeight - canvas.canvas.height);

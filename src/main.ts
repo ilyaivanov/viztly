@@ -10,6 +10,7 @@ import {
   getPageHeight,
 } from "./view/treeView";
 import { appendToOffset } from "./view/scrollbar";
+import { onKeyDown } from "./keyboard";
 
 const el = canvas.createFullscreenCanvas();
 
@@ -21,6 +22,7 @@ tree.createTree(
       createItem("Item 3.1", list("Item 3.1.", 20)),
       createItem("Item 3.2", list("Item 3.2.", 10)),
     ]),
+    createItem("Big", list("Big child ", 50)),
     createItem("Item 4", [
       createItem("Item 4.1.", list("Item 4.1.", 10)),
       createItem("Item 4.2.", list("Item 4.2.", 10)),
@@ -50,52 +52,10 @@ const render = () => {
 //when blured finishEdit is called from input, which won't re-render items
 tree.on("item-finishEdit", render);
 
-//TODO: I need to see if more declarative approach makes sense, like in experiments branch
 document.addEventListener("keydown", (e) => {
-  const code = e.code as KeyboardKey;
-
-  if (input.isEditing()) {
-    if (code === "Enter" || code === "NumpadEnter" || code === "Escape")
-      input.finishEdit();
-
-    handleItemMovement(code, e);
-    render();
-    return;
-  }
-
-  handleItemMovement(code, e);
-  if (code === "ArrowDown") {
-    if (e.altKey && e.ctrlKey) tree.goToNextSibling();
-    else tree.goDown();
-  } else if (code === "ArrowUp") {
-    if (e.altKey && e.ctrlKey) tree.goToPreviousSibling();
-    else tree.goUp();
-  } else if (code === "ArrowLeft") tree.goLeft();
-  else if (code === "ArrowRight") tree.goRight();
-  else if (code === "Backspace" && e.altKey && e.shiftKey)
-    tree.removeSelected();
-  else if (code === "KeyE") {
-    tree.startEdit();
-    e.preventDefault();
-  } else if (code === "Enter") {
-    tree.createItemAfterSelected();
-  }
+  onKeyDown(e);
   render();
 });
-
-const handleItemMovement = (code: KeyboardKey, e: KeyboardEvent) => {
-  if (e.shiftKey && e.altKey) {
-    if (code === "ArrowDown") tree.moveSelectedDown();
-    else if (code === "ArrowUp") tree.moveSelectedUp();
-    else if (code === "ArrowLeft") tree.moveSelectedLeft();
-    else if (code === "ArrowRight") tree.moveSelectedRight();
-  }
-  if (code === "Tab") {
-    if (e.shiftKey) tree.moveSelectedLeft();
-    else tree.moveSelectedRight();
-    e.preventDefault();
-  }
-};
 
 document.addEventListener("wheel", (e) => {
   appendToOffset(e.deltaY, getPageHeight());

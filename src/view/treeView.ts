@@ -36,7 +36,10 @@ export const init = (focused: Item) => {
 
 export const subscribe = () => {
   on("item-toggled", toggleItem);
-  on("item-moved", () => updatePositions(getFocused()));
+  on("item-moved", () => {
+    updatePositions(getFocused());
+    centerOnSelectedItemIfOffscreen();
+  });
   on("item-added", (item) => {
     const prevItem = getPreviousSiblingOrItemAbove(item);
     if (prevItem) {
@@ -47,6 +50,7 @@ export const subscribe = () => {
         : createItemView(0, 0, item);
       itemToViews.set(item, view);
       updatePositions(getFocused());
+      centerOnSelectedItemIfOffscreen();
     }
   });
   on("item-removed", (e) => {
@@ -54,10 +58,7 @@ export const subscribe = () => {
     removeViewForItem(e.itemRemoved);
   });
 
-  on("selection-changed", ({ current }) => {
-    const view = itemToViews.get(current);
-    if (view && !isItemOnScreen(view)) centerOnItem(view, getPageHeight());
-  });
+  on("selection-changed", centerOnSelectedItemIfOffscreen);
 
   on("item-startEdit", (item) => {
     const view = itemToViews.get(item);
@@ -88,6 +89,14 @@ export const getPageHeight = () => {
     if (max < view.y) max = view.y;
   });
   return max + sp.start;
+};
+
+const centerOnSelectedItemIfOffscreen = () => {
+  const selected = getSelected();
+  if (selected) {
+    const view = itemToViews.get(selected);
+    if (view && !isItemOnScreen(view)) centerOnItem(view, getPageHeight());
+  }
 };
 
 const toggleItem = (item: Item) => {
@@ -151,6 +160,7 @@ const updatePositions = (item: Item) => {
     const itemView = itemToViews.get(item);
 
     if (itemView && (itemView.x !== x || itemView.y !== yOffset)) {
+      itemView.targetY = yOffset;
       animatePosition(itemView, x, yOffset);
     }
 

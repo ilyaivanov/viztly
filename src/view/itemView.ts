@@ -10,6 +10,9 @@ export type ItemView2 = {
   x: number;
   y: number;
 
+  //targetY is used to determine destinational position of item during animation
+  targetY: number;
+
   isTextHidden?: boolean;
   item: Item;
 };
@@ -58,4 +61,4 @@ export const createItemView = (
   x: number,
   y: number,
   item: Item
-): ItemView2 => ({ opacity: 1, x, y, item });
+): ItemView2 => ({ opacity: 1, x, y, targetY: y, item });
