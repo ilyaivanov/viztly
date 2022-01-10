@@ -1,6 +1,7 @@
 import { sp } from "../design";
 import { canvas, numbers } from "../infra";
 import { spring } from "../infra/animations";
+import { getSelected } from "../tree";
 import { drawTextOnMinimap, ItemView2 } from "./itemView";
 
 export let canvasOffset = 0;
@@ -23,7 +24,24 @@ export const drawMinimap = (itemToViews: Map<Item, ItemView2>) => {
     canvas.canvas.height / sp.minimapScale,
     "rgba(255,255,255,0.1)"
   );
+
   itemToViews.forEach(drawTextOnMinimap);
+
+  const s = getSelected();
+  if (s) {
+    const selectedView = itemToViews.get(s);
+    if (selectedView) {
+      c.canvas.ctx.globalAlpha = 0.6;
+      c.drawRect(
+        canvas.canvas.width - minimapWidth,
+        selectedView.y / sp.minimapScale - sp.yStep / 2 / sp.minimapScale,
+        minimapWidth,
+        sp.yStep / sp.minimapScale,
+        sp.selectedCircle
+      );
+      c.canvas.ctx.globalAlpha = 1;
+    }
+  }
 };
 
 export const getMinimapWidth = () =>
