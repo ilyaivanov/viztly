@@ -1,8 +1,4 @@
-import {
-  getItemAbove,
-  getItemBelow,
-  isRoot,
-} from "../../src/domain/tree.traversal";
+import { getItemAbove, getItemBelow, isRoot } from "./tree.traversal";
 import * as events from "../events";
 import { removeItem } from "./tree.crud";
 import * as movement from "./tree.movement";
@@ -22,6 +18,7 @@ export type AppEvents = {
   "item-finishEdit": Item;
   "item-removed": { itemRemoved: Item; itemSelected: Item | undefined };
 };
+
 export const init = () => {
   if (tree.selectedItem) trigger("init", { selectedItem: tree.selectedItem });
 };

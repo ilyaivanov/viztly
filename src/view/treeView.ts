@@ -1,9 +1,9 @@
-import { forEachOpenChild } from "../../src/domain/tree.traversal";
-import { canvas } from "../../src/infra";
-import { sp } from "../../src/view/design";
+import { forEachOpenChild } from "../tree/tree.traversal";
+import { canvas } from "../infra";
+import { sp } from "../design";
 import { on, getFocused } from "../tree";
 import { draw, drawTextOnMinimap, ItemView2 } from "./itemView";
-import { animatePosition, spring } from "../../src/infra/animations";
+import { animatePosition, spring } from "../infra/animations";
 import { renderInputAt } from "./itemInput";
 
 let itemToViews: Map<Item, ItemView2> = new Map();
@@ -93,7 +93,6 @@ const viewItemChildren = (item: Item, xStart: number, yStart: number) => {
     const view: ItemView2 = {
       opacity: 1,
       x,
-      targetY: yOffset,
       y: yOffset,
       item,
       // lastChildOffset: 0,
@@ -118,7 +117,6 @@ const updatePositions = (item: Item) => {
     const itemView = itemToViews.get(item);
 
     if (itemView && (itemView.x !== x || itemView.y !== yOffset)) {
-      itemView.targetY = yOffset;
       animatePosition(itemView, x, yOffset);
     }
 

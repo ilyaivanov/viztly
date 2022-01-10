@@ -1,85 +1,55 @@
-import * as traversal from "../domain/tree.traversal";
-import { AppContent } from "../app";
-import { sp } from "./design";
-import { isRoot } from "../domain/tree.traversal";
-import { animatePosition } from "../infra/animations";
+import { isRoot } from "../tree/tree.traversal";
+import { canvas } from "../infra";
+import { sp } from "../design";
+import { isSelected } from "../tree";
+import { getMinimapWidth } from "./treeView";
 
-//itemView consist of individual shapes and operations upon them
+export type ItemView2 = {
+  opacity: number;
 
-export const createItemViewAt = (
-  app: AppContent,
-  item: Item,
-  x: number,
-  y: number
-): ItemView => {
-  const color = app.selectedItem === item ? sp.selectedCircle : sp.regularColor;
-  const text = item.title;
+  x: number;
+  y: number;
 
-  const childLine: Line | undefined =
-    item.parent && !isRoot(item.parent)
-      ? {
-          type: "line",
-          color: sp.line,
-          start: { x: 0, y: 0 },
-          end: { x: 0, y: 0 },
-          width: 2,
-        }
-      : undefined;
-
-  const openLine: Line | undefined = item.isOpen
-    ? {
-        type: "line",
-        color: sp.line,
-        start: { x: 0, y: 0 },
-        end: { x: 0, y: 0 },
-        width: 2,
-      }
-    : undefined;
-
-  const view: ItemView = {
-    circle: { type: "circle", color, x: 0, y: 0, filled: false, r: 3 },
-    text: { type: "text", color, x: 0, y: 0, text, fontSize: sp.fontSize },
-    childLine,
-    openLine,
-  };
-
-  updateItemPosition(view, item, x, y);
-  return view;
+  isTextHidden?: boolean;
+  item: Item;
 };
 
-export const updateItemPosition = (
-  view: ItemView,
-  item: Item,
-  x: number,
-  y: number
+export const draw = (
+  { item, x, y, opacity, isTextHidden }: ItemView2,
+  lastChild?: ItemView2
 ) => {
-  view.circle.x = x;
-  view.circle.y = y;
+  const c = canvas;
 
-  if (view.childLine) {
-    view.childLine.start.x = x;
-    view.childLine.start.y = y;
-    view.childLine.end.x = x - sp.xStep;
-    view.childLine.end.y = y;
+  c.canvas.ctx.globalAlpha = opacity;
+
+  if (item.parent && !isRoot(item.parent))
+    c.drawLine(x, y, x - sp.xStep, y, sp.line, 2);
+
+  if (lastChild) c.drawLine(x, y, x, lastChild.y, sp.line, 2);
+
+  const color = isSelected(item) ? sp.selectedCircle : sp.regularColor;
+  c.drawCircle(x, y, sp.circleR, color, item.children.length > 0);
+
+  if (!isTextHidden) {
+    const textX = x + sp.circleToTextDistance;
+    const textY = y + 0.32 * sp.fontSize;
+    c.drawText(textX, textY, item.title, sp.fontSize, color);
   }
-
-  view.circle.filled = !traversal.isEmpty(item);
-
-  view.text.x = x + sp.circleToTextDistance;
-  view.text.y = y + 0.32 * sp.fontSize;
 };
 
-export const updateOpenItemLines = (app: AppContent, item: Item) => {
-  const view = app.itemsToViews.get(item);
-  if (view && view.openLine) {
-    const lastChild = app.itemsToViews.get(
-      item.children[item.children.length - 1]
-    );
-    if (lastChild) {
-      view.openLine.start.x = view.circle.x;
-      view.openLine.start.y = view.circle.y;
-      view.openLine.end.x = lastChild.circle.x - sp.xStep;
-      view.openLine.end.y = lastChild.circle.y + 1;
-    }
-  }
+export const drawTextOnMinimap = ({ item, x, y, opacity }: ItemView2) => {
+  const c = canvas;
+  c.canvas.ctx.globalAlpha = opacity;
+
+  const color = isSelected(item) ? sp.selectedCircle : sp.minimapColor;
+  const textX = x + sp.circleToTextDistance;
+  const textY = y + 0.32 * sp.fontSize;
+  const xOffset = canvas.canvas.width - getMinimapWidth();
+  c.drawText(
+    xOffset + textX / sp.minimapScale,
+    textY / sp.minimapScale,
+    item.title,
+    sp.fontSize / sp.minimapScale,
+    color
+  );
 };
