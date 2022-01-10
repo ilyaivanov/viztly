@@ -25,5 +25,8 @@ type KeyboardKey =
   | "ArrowLeft"
   | "ArrowRight"
   | "Enter"
+  | "NumpadEnter"
+  | "Escape"
+  | "Tab"
   | "KeyE"
   | "Backspace";

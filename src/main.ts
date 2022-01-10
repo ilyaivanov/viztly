@@ -1,7 +1,7 @@
 import { createItem, createRoot, list } from "./tree/tree.crud";
 import { canvas, engine } from "./infra";
 import * as tree from "./tree";
-import { finishEdit, isEditing } from "./view/itemInput";
+import * as input from "./view/itemInput";
 import {
   init,
   subscribe,
@@ -50,31 +50,29 @@ const render = () => {
 //when blured finishEdit is called from input, which won't re-render items
 tree.on("item-finishEdit", render);
 
+//TODO: I need to see if more declarative approach makes sense, like in experiments branch
 document.addEventListener("keydown", (e) => {
   const code = e.code as KeyboardKey;
 
-  if (isEditing()) {
-    if (e.code === "Enter" || e.code === "NumpadEnter" || e.code === "Escape")
-      finishEdit();
+  if (input.isEditing()) {
+    if (code === "Enter" || code === "NumpadEnter" || code === "Escape")
+      input.finishEdit();
+
+    handleItemMovement(code, e);
     render();
     return;
   }
 
+  handleItemMovement(code, e);
   if (code === "ArrowDown") {
-    if (e.shiftKey && e.altKey) tree.moveSelectedDown();
-    else if (e.altKey && e.ctrlKey) tree.goToNextSibling();
+    if (e.altKey && e.ctrlKey) tree.goToNextSibling();
     else tree.goDown();
   } else if (code === "ArrowUp") {
-    if (e.shiftKey && e.altKey) tree.moveSelectedUp();
-    else if (e.altKey && e.ctrlKey) tree.goToPreviousSibling();
+    if (e.altKey && e.ctrlKey) tree.goToPreviousSibling();
     else tree.goUp();
-  } else if (code === "ArrowLeft") {
-    if (e.shiftKey && e.altKey) tree.moveSelectedLeft();
-    else tree.goLeft();
-  } else if (code === "ArrowRight") {
-    if (e.shiftKey && e.altKey) tree.moveSelectedRight();
-    else tree.goRight();
-  } else if (code === "Backspace" && e.altKey && e.shiftKey)
+  } else if (code === "ArrowLeft") tree.goLeft();
+  else if (code === "ArrowRight") tree.goRight();
+  else if (code === "Backspace" && e.altKey && e.shiftKey)
     tree.removeSelected();
   else if (code === "KeyE") {
     tree.startEdit();
@@ -84,6 +82,20 @@ document.addEventListener("keydown", (e) => {
   }
   render();
 });
+
+const handleItemMovement = (code: KeyboardKey, e: KeyboardEvent) => {
+  if (e.shiftKey && e.altKey) {
+    if (code === "ArrowDown") tree.moveSelectedDown();
+    else if (code === "ArrowUp") tree.moveSelectedUp();
+    else if (code === "ArrowLeft") tree.moveSelectedLeft();
+    else if (code === "ArrowRight") tree.moveSelectedRight();
+  }
+  if (code === "Tab") {
+    if (e.shiftKey) tree.moveSelectedLeft();
+    else tree.moveSelectedRight();
+    e.preventDefault();
+  }
+};
 
 document.addEventListener("wheel", (e) => {
   appendToOffset(e.deltaY, getPageHeight());
@@ -95,6 +107,6 @@ canvas.addEventListener("resize", render);
 engine.onTick = () => {
   render();
 
-  if (isEditing()) updateSelectedItemInputCoords();
+  if (input.isEditing()) updateSelectedItemInputCoords();
 };
 render();
