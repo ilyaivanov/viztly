@@ -1,5 +1,6 @@
 import { sp } from "../design";
 import * as tree from "../tree";
+import { canvasOffset } from "./scrollbar";
 
 let input: HTMLInputElement | undefined;
 
@@ -26,14 +27,10 @@ export const finishEdit = () => {
 };
 
 export const renderInputAt = (x: number, y: number, title: string) => {
-  const inputX = x + sp.circleToTextDistance;
-  const inputY = y - sp.fontSize * 0.32 * 2.5;
-
   input = document.createElement("input");
   input.autocomplete = "off";
   input.id = "main-input";
-  input.style.left = inputX + "px";
-  input.style.top = inputY + "px";
+  setInputCoords(input, x, y);
   input.style.color = sp.selectedCircle;
   input.value = title;
 
@@ -42,11 +39,14 @@ export const renderInputAt = (x: number, y: number, title: string) => {
   input.focus();
   input.setSelectionRange(0, 0);
 };
+
 export const updateInputCoords = (x: number, y: number) => {
-  if (input) {
-    const inputX = x + sp.circleToTextDistance;
-    const inputY = y - sp.fontSize * 0.32 * 2.5;
-    input.style.left = inputX + "px";
-    input.style.top = inputY + "px";
-  }
+  if (input) setInputCoords(input, x, y);
+};
+
+const setInputCoords = (input: HTMLInputElement, x: number, y: number) => {
+  const inputX = x + sp.circleToTextDistance;
+  const inputY = y - sp.fontSize * 0.32 * 2.5 - canvasOffset;
+  input.style.left = inputX + "px";
+  input.style.top = inputY + "px";
 };

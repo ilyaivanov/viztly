@@ -47,6 +47,9 @@ const render = () => {
   drawTree();
 };
 
+//when blured finishEdit is called from input, which won't re-render items
+tree.on("item-finishEdit", render);
+
 document.addEventListener("keydown", (e) => {
   const code = e.code as KeyboardKey;
 
