@@ -2,4 +2,3 @@ node_modules
 .idea
 build
 package-lock.json
-src/controllers/stateReader.config.ts
