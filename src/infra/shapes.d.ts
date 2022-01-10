@@ -46,10 +46,3 @@ type KeyboardKey =
   | "Enter"
   | "KeyE"
   | "Backspace";
-
-type ItemView = {
-  circle: Circle;
-  text: TextShape;
-  childLine?: Line;
-  openLine?: Line;
-};
