@@ -42,11 +42,14 @@ export const updateHeight = () => {
 };
 
 export const setTranslation = (x: number, y: number) => {
-  canvas.ctx.resetTransform();
+  resetTranslation();
 
   const scaleFactor = window.devicePixelRatio;
   canvas.ctx.scale(scaleFactor, scaleFactor);
   canvas.ctx.translate(x, y);
+};
+export const resetTranslation = () => {
+  canvas.ctx.resetTransform();
 };
 
 export const drawCircle = (

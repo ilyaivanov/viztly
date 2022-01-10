@@ -2,16 +2,23 @@ import {
   forEachOpenChild,
   getPreviousSiblingOrItemAbove,
 } from "../tree/tree.traversal";
-import { canvas } from "../infra";
 import { sp } from "../design";
 import { on, getFocused, getSelected } from "../tree";
-import { createItemView, draw, drawTextOnMinimap, ItemView2 } from "./itemView";
+import { createItemView, draw, ItemView2 } from "./itemView";
 import { animatePosition, spring } from "../infra/animations";
 import { renderInputAt, updateInputCoords } from "./itemInput";
+import {
+  drawMinimap,
+  canvasOffset,
+  isItemOnScreen,
+  centerOnItem,
+} from "./scrollbar";
+import { canvas } from "../infra";
 
 let itemToViews: Map<Item, ItemView2> = new Map();
 
 export const drawTree = () => {
+  canvas.setTranslation(0, -canvasOffset);
   itemToViews.forEach((item) => {
     const lastChild = item.item.isOpen
       ? itemToViews.get(item.item.children[item.item.children.length - 1])
@@ -19,7 +26,8 @@ export const drawTree = () => {
     draw(item, lastChild);
   });
 
-  drawMinimap();
+  canvas.resetTranslation();
+  drawMinimap(itemToViews);
 };
 
 export const init = (focused: Item) => {
@@ -46,6 +54,11 @@ export const subscribe = () => {
     removeViewForItem(e.itemRemoved);
   });
 
+  on("selection-changed", ({ current }) => {
+    const view = itemToViews.get(current);
+    if (view && !isItemOnScreen(view)) centerOnItem(view, getPageHeight());
+  });
+
   on("item-startEdit", (item) => {
     const view = itemToViews.get(item);
     if (view) {
@@ -66,6 +79,15 @@ export const updateSelectedItemInputCoords = () => {
     const view = itemToViews.get(s);
     if (view) updateInputCoords(view.x, view.y);
   }
+};
+
+export const getPageHeight = () => {
+  let max = 0;
+  //TODO: this can be cached and updates in updatePositions
+  itemToViews.forEach((view) => {
+    if (max < view.y) max = view.y;
+  });
+  return max + sp.start;
 };
 
 const toggleItem = (item: Item) => {
@@ -140,29 +162,3 @@ const updatePositions = (item: Item) => {
 
   item.children.forEach((c) => step(c, 0));
 };
-
-//minimap
-const drawMinimap = () => {
-  const c = canvas;
-  c.canvas.ctx.globalAlpha = 1;
-
-  const minimapWidth = getMinimapWidth();
-  c.drawRect(
-    canvas.canvas.width - minimapWidth,
-    0,
-    minimapWidth,
-    canvas.canvas.height,
-    "rgba(255,255,255,0.03)"
-  );
-  c.drawRect(
-    canvas.canvas.width - minimapWidth,
-    0,
-    minimapWidth,
-    canvas.canvas.height / sp.minimapScale,
-    "rgba(255,255,255,0.1)"
-  );
-  itemToViews.forEach(drawTextOnMinimap);
-};
-
-export const getMinimapWidth = () =>
-  Math.min(canvas.canvas.width / sp.minimapScale, 120);

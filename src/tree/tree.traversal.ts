@@ -71,8 +71,6 @@ const getRelativeSibling = (
   const context = item.parent?.children;
   if (context) {
     const index = context.indexOf(item);
-    if (index < context.length - 1) {
-      return context[getItemIndex(index)];
-    }
+    return context[getItemIndex(index)];
   }
 };
