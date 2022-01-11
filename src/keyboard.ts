@@ -52,6 +52,9 @@ const keyMap: CommandDefinition[] = [
   { key: "down", command: tree.goDown, edit: "ignore" },
   { key: "up", command: tree.goUp, edit: "ignore" },
 
+  { key: "alt+right", command: tree.focusOnSelected, edit: "ignore" },
+  { key: "alt+left", command: tree.focusOnParent, edit: "ignore" },
+
   { key: "e", command: tree.startEdit, preventDefault: true, edit: "ignore" },
   { key: "enter", command: tree.createItemAfterSelected, edit: "ignore" },
   {

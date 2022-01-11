@@ -8,12 +8,14 @@ let tree: Tree;
 export type Tree = {
   root: Item;
   selectedItem: Item | undefined;
+  itemFocused: Item;
 };
 export type AppEvents = {
   init: { selectedItem: Item };
   "selection-changed": { prev: Item; current: Item };
   "item-toggled": Item;
   "item-moved": Item;
+  "item-focused": { prev: Item; current: Item };
   "item-startEdit": Item;
   "item-finishEdit": Item;
   "item-removed": { itemRemoved: Item; itemSelected: Item | undefined };
@@ -27,13 +29,15 @@ export const init = (initialTree: Tree) => {
 
 export const createTree = (root: Item): Tree => ({
   root,
+  itemFocused: root,
   selectedItem: root.children[0],
 });
 
-export const getFocused = () => tree.root;
+export const getFocused = () => tree.itemFocused;
 export const getTree = () => tree;
 export const getSelected = () => tree.selectedItem;
 export const isSelected = (item: Item) => tree.selectedItem === item;
+export const isFocused = (item: Item) => tree.itemFocused === item;
 
 //actions
 
@@ -50,6 +54,21 @@ export const removeSelected = () => {
   }
 };
 
+export const focusOnSelected = () => {
+  if (tree.selectedItem) {
+    const prev = tree.itemFocused;
+    tree.itemFocused = tree.selectedItem;
+    trigger("item-focused", { prev, current: tree.itemFocused });
+  }
+};
+export const focusOnParent = () => {
+  const focused = tree.itemFocused;
+  if (focused.parent) {
+    const prev = tree.itemFocused;
+    tree.itemFocused = focused.parent;
+    trigger("item-focused", { prev, current: tree.itemFocused });
+  }
+};
 export const startEdit = () => {
   if (tree.selectedItem) trigger("item-startEdit", tree.selectedItem);
 };

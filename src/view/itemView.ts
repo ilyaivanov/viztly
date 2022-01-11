@@ -1,7 +1,7 @@
 import { isRoot } from "../tree/tree.traversal";
 import { canvas } from "../infra";
 import { sp } from "../design";
-import { isSelected } from "../tree";
+import { isFocused, isSelected } from "../tree";
 import { getMinimapWidth } from "./scrollbar";
 
 export type ItemView2 = {
@@ -25,7 +25,7 @@ export const draw = (
 
   c.canvas.ctx.globalAlpha = opacity;
 
-  if (item.parent && !isRoot(item.parent))
+  if (item.parent && !isRoot(item.parent) && !isFocused(item))
     c.drawLine(x, y, x - sp.xStep, y, sp.line, 2);
 
   if (lastChild) c.drawLine(x, y, x, lastChild.y, sp.line, 2);

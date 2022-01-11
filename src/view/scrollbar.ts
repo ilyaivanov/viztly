@@ -3,7 +3,6 @@ import { canvas, numbers } from "../infra";
 import { spring } from "../infra/animations";
 import { getSelected } from "../tree";
 import { drawTextOnMinimap, ItemView2 } from "./itemView";
-import { getPageHeight } from "./treeView";
 
 export let canvasOffset = 0;
 export const drawMinimap = (

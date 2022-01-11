@@ -1,6 +1,7 @@
 import {
   forEachOpenChild,
   getPreviousSiblingOrItemAbove,
+  isRoot,
 } from "../tree/tree.traversal";
 import { sp } from "../design";
 import { on, getFocused, getSelected } from "../tree";
@@ -37,6 +38,7 @@ export const init = () => {
 
 export const subscribe = () => {
   on("item-toggled", toggleItem);
+  on("item-focused", refocus);
   on("init", init);
   on("item-moved", () => {
     updatePositions(getFocused());
@@ -151,7 +153,8 @@ const viewItemChildren = (item: Item, xStart: number, yStart: number) => {
     }
   };
 
-  item.children.forEach((c) => step(c, 0));
+  if (isRoot(item)) item.children.forEach((c) => step(c, 0));
+  else step(item, 0);
 };
 
 const updatePositions = (item: Item) => {
@@ -172,5 +175,11 @@ const updatePositions = (item: Item) => {
     }
   };
 
-  item.children.forEach((c) => step(c, 0));
+  if (isRoot(item)) item.children.forEach((c) => step(c, 0));
+  else step(item, 0);
+};
+
+const refocus = ({ prev, current }: { prev: Item; current: Item }) => {
+  itemToViews.clear();
+  viewItemChildren(current, sp.start, sp.start);
 };
