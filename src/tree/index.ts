@@ -140,8 +140,10 @@ const close = (item: Item) => {
 
 const source = events.createSource<AppEvents>();
 
-const trigger = <T extends keyof AppEvents>(event: T, data: AppEvents[T]) =>
-  events.trigger(source, event, data);
+export const trigger = <T extends keyof AppEvents>(
+  event: T,
+  data: AppEvents[T]
+) => events.trigger(source, event, data);
 
 export const on = <T extends keyof AppEvents>(event: T, cb: F1<AppEvents[T]>) =>
   events.on(source, event, cb);

@@ -1,10 +1,15 @@
+import { trigger } from ".";
+
 export const moveItemRight = (item: Item) => {
   const parent = item.parent;
   if (parent) {
     const index = parent.children.indexOf(item);
     if (index > 0) {
       const prevItem = parent.children[index - 1];
-      prevItem.isOpen = true;
+      if (!prevItem.isOpen) {
+        prevItem.isOpen = true;
+        trigger("item-toggled", prevItem);
+      }
       removeChildAt(parent, index);
       addChildAt(prevItem, item, prevItem.children.length);
     }
