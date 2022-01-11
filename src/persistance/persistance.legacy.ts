@@ -1,5 +1,5 @@
-import { createTree, Tree } from "./tree";
-import { createItem } from "./tree/tree.crud";
+import { createTree, Tree } from "../tree";
+import { createItem } from "../tree/tree.crud";
 
 export const deserialize = (root: any): Item => {
   const map = (item: ItemToSerialize): Item => {
@@ -71,5 +71,5 @@ const deserializingTypes: Record<SerializedItemType, ItemType> =
     Object.entries(serializingTypes).map(([k, v]) => [v, k])
   ) as Record<SerializedItemType, ItemType>;
 
-//   PASTE LEGACY OBJECT HERE
+// PASTE LEGACY OBJECT HERE
 const itemsBackup = {};

@@ -1,4 +1,4 @@
-import { createTree, Tree } from "./tree";
+import { createTree, Tree } from "../tree";
 import defaultState from "./persistance.initial";
 
 export const saveToFile = async (tree: Tree) => {

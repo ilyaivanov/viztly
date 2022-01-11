@@ -1,5 +1,5 @@
-import { createTree } from "./tree";
-import { createItem, createRoot, list } from "./tree/tree.crud";
+import { createTree } from "../tree";
+import { createItem, createRoot, list } from "../tree/tree.crud";
 
 const medium = createRoot([
   createItem("Item 1", list("Item 1.", 10)),
