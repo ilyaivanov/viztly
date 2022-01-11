@@ -1,6 +1,6 @@
 import { sp } from "../design";
 import * as tree from "../tree";
-import { canvasOffset } from "./scrollbar";
+import { canvasOffset } from "./minimap";
 
 let input: HTMLInputElement | undefined;
 

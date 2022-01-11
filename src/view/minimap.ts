@@ -21,7 +21,7 @@ export const drawMinimap = (
     0,
     minimapWidth,
     canvas.canvas.height,
-    "#252525" //rgba(255,255,255,0.03) on a background
+    sp.background
   );
   ctx.shadowBlur = 0;
 
@@ -55,6 +55,8 @@ export const drawMinimap = (
 
 export const getMinimapWidth = () =>
   Math.min(canvas.canvas.width / sp.minimapScale, 120);
+
+export const resetOffset = () => (canvasOffset = 0);
 
 export const appendToOffset = (delta: number, pageHeight: number) => {
   if (pageHeight > canvas.canvas.height) {
@@ -93,5 +95,7 @@ const getMinimapOffset = (page: number, canvasHeight: number) => {
   );
 };
 
-const clampOffset = (offset: number, pageHeight: number) =>
-  numbers.clamp(offset, 0, pageHeight - canvas.canvas.height);
+const clampOffset = (offset: number, pageHeight: number) => {
+  if (pageHeight < canvas.canvas.height) return 0;
+  return numbers.clamp(offset, 0, pageHeight - canvas.canvas.height);
+};

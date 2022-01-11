@@ -2,7 +2,7 @@ import { isRoot } from "../tree/tree.traversal";
 import { canvas } from "../infra";
 import { sp } from "../design";
 import { isFocused, isSelected } from "../tree";
-import { getMinimapWidth } from "./scrollbar";
+import { getMinimapWidth } from "./minimap";
 
 export type ItemView2 = {
   opacity: number;

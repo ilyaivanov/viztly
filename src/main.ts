@@ -7,7 +7,7 @@ import {
   updateSelectedItemInputCoords,
   getPageHeight,
 } from "./view/treeView";
-import { appendToOffset } from "./view/scrollbar";
+import { appendToOffset } from "./view/minimap";
 import { onKeyDown } from "./keyboard";
 import { loadFromLocalStorage, saveToLocalStorage } from "./persistance";
 

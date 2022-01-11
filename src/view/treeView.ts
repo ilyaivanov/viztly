@@ -8,18 +8,13 @@ import { on, getFocused, getSelected } from "../tree";
 import { createItemView, draw, ItemView2 } from "./itemView";
 import { animatePosition, spring } from "../infra/animations";
 import { renderInputAt, updateInputCoords } from "./itemInput";
-import {
-  drawMinimap,
-  canvasOffset,
-  isItemOnScreen,
-  centerOnItem,
-} from "./scrollbar";
+import * as minimap from "./minimap";
 import { canvas } from "../infra";
 
 let itemToViews: Map<Item, ItemView2> = new Map();
 
 export const drawTree = () => {
-  canvas.setTranslation(0, -canvasOffset);
+  canvas.setTranslation(0, -minimap.canvasOffset);
   itemToViews.forEach((item) => {
     const lastChild = item.item.isOpen
       ? itemToViews.get(item.item.children[item.item.children.length - 1])
@@ -28,7 +23,7 @@ export const drawTree = () => {
   });
 
   canvas.resetTranslation();
-  drawMinimap(itemToViews, getPageHeight());
+  minimap.drawMinimap(itemToViews, getPageHeight());
 };
 
 export const init = () => {
@@ -99,7 +94,8 @@ const centerOnSelectedItemIfOffscreen = () => {
   const selected = getSelected();
   if (selected) {
     const view = itemToViews.get(selected);
-    if (view && !isItemOnScreen(view)) centerOnItem(view, getPageHeight());
+    if (view && !minimap.isItemOnScreen(view))
+      minimap.centerOnItem(view, getPageHeight());
   }
 };
 
@@ -182,4 +178,5 @@ const updatePositions = (item: Item) => {
 const refocus = ({ prev, current }: { prev: Item; current: Item }) => {
   itemToViews.clear();
   viewItemChildren(current, sp.start, sp.start);
+  centerOnSelectedItemIfOffscreen();
 };
