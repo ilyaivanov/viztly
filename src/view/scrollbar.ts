@@ -3,9 +3,13 @@ import { canvas, numbers } from "../infra";
 import { spring } from "../infra/animations";
 import { getSelected } from "../tree";
 import { drawTextOnMinimap, ItemView2 } from "./itemView";
+import { getPageHeight } from "./treeView";
 
 export let canvasOffset = 0;
-export const drawMinimap = (itemToViews: Map<Item, ItemView2>) => {
+export const drawMinimap = (
+  itemToViews: Map<Item, ItemView2>,
+  pageHeight: number
+) => {
   const c = canvas;
   const ctx = c.canvas.ctx;
   ctx.globalAlpha = 1;
@@ -24,14 +28,14 @@ export const drawMinimap = (itemToViews: Map<Item, ItemView2>) => {
 
   c.drawRect(
     canvas.canvas.width - minimapWidth,
-    canvasOffset / sp.minimapScale,
+    getScrollbarOffset(pageHeight, c.canvas.height),
     minimapWidth,
     canvas.canvas.height / sp.minimapScale,
     "rgba(255,255,255,0.1)"
   );
 
+  c.setTranslation(0, getMinimapOffset(pageHeight, c.canvas.height));
   itemToViews.forEach(drawTextOnMinimap);
-
   const s = getSelected();
   if (s) {
     const selectedView = itemToViews.get(s);
@@ -47,6 +51,7 @@ export const drawMinimap = (itemToViews: Map<Item, ItemView2>) => {
       c.canvas.ctx.globalAlpha = 1;
     }
   }
+  c.resetTranslation();
 };
 
 export const getMinimapWidth = () =>
@@ -73,6 +78,21 @@ export const centerOnItem = (view: ItemView2, pageHeight: number) => {
 export const isItemOnScreen = (view: ItemView2) =>
   view.targetY >= canvasOffset &&
   view.targetY <= canvasOffset + canvas.canvas.height;
+
+const getScrollbarOffset = (page: number, canvasHeight: number) => {
+  if (page / sp.minimapScale < canvasHeight)
+    return canvasOffset / sp.minimapScale;
+
+  const canvasOffsetCoef = canvasOffset / (page - canvasHeight);
+  return (canvasHeight - canvasHeight / sp.minimapScale) * canvasOffsetCoef;
+};
+
+const getMinimapOffset = (page: number, canvasHeight: number) => {
+  if (page / sp.minimapScale < canvasHeight) return 0;
+  return (
+    -canvasOffset / sp.minimapScale + getScrollbarOffset(page, canvasHeight)
+  );
+};
 
 const clampOffset = (offset: number, pageHeight: number) =>
   numbers.clamp(offset, 0, pageHeight - canvas.canvas.height);

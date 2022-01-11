@@ -27,7 +27,7 @@ export const drawTree = () => {
   });
 
   canvas.resetTranslation();
-  drawMinimap(itemToViews);
+  drawMinimap(itemToViews, getPageHeight());
 };
 
 export const init = () => {
