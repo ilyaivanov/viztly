@@ -1,3 +1,4 @@
+import { loadFromFile, saveToFile } from "./persistance";
 import * as tree from "./tree";
 import * as input from "./view/itemInput";
 
@@ -18,6 +19,21 @@ export const onKeyDown = async (e: KeyboardEvent) => {
 };
 
 const keyMap: CommandDefinition[] = [
+  {
+    key: "ctrl+l",
+    command: async () => {
+      const loadedTree = await loadFromFile();
+      tree.init(loadedTree);
+    },
+    preventDefault: true,
+  },
+
+  {
+    key: "ctrl+s",
+    command: () => saveToFile(tree.getTree()),
+    preventDefault: true,
+  },
+
   { key: "shift+tab", command: tree.moveSelectedLeft, preventDefault: true },
   { key: "tab", command: tree.moveSelectedRight, preventDefault: true },
 
@@ -100,9 +116,36 @@ const selectBestKey = (entry: typeof keyMap) => {
   }
   return candidate;
 };
+type Alphabet =
+  | "a"
+  | "b"
+  | "c"
+  | "d"
+  | "e"
+  | "f"
+  | "g"
+  | "h"
+  | "i"
+  | "j"
+  | "k"
+  | "l"
+  | "m"
+  | "n"
+  | "o"
+  | "p"
+  | "q"
+  | "r"
+  | "s"
+  | "t"
+  | "u"
+  | "v"
+  | "w"
+  | "x"
+  | "y"
+  | "z";
 
 type TargetKey =
-  | "e"
+  | Alphabet
   | "tab"
   | "left"
   | "right"

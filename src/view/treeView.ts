@@ -30,12 +30,14 @@ export const drawTree = () => {
   drawMinimap(itemToViews);
 };
 
-export const init = (focused: Item) => {
-  viewItemChildren(focused, sp.start, sp.start);
+export const init = () => {
+  itemToViews.clear();
+  viewItemChildren(getFocused(), sp.start, sp.start);
 };
 
 export const subscribe = () => {
   on("item-toggled", toggleItem);
+  on("init", init);
   on("item-moved", () => {
     updatePositions(getFocused());
     centerOnSelectedItemIfOffscreen();

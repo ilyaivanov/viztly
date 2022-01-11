@@ -5,7 +5,7 @@ import * as traversal from "./tree.traversal";
 
 let tree: Tree;
 
-type Tree = {
+export type Tree = {
   root: Item;
   selectedItem: Item | undefined;
 };
@@ -20,18 +20,18 @@ export type AppEvents = {
   "item-added": Item;
 };
 
-export const init = () => {
+export const init = (initialTree: Tree) => {
+  tree = initialTree;
   if (tree.selectedItem) trigger("init", { selectedItem: tree.selectedItem });
 };
 
-export const createTree = (root: Item) => {
-  tree = {
-    root,
-    selectedItem: root.children[0],
-  };
-};
+export const createTree = (root: Item): Tree => ({
+  root,
+  selectedItem: root.children[0],
+});
 
 export const getFocused = () => tree.root;
+export const getTree = () => tree;
 export const getSelected = () => tree.selectedItem;
 export const isSelected = (item: Item) => tree.selectedItem === item;
 
