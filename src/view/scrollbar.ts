@@ -7,16 +7,21 @@ import { drawTextOnMinimap, ItemView2 } from "./itemView";
 export let canvasOffset = 0;
 export const drawMinimap = (itemToViews: Map<Item, ItemView2>) => {
   const c = canvas;
-  c.canvas.ctx.globalAlpha = 1;
+  const ctx = c.canvas.ctx;
+  ctx.globalAlpha = 1;
 
   const minimapWidth = getMinimapWidth();
+  ctx.shadowColor = "black";
+  ctx.shadowBlur = 5;
   c.drawRect(
     canvas.canvas.width - minimapWidth,
     0,
     minimapWidth,
     canvas.canvas.height,
-    "rgba(255,255,255,0.03)"
+    "#252525" //rgba(255,255,255,0.03) on a background
   );
+  ctx.shadowBlur = 0;
+
   c.drawRect(
     canvas.canvas.width - minimapWidth,
     canvasOffset / sp.minimapScale,

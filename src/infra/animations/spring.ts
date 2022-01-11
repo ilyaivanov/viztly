@@ -8,8 +8,8 @@ export class SpringAnimated implements Animated {
   public last: number;
 
   // { stiffness: 0.02, damping: 2, invertedMass: 0.2 },
-  stiffness = 0.035;
-  damping = 2;
+  stiffness = 0.02;
+  damping = 2.5;
   invertedMass = 0.28;
 
   onTick?: (val: number, ended: boolean) => void;

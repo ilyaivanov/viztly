@@ -1,7 +1,7 @@
 export const sp = {
   start: 50,
   xStep: 20,
-  yStep: 20,
+  yStep: 22,
 
   //design
   fontSize: 14,
