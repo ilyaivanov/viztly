@@ -13,8 +13,8 @@ export const onKeyDown = async (e: KeyboardEvent) => {
 
   if (commands.length > 0) {
     const commandEntry = selectBestKey(commands);
-    await commandEntry.command();
     if (commandEntry.preventDefault) e.preventDefault();
+    await commandEntry.command();
   }
 };
 
