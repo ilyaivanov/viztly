@@ -9,6 +9,8 @@ export const sp = {
   minimapScale: 10,
   circleToTextDistance: 8,
 
+  background: "#1e1e1e",
+
   selectedCircle: "#ACE854",
   regularColor: "white",
   minimapColor: "#DEDEDE",

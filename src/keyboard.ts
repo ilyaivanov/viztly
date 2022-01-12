@@ -13,8 +13,8 @@ export const onKeyDown = async (e: KeyboardEvent) => {
 
   if (commands.length > 0) {
     const commandEntry = selectBestKey(commands);
-    await commandEntry.command();
     if (commandEntry.preventDefault) e.preventDefault();
+    await commandEntry.command();
   }
 };
 
@@ -51,6 +51,9 @@ const keyMap: CommandDefinition[] = [
   { key: "right", command: tree.goRight, edit: "ignore" },
   { key: "down", command: tree.goDown, edit: "ignore" },
   { key: "up", command: tree.goUp, edit: "ignore" },
+
+  { key: "alt+right", command: tree.focusOnSelected, edit: "ignore" },
+  { key: "alt+left", command: tree.focusOnParent, edit: "ignore" },
 
   { key: "e", command: tree.startEdit, preventDefault: true, edit: "ignore" },
   { key: "enter", command: tree.createItemAfterSelected, edit: "ignore" },

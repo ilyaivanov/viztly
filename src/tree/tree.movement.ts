@@ -1,10 +1,15 @@
+import { isFocused, trigger } from ".";
+
 export const moveItemRight = (item: Item) => {
   const parent = item.parent;
-  if (parent) {
+  if (parent && canItemBeMoved(item)) {
     const index = parent.children.indexOf(item);
     if (index > 0) {
       const prevItem = parent.children[index - 1];
-      prevItem.isOpen = true;
+      if (!prevItem.isOpen) {
+        prevItem.isOpen = true;
+        trigger("item-toggled", prevItem);
+      }
       removeChildAt(parent, index);
       addChildAt(prevItem, item, prevItem.children.length);
     }
@@ -13,7 +18,7 @@ export const moveItemRight = (item: Item) => {
 
 export const moveItemLeft = (item: Item) => {
   const parent = item.parent;
-  if (parent) {
+  if (parent && canItemBeMovedLeft(item)) {
     const parentOfParent = parent.parent;
     if (parentOfParent) {
       const parentIndex = parentOfParent.children.indexOf(parent);
@@ -25,7 +30,7 @@ export const moveItemLeft = (item: Item) => {
 
 export const moveItemUp = (item: Item) => {
   const parent = item.parent;
-  if (parent) {
+  if (parent && canItemBeMoved(item)) {
     const index = parent.children.indexOf(item);
     if (index > 0) {
       removeChildAt(parent, index);
@@ -36,7 +41,7 @@ export const moveItemUp = (item: Item) => {
 
 export const moveItemDown = (item: Item) => {
   const parent = item.parent;
-  if (parent) {
+  if (parent && canItemBeMoved(item)) {
     const index = parent.children.indexOf(item);
     if (index <= parent.children.length - 1) {
       removeChildAt(parent, index);
@@ -44,6 +49,10 @@ export const moveItemDown = (item: Item) => {
     }
   }
 };
+
+const canItemBeMoved = (item: Item) => !isFocused(item);
+const canItemBeMovedLeft = (item: Item) =>
+  canItemBeMoved(item) && item.parent && !isFocused(item.parent);
 
 //common
 const updateIsOpenFlag = (item: Item) => {

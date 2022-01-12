@@ -1,6 +1,7 @@
 import { sp } from "../design";
 import * as tree from "../tree";
-import { canvasOffset } from "./scrollbar";
+import { canvasOffset } from "./minimap";
+import { canvas } from "../infra";
 
 let input: HTMLInputElement | undefined;
 
@@ -37,6 +38,7 @@ export const renderInputAt = (x: number, y: number, title: string) => {
   input.addEventListener("blur", onBlur);
   document.body.appendChild(input);
   input.focus();
+  input.scrollTo({ left: 0 });
   input.setSelectionRange(0, 0);
 };
 
@@ -49,4 +51,5 @@ const setInputCoords = (input: HTMLInputElement, x: number, y: number) => {
   const inputY = y - sp.fontSize * 0.32 * 2.5 - canvasOffset;
   input.style.left = inputX + "px";
   input.style.top = inputY + "px";
+  input.style.width = canvas.canvas.width - inputX + "px";
 };

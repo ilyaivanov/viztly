@@ -1,24 +1,20 @@
 import {
   forEachOpenChild,
   getPreviousSiblingOrItemAbove,
+  isRoot,
 } from "../tree/tree.traversal";
 import { sp } from "../design";
 import { on, getFocused, getSelected } from "../tree";
 import { createItemView, draw, ItemView2 } from "./itemView";
 import { animatePosition, spring } from "../infra/animations";
 import { renderInputAt, updateInputCoords } from "./itemInput";
-import {
-  drawMinimap,
-  canvasOffset,
-  isItemOnScreen,
-  centerOnItem,
-} from "./scrollbar";
+import * as minimap from "./minimap";
 import { canvas } from "../infra";
 
 let itemToViews: Map<Item, ItemView2> = new Map();
 
 export const drawTree = () => {
-  canvas.setTranslation(0, -canvasOffset);
+  canvas.setTranslation(0, -minimap.canvasOffset);
   itemToViews.forEach((item) => {
     const lastChild = item.item.isOpen
       ? itemToViews.get(item.item.children[item.item.children.length - 1])
@@ -27,7 +23,7 @@ export const drawTree = () => {
   });
 
   canvas.resetTranslation();
-  drawMinimap(itemToViews, getPageHeight());
+  minimap.drawMinimap(itemToViews, getPageHeight());
 };
 
 export const init = () => {
@@ -37,6 +33,7 @@ export const init = () => {
 
 export const subscribe = () => {
   on("item-toggled", toggleItem);
+  on("item-focused", refocus);
   on("init", init);
   on("item-moved", () => {
     updatePositions(getFocused());
@@ -97,7 +94,8 @@ const centerOnSelectedItemIfOffscreen = () => {
   const selected = getSelected();
   if (selected) {
     const view = itemToViews.get(selected);
-    if (view && !isItemOnScreen(view)) centerOnItem(view, getPageHeight());
+    if (view && !minimap.isItemOnScreen(view))
+      minimap.centerOnItem(view, getPageHeight());
   }
 };
 
@@ -151,7 +149,8 @@ const viewItemChildren = (item: Item, xStart: number, yStart: number) => {
     }
   };
 
-  item.children.forEach((c) => step(c, 0));
+  if (isRoot(item)) item.children.forEach((c) => step(c, 0));
+  else step(item, 0);
 };
 
 const updatePositions = (item: Item) => {
@@ -172,5 +171,12 @@ const updatePositions = (item: Item) => {
     }
   };
 
-  item.children.forEach((c) => step(c, 0));
+  if (isRoot(item)) item.children.forEach((c) => step(c, 0));
+  else step(item, 0);
+};
+
+const refocus = ({ prev, current }: { prev: Item; current: Item }) => {
+  itemToViews.clear();
+  viewItemChildren(current, sp.start, sp.start);
+  centerOnSelectedItemIfOffscreen();
 };
