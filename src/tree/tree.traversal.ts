@@ -38,6 +38,17 @@ export const isEmpty = (item: Item) => item.children.length === 0;
 export const needsToBeClosed = (item: Item) => item.isOpen;
 export const isRoot = (item: Item) => !item.parent;
 
+export const hasItemInPath = (item: Item, itemToSearch: Item) => {
+  let parent: Item | undefined = item;
+
+  while (parent) {
+    if (parent === itemToSearch) return true;
+
+    parent = parent.parent;
+  }
+  return false;
+};
+
 const getLastNestedItem = (item: Item): Item => {
   if (item.isOpen && item.children) {
     const { children } = item;

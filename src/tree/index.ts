@@ -81,10 +81,13 @@ export const finishEdit = (newText: string) => {
 const changeSelection = (getNextItem: F2<Item, Item | undefined>) => {
   if (tree.selectedItem) {
     const prev = tree.selectedItem;
-    const current = getNextItem(tree.selectedItem);
-    if (current) {
-      tree.selectedItem = current;
-      trigger("selection-changed", { current, prev });
+    const nextItemSelected = getNextItem(tree.selectedItem);
+    if (
+      nextItemSelected &&
+      traversal.hasItemInPath(nextItemSelected, tree.itemFocused)
+    ) {
+      tree.selectedItem = nextItemSelected;
+      trigger("selection-changed", { current: nextItemSelected, prev });
     }
   }
 };
