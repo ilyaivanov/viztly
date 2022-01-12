@@ -35,8 +35,8 @@ export const draw = (
 
   if (!isTextHidden) {
     const textX = x + sp.circleToTextDistance;
-    const textY = y + 0.32 * sp.fontSize;
-    c.drawText(textX, textY, item.title, sp.fontSize, color);
+    const textY = y + 0.32 * fontSize(item);
+    c.drawText(textX, textY, item.title, fontSize(item), color);
   }
 };
 
@@ -46,13 +46,13 @@ export const drawTextOnMinimap = ({ item, x, y, opacity }: ItemView2) => {
 
   const color = isSelected(item) ? sp.selectedCircle : sp.minimapColor;
   const textX = x + sp.circleToTextDistance;
-  const textY = y + 0.32 * sp.fontSize;
+  const textY = y + 0.32 * fontSize(item);
   const xOffset = canvas.canvas.width - getMinimapWidth();
   c.drawText(
     xOffset + textX / sp.minimapScale,
     textY / sp.minimapScale,
     item.title,
-    sp.fontSize / sp.minimapScale,
+    fontSize(item) / sp.minimapScale,
     color
   );
 };
@@ -62,3 +62,6 @@ export const createItemView = (
   y: number,
   item: Item
 ): ItemView2 => ({ opacity: 1, x, y, targetY: y, item });
+
+const fontSize = (item: Item) =>
+  isFocused(item) ? Math.round(sp.fontSize * 1.3) : sp.fontSize;
