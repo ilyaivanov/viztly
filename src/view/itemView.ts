@@ -19,6 +19,7 @@ export type ItemView2 = {
 
 export const draw = (
   { item, x, y, opacity, isTextHidden }: ItemView2,
+  isSelected: boolean,
   lastChild?: ItemView2
 ) => {
   const c = canvas;
@@ -30,7 +31,7 @@ export const draw = (
 
   if (lastChild) c.drawLine(x, y, x, lastChild.y, sp.line, 2);
 
-  const color = isSelected(item) ? sp.selectedCircle : sp.regularColor;
+  const color = isSelected ? sp.selectedCircle : sp.regularColor;
   c.drawCircle(x, y, sp.circleR, color, item.children.length > 0);
 
   if (!isTextHidden) {
@@ -40,11 +41,14 @@ export const draw = (
   }
 };
 
-export const drawTextOnMinimap = ({ item, x, y, opacity }: ItemView2) => {
+export const drawTextOnMinimap = (
+  { item, x, y, opacity }: ItemView2,
+  isSelected: boolean
+) => {
   const c = canvas;
   c.canvas.ctx.globalAlpha = opacity;
 
-  const color = isSelected(item) ? sp.selectedCircle : sp.minimapColor;
+  const color = isSelected ? sp.selectedCircle : sp.minimapColor;
   const textX = x + sp.circleToTextDistance;
   const textY = y + 0.32 * fontSize(item);
   const xOffset = canvas.canvas.width - getMinimapWidth();

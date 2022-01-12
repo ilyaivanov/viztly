@@ -1,8 +1,11 @@
 import { loadFromFile, saveToFile } from "./persistance";
 import * as tree from "./tree";
 import * as input from "./view/itemInput";
+import * as modal from "./view/modal";
 
 export const onKeyDown = async (e: KeyboardEvent) => {
+  if (modal.isKeyboardCaptured()) return;
+
   let commands = keyMap.filter((entry) => match(entry.key, e));
 
   if (input.isEditing()) {
@@ -62,6 +65,8 @@ const keyMap: CommandDefinition[] = [
     command: input.finishEdit,
     edit: "only",
   },
+
+  { key: "ctrl+shift+f", command: modal.show },
 ];
 
 type CommandDefinition = {

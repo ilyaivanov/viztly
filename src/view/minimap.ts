@@ -1,7 +1,7 @@
 import { sp } from "../design";
 import { canvas, numbers } from "../infra";
 import { spring } from "../infra/animations";
-import { getSelected } from "../tree";
+import { getSelected, isSelected } from "../tree";
 import { drawTextOnMinimap, ItemView2 } from "./itemView";
 
 export let canvasOffset = 0;
@@ -34,7 +34,7 @@ export const drawMinimap = (
   );
 
   c.setTranslation(0, getMinimapOffset(pageHeight, c.canvas.height));
-  itemToViews.forEach(drawTextOnMinimap);
+  itemToViews.forEach((view) => drawTextOnMinimap(view, isSelected(view.item)));
   const s = getSelected();
   if (s) {
     const selectedView = itemToViews.get(s);
