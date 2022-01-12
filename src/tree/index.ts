@@ -59,6 +59,7 @@ export const focusOnSelected = () => {
     const prev = tree.itemFocused;
     tree.itemFocused = tree.selectedItem;
     trigger("item-focused", { prev, current: tree.itemFocused });
+    if (!tree.itemFocused.isOpen) open(tree.itemFocused);
   }
 };
 export const focusOnParent = () => {
@@ -135,6 +136,8 @@ const open = (item: Item) => {
   trigger("item-toggled", item);
 };
 const close = (item: Item) => {
+  if (isFocused(item)) return;
+
   item.isOpen = false;
   trigger("item-toggled", item);
 };
