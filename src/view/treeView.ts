@@ -4,7 +4,7 @@ import {
   isRoot,
 } from "../tree/tree.traversal";
 import { sp } from "../design";
-import { on, getFocused, getSelected } from "../tree";
+import { on, getFocused, getSelected, isSelected } from "../tree";
 import { createItemView, draw, ItemView2 } from "./itemView";
 import { animatePosition, spring } from "../infra/animations";
 import { renderInputAt, updateInputCoords } from "./itemInput";
@@ -15,11 +15,11 @@ let itemToViews: Map<Item, ItemView2> = new Map();
 
 export const drawTree = () => {
   canvas.setTranslation(0, -minimap.canvasOffset);
-  itemToViews.forEach((item) => {
-    const lastChild = item.item.isOpen
-      ? itemToViews.get(item.item.children[item.item.children.length - 1])
+  itemToViews.forEach((view) => {
+    const lastChild = view.item.isOpen
+      ? itemToViews.get(view.item.children[view.item.children.length - 1])
       : undefined;
-    draw(item, lastChild);
+    draw(view, isSelected(view.item), lastChild);
   });
 
   canvas.resetTranslation();

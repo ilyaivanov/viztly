@@ -10,6 +10,7 @@ import {
 import { appendToOffset } from "./view/minimap";
 import { onKeyDown } from "./keyboard";
 import { loadFromLocalStorage, saveToLocalStorage } from "./persistance";
+import * as modal from "./view/modal";
 
 const el = canvas.createFullscreenCanvas();
 
@@ -26,7 +27,10 @@ tree.init(loadFromLocalStorage());
 const render = () => {
   canvas.clear();
   drawTree();
+  modal.render();
 };
+
+modal.setOnChange(render);
 
 //when blured finishEdit is called from input, which won't re-render items
 tree.on("item-finishEdit", render);
