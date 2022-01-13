@@ -28,18 +28,12 @@ export const finishEdit = () => {
 };
 
 export const renderInputAt = (x: number, y: number, title: string) => {
-  input = document.createElement("input");
-  input.autocomplete = "off";
-  input.id = "main-input";
+  input = createInput();
   setInputCoords(input, x, y);
   input.style.color = sp.selectedCircle;
   input.value = title;
 
   input.addEventListener("blur", onBlur);
-  document.body.appendChild(input);
-  input.focus();
-  input.scrollTo({ left: 0 });
-  input.setSelectionRange(0, 0);
 };
 
 export const updateInputCoords = (x: number, y: number) => {

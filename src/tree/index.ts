@@ -46,6 +46,7 @@ export const moveSelectedDown = () => applyMovement(movement.moveItemDown);
 export const moveSelectedUp = () => applyMovement(movement.moveItemUp);
 export const moveSelectedLeft = () => applyMovement(movement.moveItemLeft);
 export const moveSelectedRight = () => applyMovement(movement.moveItemRight);
+
 export const removeSelected = () => {
   if (tree.selectedItem) {
     const itemRemoved = tree.selectedItem;
@@ -58,6 +59,7 @@ export const removeSelected = () => {
 export const focusOnSelected = () => {
   if (tree.selectedItem) focusOnItem(tree.selectedItem);
 };
+
 export const focusOnParent = () => {
   if (tree.itemFocused.parent) focusOnItem(tree.itemFocused.parent);
 };
@@ -68,15 +70,18 @@ export const focusOnItem = (item: Item) => {
   trigger("item-focused", { prev, current: tree.itemFocused });
   if (!tree.itemFocused.isOpen) open(tree.itemFocused);
 };
+
 export const startEdit = () => {
   if (tree.selectedItem) trigger("item-startEdit", tree.selectedItem);
 };
+
 export const finishEdit = (newText: string) => {
   if (tree.selectedItem) {
     tree.selectedItem.title = newText;
     trigger("item-finishEdit", tree.selectedItem);
   }
 };
+
 const changeSelection = (getNextItem: F2<Item, Item | undefined>) => {
   if (tree.selectedItem) {
     const prev = tree.selectedItem;

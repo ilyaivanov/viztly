@@ -66,7 +66,6 @@ export const findLocalItems = (
   };
 };
 
-//see unit tests for more details
 const createTermsFound = (title: string, terms: string[]): Highlight[] => {
   const indexes = terms.map((term) => title.toLocaleLowerCase().indexOf(term));
   return createTitleHighlightsFromFoundTerms(
