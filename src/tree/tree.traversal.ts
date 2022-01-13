@@ -30,6 +30,26 @@ export const forEachOpenChild = (item: Item, cb: F1<Item>) => {
   traverse(item.children);
 };
 
+export const findFirstChild = (
+  item: Item,
+  predicate: F2<Item, boolean>
+): Item | undefined => {
+  const traverse = (children: Item[]): Item | undefined => {
+    for (let i = 0; i < children.length; i += 1) {
+      const item = children[i];
+      if (predicate(item)) return item;
+
+      if (item.children.length > 0) {
+        const anyChildFound = traverse(item.children);
+        if (anyChildFound) return anyChildFound;
+      }
+    }
+  };
+
+  if (predicate(item)) return item;
+  else return traverse(item.children);
+};
+
 export const needsToBeOpened = (item: Item) =>
   !item.isOpen && item.children.length > 0;
 

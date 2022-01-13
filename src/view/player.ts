@@ -4,7 +4,11 @@ import { engine, springKeyed } from "../infra/animations";
 import { getSelected } from "../tree";
 import * as icons from "./playerIcons";
 import * as youtube from "./player.youtube";
-import { getItemAbove, getItemBelow } from "../tree/tree.traversal";
+import {
+  findFirstChild,
+  getItemAbove,
+  getItemBelow,
+} from "../tree/tree.traversal";
 
 const state = {
   isShown: false,
@@ -30,13 +34,18 @@ export const show = () => {
 
 export const playSelectedItem = () => {
   const selected = getSelected();
-  if (selected && selected.videoId) {
-    if (!state.isShown) show();
 
-    if (state.isPlaying && state.itemInVideo == selected) pause();
-    else play(selected, selected.videoId);
+  if (selected) {
+    const itemToPlay = findFirstChild(selected, (i) => !!i.videoId);
+    if (itemToPlay && itemToPlay.videoId) {
+      if (!state.isShown) show();
+
+      if (state.isPlaying && state.itemInVideo == selected) pause();
+      else play(itemToPlay, itemToPlay.videoId);
+    }
   }
 };
+
 export const playNextItem = () => {
   let item = state.itemInVideo;
   while (item) {
@@ -51,6 +60,7 @@ export const playNextItem = () => {
   }
   engine.onTick && engine.onTick();
 };
+
 export const playPreviousItem = () => {
   let item = state.itemInVideo;
   while (item) {
@@ -112,7 +122,12 @@ export const render = () => {
   ctx.fillStyle = "#aaaaaa";
 
   const textWidth = ctx.measureText(label).width;
-  ctx.fillText(label, c.width - textWidth - 10, y + 0.32 * 12);
+  ctx.fillText(label, c.width - textWidth - 10, y + 0.32 * 12 + 16);
+
+  ctx.font = `14px Segoe UI`;
+  ctx.fillStyle = "#dddddd";
+  if (state.itemInVideo)
+    ctx.fillText(state.itemInVideo.title, x + 90, y + 0.32 * 14);
 };
 
 export const toggleYoutubeVisibility = () => {
