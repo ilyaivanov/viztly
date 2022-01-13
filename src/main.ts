@@ -32,13 +32,12 @@ const render = () => {
   player.render();
 };
 
-modal.setOnChange(render);
-
 //when blured finishEdit is called from input, which won't re-render items
 tree.on("item-finishEdit", render);
 
 //this is called not only during first loading, but also when app loads state from file
 tree.on("init", render);
+player.init();
 
 document.addEventListener("keydown", (e) => {
   onKeyDown(e);

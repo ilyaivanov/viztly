@@ -1,9 +1,10 @@
 import { sp } from "../design";
 import { canvas } from "../infra";
-import { springKeyed } from "../infra/animations";
+import { engine, springKeyed } from "../infra/animations";
 import { getSelected } from "../tree";
 import * as icons from "./playerIcons";
 import * as youtube from "./player.youtube";
+import { getItemAbove, getItemBelow } from "../tree/tree.traversal";
 
 const state = {
   isShown: false,
@@ -11,6 +12,10 @@ const state = {
   isPlaying: false,
   height: 0,
   itemInVideo: undefined as Item | undefined,
+};
+
+export const init = () => {
+  youtube.addEventListener("videoEnd", playNextItem);
 };
 
 export const isVideoPlayed = (item: Item) =>
@@ -32,10 +37,47 @@ export const playSelectedItem = () => {
     else play(selected, selected.videoId);
   }
 };
+export const playNextItem = () => {
+  let item = state.itemInVideo;
+  while (item) {
+    //this doesn't go inside closed items, but should
+    item = getItemBelow(item);
+
+    if (!item) break;
+    if (item.videoId) {
+      play(item, item.videoId);
+      break;
+    }
+  }
+  engine.onTick && engine.onTick();
+};
+export const playPreviousItem = () => {
+  let item = state.itemInVideo;
+  while (item) {
+    item = getItemAbove(item);
+
+    if (!item) break;
+    if (item.videoId) {
+      play(item, item.videoId);
+      break;
+    }
+  }
+  engine.onTick && engine.onTick();
+};
 
 const pause = () => {
   state.isPlaying = false;
   youtube.pause();
+};
+
+const resume = () => {
+  state.isPlaying = true;
+  youtube.resume();
+};
+
+export const toggleVideoState = () => {
+  if (state.isPlaying) pause();
+  else resume();
 };
 
 const play = (item: Item, videoId: string) => {

@@ -46,7 +46,6 @@ declare const YT: any;
 
 export function play(videoId: string) {
   videoRequested = videoId;
-  console.log(videoId);
   if (!player && !isLoadingPlayer) init();
   else if (isReady) {
     player.loadVideoById(videoId);

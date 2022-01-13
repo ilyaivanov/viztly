@@ -1,6 +1,6 @@
 import { sp } from "../design";
 import { canvas } from "../infra";
-import { springKeyed } from "../infra/animations";
+import { engine, springKeyed } from "../infra/animations";
 import * as tree from "../tree";
 import { createInput, removeInput, setCoords } from "./itemInput";
 import { drawItemCircle } from "./itemView";
@@ -16,12 +16,6 @@ let options = {
   selectedItemIndex: 0,
 };
 let input: HTMLInputElement | undefined;
-
-//TODO: stupid freaking design, need to think about better solution
-let onChange: () => void;
-export const setOnChange = (onRender: () => void) => {
-  onChange = onRender;
-};
 
 export const isKeyboardCaptured = () =>
   options.state === "showing" || options.state === "shown";
@@ -158,7 +152,7 @@ const onInputChange = () => {
     options.selectedItemIndex = 0;
     if (options.searchResults.items[0])
       options.searchResults.items[0].isSelected = true;
-    onChange && onChange();
+    engine.onTick && engine.onTick();
   }
 };
 const onInputKeyDown = (e: KeyboardEvent) => {
