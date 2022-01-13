@@ -3,6 +3,8 @@ import { canvas } from "../infra";
 import { sp } from "../design";
 import { isFocused } from "../tree";
 import { getMinimapWidth } from "./minimap";
+import { drawPauseButton, drawPlayButton } from "../infra/icons";
+import * as player from "./player";
 
 export type ItemView2 = {
   opacity: number;
@@ -49,7 +51,10 @@ export const drawItemCircle = (
 ) => {
   const c = canvas;
   const color = getItemColor(isSelected);
-  c.drawCircle(x, y, sp.circleR, color, item.children.length > 0);
+  if (item.videoId) {
+    if (player.isVideoPlayed(item)) drawPauseButton(x, y, color);
+    else drawPlayButton(x, y, color);
+  } else c.drawCircle(x, y, sp.circleR, color, item.children.length > 0);
 };
 
 const getItemColor = (isSelected: boolean) =>

@@ -11,6 +11,7 @@ import { appendToOffset } from "./view/minimap";
 import { onKeyDown } from "./keyboard";
 import { loadFromLocalStorage, saveToLocalStorage } from "./persistance";
 import * as modal from "./view/modal";
+import * as player from "./view/player";
 
 const el = canvas.createFullscreenCanvas();
 
@@ -28,6 +29,7 @@ const render = () => {
   canvas.clear();
   drawTree();
   modal.render();
+  player.render();
 };
 
 modal.setOnChange(render);

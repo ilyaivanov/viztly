@@ -17,4 +17,6 @@ export const sp = {
 
   line: "#3C413D",
   lineSelected: "#638038",
+
+  footer: "#252526",
 };

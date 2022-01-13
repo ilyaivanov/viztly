@@ -87,7 +87,7 @@ export const getPageHeight = () => {
   itemToViews.forEach((view) => {
     if (max < view.y) max = view.y;
   });
-  return max + sp.start;
+  return max + sp.start + 100; //100 pixels is for the player
 };
 
 const centerOnSelectedItemIfOffscreen = () => {

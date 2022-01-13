@@ -17,7 +17,22 @@
         font-size: 14px;
         padding: 0;
       }
+      #youtubeIframe {
+        position: absolute;
+        right: 20px;
+        bottom: 70px;
+        width: 350px;
+        height: 150px;
+        transition: opacity 200ms, transform 200ms;
+      }
+      .youtube-hidden {
+        transform: translateY(20px);
+        opacity: 0;
+        pointer-events: none;
+      }
     </style>
   </head>
-  <body></body>
+  <body>
+    <div id="youtubeIframe"></div>
+  </body>
 </html>

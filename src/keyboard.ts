@@ -2,6 +2,7 @@ import { loadFromFile, saveToFile } from "./persistance";
 import * as tree from "./tree";
 import * as input from "./view/itemInput";
 import * as modal from "./view/modal";
+import * as player from "./view/player";
 
 export const onKeyDown = async (e: KeyboardEvent) => {
   if (modal.isKeyboardCaptured()) {
@@ -70,6 +71,9 @@ const keyMap: CommandDefinition[] = [
   },
 
   { key: "ctrl+shift+f", command: modal.show },
+
+  { key: "m", command: player.toggleYoutubeVisibility },
+  { key: "space", command: player.playSelectedItem },
 ];
 
 type CommandDefinition = {
@@ -163,6 +167,7 @@ type TargetKey =
   | "down"
   | "up"
   | "enter"
+  | "space"
   | "numpadenter"
   | "backspace"
   | "escape";
