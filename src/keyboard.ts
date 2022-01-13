@@ -4,7 +4,10 @@ import * as input from "./view/itemInput";
 import * as modal from "./view/modal";
 
 export const onKeyDown = async (e: KeyboardEvent) => {
-  if (modal.isKeyboardCaptured()) return;
+  if (modal.isKeyboardCaptured()) {
+    modal.onKeyDown(e);
+    return;
+  }
 
   let commands = keyMap.filter((entry) => match(entry.key, e));
 

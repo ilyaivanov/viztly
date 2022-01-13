@@ -34,6 +34,7 @@ export const createTree = (root: Item): Tree => ({
 });
 
 export const getFocused = () => tree.itemFocused;
+export const getRoot = () => tree.root;
 export const getTree = () => tree;
 export const getSelected = () => tree.selectedItem;
 export const isSelected = (item: Item) => tree.selectedItem === item;
@@ -55,20 +56,17 @@ export const removeSelected = () => {
 };
 
 export const focusOnSelected = () => {
-  if (tree.selectedItem) {
-    const prev = tree.itemFocused;
-    tree.itemFocused = tree.selectedItem;
-    trigger("item-focused", { prev, current: tree.itemFocused });
-    if (!tree.itemFocused.isOpen) open(tree.itemFocused);
-  }
+  if (tree.selectedItem) focusOnItem(tree.selectedItem);
 };
 export const focusOnParent = () => {
-  const focused = tree.itemFocused;
-  if (focused.parent) {
-    const prev = tree.itemFocused;
-    tree.itemFocused = focused.parent;
-    trigger("item-focused", { prev, current: tree.itemFocused });
-  }
+  if (tree.itemFocused.parent) focusOnItem(tree.itemFocused.parent);
+};
+
+export const focusOnItem = (item: Item) => {
+  const prev = tree.itemFocused;
+  tree.itemFocused = item;
+  trigger("item-focused", { prev, current: tree.itemFocused });
+  if (!tree.itemFocused.isOpen) open(tree.itemFocused);
 };
 export const startEdit = () => {
   if (tree.selectedItem) trigger("item-startEdit", tree.selectedItem);
@@ -100,6 +98,7 @@ const applyMovement = (movement: F1<Item>) => {
   }
 };
 
+export const selectItem = (item: Item) => changeSelection(() => item);
 export const goDown = () => changeSelection(traversal.getItemBelow);
 export const goUp = () => changeSelection(traversal.getItemAbove);
 export const goToNextSibling = () =>
@@ -110,7 +109,7 @@ export const goLeft = () => {
   const selected = tree.selectedItem;
   if (selected && selected.isOpen) close(selected);
   else if (selected && selected.parent && !traversal.isRoot(selected.parent))
-    changeSelection(() => selected.parent);
+    selectItem(selected.parent);
 };
 
 export const goRight = () => {
@@ -118,7 +117,7 @@ export const goRight = () => {
   if (selected && !selected.isOpen && selected.children.length > 0)
     open(selected);
   else if (selected && selected.children.length > 0)
-    changeSelection(() => selected.children[0]);
+    selectItem(selected.children[0]);
 };
 
 export const createItemAfterSelected = () => {
@@ -126,7 +125,7 @@ export const createItemAfterSelected = () => {
     const newItem = createItem("");
     if (isFocused(tree.selectedItem)) addChildAt(tree.selectedItem, newItem, 0);
     else addItemAfter(tree.selectedItem, newItem);
-    changeSelection(() => newItem);
+    selectItem(newItem);
     trigger("item-added", tree.selectedItem);
     trigger("item-startEdit", tree.selectedItem);
   }

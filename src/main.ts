@@ -30,6 +30,8 @@ const render = () => {
   modal.render();
 };
 
+modal.setOnChange(render);
+
 //when blured finishEdit is called from input, which won't re-render items
 tree.on("item-finishEdit", render);
 
