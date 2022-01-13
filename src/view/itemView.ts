@@ -29,7 +29,7 @@ export const draw = (
   if (item.parent && !isRoot(item.parent) && !isFocused(item))
     c.drawLine(x, y, x - sp.xStep, y, sp.line, 2);
 
-  if (lastChild) c.drawLine(x, y, x, lastChild.y, sp.line, 2);
+  if (lastChild) c.drawLine(x, y, x, lastChild.y + 1, sp.line, 2);
 
   drawItemCircle(x, y, item, isSelected);
 
