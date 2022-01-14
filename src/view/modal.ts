@@ -23,7 +23,7 @@ export const isKeyboardCaptured = () =>
 export const show = () => {
   options.state = "showing";
 
-  input = createInput();
+  input = createInput("");
   input.addEventListener("input", onInputChange);
   input.addEventListener("keydown", onInputKeyDown);
   input.style.border = `1px solid ${sp.lineSelected}`;

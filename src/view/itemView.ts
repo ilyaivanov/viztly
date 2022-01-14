@@ -50,7 +50,7 @@ export const drawItemCircle = (
   isSelected: boolean
 ) => {
   const c = canvas;
-  const color = getItemColor(isSelected);
+  const color = getIconColor(isSelected);
   if (item.videoId) {
     if (player.isVideoPlayed(item)) drawPauseButton(x, y, color);
     else drawPlayButton(x, y, color);
@@ -59,6 +59,8 @@ export const drawItemCircle = (
 
 const getItemColor = (isSelected: boolean) =>
   isSelected ? sp.selectedCircle : sp.regularColor;
+const getIconColor = (isSelected: boolean) =>
+  isSelected ? sp.selectedCircle : sp.regularCicrle;
 
 export const drawTextOnMinimap = (
   { item, x, y, opacity }: ItemView2,
