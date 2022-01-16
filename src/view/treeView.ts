@@ -9,7 +9,9 @@ import { createItemView, draw, ItemView2 } from "./itemView";
 import { animatePosition, spring } from "../infra/animations";
 import { renderInputAt, updateInputCoords } from "./itemInput";
 import * as minimap from "./minimap";
-import { canvas } from "../infra";
+import { canvas, engine } from "../infra";
+import { debounce } from "../infra/fn";
+import { loadSearchResults } from "../api/youtubeApi";
 
 let itemToViews: Map<Item, ItemView2> = new Map();
 
@@ -30,6 +32,16 @@ export const init = () => {
   itemToViews.clear();
   viewItemChildren(getFocused(), sp.start, sp.start);
 };
+
+const searchDebounced = debounce(async (item: Item) => {
+  const res = await loadSearchResults(item.title);
+  removeChildViewsForItem(item);
+  item.children = res.items;
+  res.items.forEach((i) => (i.parent = item));
+  item.isOpen = true;
+  toggleItem(item);
+  engine.onTick && engine.onTick();
+}, 600);
 
 export const subscribe = () => {
   on("item-toggled", toggleItem);
@@ -64,7 +76,23 @@ export const subscribe = () => {
     if (view) {
       view.isTextHidden = true;
 
-      renderInputAt(view.x, view.y, item.title);
+      const onInput = (e: Event) => {
+        if (e.currentTarget) {
+          const input = e.currentTarget as HTMLInputElement;
+          if (
+            input.value.trimStart().startsWith("/y") &&
+            item.remoteSource !== "youtube"
+          ) {
+            item.remoteSource = "youtube";
+            input.value = input.value.slice(2);
+            engine.onTick && engine.onTick();
+          } else if (item.remoteSource === "youtube" && input.value) {
+            item.title = input.value;
+            if (item.title.trim().length > 0) searchDebounced(item);
+          }
+        }
+      };
+      renderInputAt(view.x, view.y, item.title, onInput);
     }
   });
   on("item-finishEdit", (item) => {

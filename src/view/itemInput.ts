@@ -27,12 +27,18 @@ export const finishEdit = () => {
   }
 };
 
-export const renderInputAt = (x: number, y: number, title: string) => {
+export const renderInputAt = (
+  x: number,
+  y: number,
+  title: string,
+  onInput: F1<Event>
+) => {
   input = createInput(title);
   setInputCoords(input, x, y);
   input.style.color = sp.selectedCircle;
 
   input.addEventListener("blur", onBlur);
+  input.addEventListener("input", onInput);
 };
 
 export const updateInputCoords = (x: number, y: number) => {

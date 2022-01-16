@@ -5,6 +5,11 @@ import { isFocused } from "../tree";
 import { getMinimapWidth } from "./minimap";
 import { drawPauseButton, drawPlayButton } from "../infra/icons";
 import * as player from "./player";
+import {
+  drawPlaylistIcon,
+  drawProfileIcon,
+  drawYoutubeIcon,
+} from "./playerIcons";
 
 export type ItemView2 = {
   opacity: number;
@@ -54,7 +59,10 @@ export const drawItemCircle = (
   if (item.videoId) {
     if (player.isVideoPlayed(item)) drawPauseButton(x, y, color);
     else drawPlayButton(x, y, color);
-  } else c.drawCircle(x, y, sp.circleR, color, item.children.length > 0);
+  } else if (item.remoteSource === "youtube") drawYoutubeIcon(x, y, color);
+  else if (item.type === "YTchannel") drawProfileIcon(x, y, color);
+  else if (item.type === "YTplaylist") drawPlaylistIcon(x, y, color);
+  else c.drawCircle(x, y, sp.circleR, color, item.children.length > 0);
 };
 
 const getItemColor = (isSelected: boolean) =>

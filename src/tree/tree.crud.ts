@@ -19,6 +19,54 @@ export const createItem = (title: string, children: Item[] = []) => {
   children.forEach((c) => (c.parent = item));
   return item;
 };
+export const createVideo = (id: string, title: string, videoId: string) => {
+  const item: Item = {
+    title,
+    isOpen: false,
+    view: "tree",
+    children: [],
+    type: "YTvideo",
+    videoId,
+    id,
+  };
+  return item;
+};
+export const createPlaylist = (
+  id: string,
+  title: string,
+  image: string,
+  playlistId: string
+) => {
+  const item: Item = {
+    title,
+    isOpen: false,
+    view: "tree",
+    children: [],
+    type: "YTplaylist",
+    image,
+    playlistId,
+    id,
+  };
+  return item;
+};
+export const createChannel = (
+  id: string,
+  title: string,
+  image: string,
+  channelId: string
+) => {
+  const item: Item = {
+    title,
+    isOpen: false,
+    view: "tree",
+    children: [],
+    type: "YTchannel",
+    image,
+    channelId,
+    id,
+  };
+  return item;
+};
 
 export const removeItem = (item: Item): Item | undefined => {
   let selectedItem: Item | undefined;

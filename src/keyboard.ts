@@ -72,11 +72,11 @@ const keyMap: CommandDefinition[] = [
 
   { key: "ctrl+shift+f", command: modal.show },
 
-  { key: "m", command: player.toggleYoutubeVisibility },
-  { key: "x", command: player.toggleVideoState },
-  { key: "c", command: player.playNextItem },
-  { key: "z", command: player.playPreviousItem },
-  { key: "space", command: player.playSelectedItem },
+  { key: "m", command: player.toggleYoutubeVisibility, edit: "ignore" },
+  { key: "x", command: player.toggleVideoState, edit: "ignore" },
+  { key: "c", command: player.playNextItem, edit: "ignore" },
+  { key: "z", command: player.playPreviousItem, edit: "ignore" },
+  { key: "space", command: player.playSelectedItem, edit: "ignore" },
 ];
 
 type CommandDefinition = {

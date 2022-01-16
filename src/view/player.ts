@@ -109,13 +109,14 @@ export const render = () => {
 
   const x = 30;
   const y = c.height - height / 2;
-  icons.drawAt(x, y, 17, icons.playNext, sp.selectedCircle, true);
 
-  const playIcon =
-    state.itemInVideo && state.isPlaying ? icons.pause : icons.play;
+  icons.drawPlayPreviousIcon(x, y);
 
-  icons.drawAt(x + 30, y, 20, playIcon, sp.selectedCircle);
-  icons.drawAt(x + 60, y, 17, icons.playNext, sp.selectedCircle);
+  const isPlaying = state.itemInVideo && state.isPlaying;
+  if (isPlaying) icons.drawPauseIcon(x + 30, y);
+  else icons.drawPlayIcon(x + 30, y);
+
+  icons.drawPlayNextIcon(x + 60, y);
 
   const label = `press M to ${state.isVideoShown ? "hide" : "show"} video`;
   ctx.font = `12px Segoe UI`;
