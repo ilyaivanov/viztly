@@ -13,8 +13,6 @@ type Item = {
 
   //non-persisted
   parent?: Item;
-
-  remoteSource?: "youtube";
 };
 
 type ItemType = "folder" | "YTvideo" | "YTchannel" | "YTplaylist" | "YTsearch";

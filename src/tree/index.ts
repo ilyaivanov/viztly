@@ -1,3 +1,9 @@
+import {
+  loadChannelItems,
+  loadPlaylistItems,
+  loadSearchResults,
+  MappedResponse,
+} from "../api/youtubeApi";
 import * as events from "../events";
 import { addChildAt, addItemAfter, createItem, removeItem } from "./tree.crud";
 import * as movement from "./tree.movement";
@@ -14,6 +20,7 @@ export type AppEvents = {
   init: { selectedItem: Item };
   "selection-changed": { prev: Item; current: Item };
   "item-toggled": Item;
+  "item-children-loaded": Item;
   "item-moved": Item;
   "item-focused": { prev: Item; current: Item };
   "item-startEdit": Item;
@@ -117,12 +124,34 @@ export const goLeft = () => {
     selectItem(selected.parent);
 };
 
-export const goRight = () => {
+export const goRight = async () => {
   const selected = tree.selectedItem;
-  if (selected && !selected.isOpen && selected.children.length > 0)
-    open(selected);
-  else if (selected && selected.children.length > 0)
-    selectItem(selected.children[0]);
+
+  if (selected) {
+    if (traversal.needsToBeLoaded(selected)) {
+      loadChildren(selected);
+    } else {
+      if (selected && !selected.isOpen && selected.children.length > 0)
+        open(selected);
+      else if (selected && selected.children.length > 0)
+        selectItem(selected.children[0]);
+    }
+  }
+};
+
+export const loadChildren = async (item: Item) => {
+  console.log(item.type, item);
+  const res =
+    item.type === "YTplaylist"
+      ? await loadPlaylistItems(item)
+      : item.type === "YTsearch"
+      ? await loadSearchResults(item)
+      : await loadChannelItems(item);
+
+  item.children = res.items;
+  res.items.forEach((i) => (i.parent = item));
+  item.isOpen = true;
+  trigger("item-children-loaded", item);
 };
 
 export const createItemAfterSelected = () => {

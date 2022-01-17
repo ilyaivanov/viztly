@@ -53,6 +53,11 @@ export const findFirstChild = (
 export const needsToBeOpened = (item: Item) =>
   !item.isOpen && item.children.length > 0;
 
+export const needsToBeLoaded = (item: Item): boolean =>
+  !item.isOpen &&
+  item.children.length === 0 &&
+  (!!item.channelId || !!item.playlistId);
+
 export const isEmpty = (item: Item) => item.children.length === 0;
 
 export const needsToBeClosed = (item: Item) => item.isOpen;

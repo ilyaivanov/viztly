@@ -113,8 +113,8 @@ export const render = () => {
   icons.drawPlayPreviousIcon(x, y);
 
   const isPlaying = state.itemInVideo && state.isPlaying;
-  if (isPlaying) icons.drawPauseIcon(x + 30, y);
-  else icons.drawPlayIcon(x + 30, y);
+  if (isPlaying) icons.drawPauseIcon(x + 30, y, sp.selectedCircle);
+  else icons.drawPlayIcon(x + 30, y, sp.selectedCircle);
 
   icons.drawPlayNextIcon(x + 60, y);
 
