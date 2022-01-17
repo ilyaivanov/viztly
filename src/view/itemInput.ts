@@ -47,6 +47,7 @@ export const updateInputCoords = (x: number, y: number) => {
 
 const setInputCoords = (input: HTMLInputElement, x: number, y: number) => {
   const inputX = x + sp.circleToTextDistance;
+  //TODO: ugly 2.2 constant. Picked by hand. Need to think how to properly allign input with respect to cx cy of a circle
   const inputY = y - sp.fontSize * 0.32 * 2.2 - canvasOffset;
   setCoords(input, inputX, inputY, canvas.canvas.width - inputX);
 };
