@@ -1,6 +1,6 @@
 import { loadItem } from "../api";
 import * as events from "../events";
-import { addChildAt, addItemAfter, createItem, removeItem } from "./tree.crud";
+import * as items from "./tree.crud";
 import * as movement from "./tree.movement";
 import * as traversal from "./tree.traversal";
 
@@ -52,7 +52,7 @@ export const moveSelectedRight = () => applyMovement(movement.moveItemRight);
 export const removeSelected = () => {
   if (tree.selectedItem) {
     const itemRemoved = tree.selectedItem;
-    const itemSelected = removeItem(itemRemoved);
+    const itemSelected = items.removeItem(itemRemoved);
     if (itemSelected) changeSelection(() => itemSelected);
     trigger("item-removed", { itemRemoved, itemSelected });
   }
@@ -119,13 +119,12 @@ export const goLeft = () => {
     selectItem(selected.parent);
 };
 
-export const goRight = async () => {
+export const goRight = () => {
   const selected = tree.selectedItem;
 
   if (selected) {
-    if (traversal.needsToBeLoaded(selected)) {
-      loadChildren(selected);
-    } else {
+    if (traversal.needsToBeLoaded(selected)) loadChildren(selected);
+    else {
       if (selected && !selected.isOpen && selected.children.length > 0)
         open(selected);
       else if (selected && selected.children.length > 0)
@@ -136,17 +135,17 @@ export const goRight = async () => {
 
 export const loadChildren = async (item: Item) => {
   const res = await loadItem(item);
-  item.children = res.items;
-  res.items.forEach((i) => (i.parent = item));
+  items.setChildren(item, res.items);
   item.isOpen = true;
   trigger("item-children-loaded", item);
 };
 
 export const createItemAfterSelected = () => {
   if (tree.selectedItem) {
-    const newItem = createItem("");
-    if (isFocused(tree.selectedItem)) addChildAt(tree.selectedItem, newItem, 0);
-    else addItemAfter(tree.selectedItem, newItem);
+    const newItem = items.createItem("");
+    if (isFocused(tree.selectedItem))
+      items.addChildAt(tree.selectedItem, newItem, 0);
+    else items.addItemAfter(tree.selectedItem, newItem);
     selectItem(newItem);
     trigger("item-added", tree.selectedItem);
     trigger("item-startEdit", tree.selectedItem);
