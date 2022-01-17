@@ -16,9 +16,7 @@ let itemToViews: Map<Item, ItemView2> = new Map();
 
 let itemBeingEdited: Item | undefined;
 export const drawTree = () => {
-  const w = canvas.canvas.width;
-  const leftOffset = Math.max((w - 800) / 2, 0);
-  canvas.setTranslation(leftOffset, -minimap.canvasOffset);
+  canvas.setTranslation(getLeftOffest(), -minimap.canvasOffset);
   itemToViews.forEach((view) => {
     const lastChild = view.item.isOpen
       ? itemToViews.get(view.item.children[view.item.children.length - 1])
@@ -92,7 +90,7 @@ export const subscribe = () => {
           }
         }
       };
-      renderInputAt(view.x, view.y, item.title, onInput);
+      renderInputAt(getLeftOffest() + view.x, view.y, item.title, onInput);
     }
   });
   on("item-finishEdit", () => {
@@ -104,7 +102,7 @@ export const updateSelectedItemInputCoords = () => {
   const s = getSelected();
   if (s) {
     const view = itemToViews.get(s);
-    if (view) updateInputCoords(view.x, view.y);
+    if (view) updateInputCoords(getLeftOffest() + view.x, view.y);
   }
 };
 
@@ -207,3 +205,5 @@ const refocus = ({ prev, current }: { prev: Item; current: Item }) => {
   viewItemChildren(current, sp.start, sp.start);
   centerOnSelectedItemIfOffscreen();
 };
+
+const getLeftOffest = () => Math.max((canvas.canvas.width - 800) / 2, 0);
