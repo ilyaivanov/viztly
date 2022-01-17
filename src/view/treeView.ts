@@ -9,8 +9,7 @@ import { createItemView, draw, ItemView2 } from "./itemView";
 import { animatePosition, spring } from "../infra/animations";
 import { renderInputAt, updateInputCoords } from "./itemInput";
 import * as minimap from "./minimap";
-import { canvas, engine } from "../infra";
-import { debounce } from "../infra/fn";
+import { canvas, engine, fn } from "../infra";
 
 let itemToViews: Map<Item, ItemView2> = new Map();
 
@@ -32,7 +31,7 @@ export const init = () => {
   viewItemChildren(getFocused(), sp.start, sp.start);
 };
 
-const searchDebounced = debounce(loadChildren, 600);
+const searchDebounced = fn.debounce(loadChildren, 600);
 
 const itemChildrenLoaded = (item: Item) => {
   removeChildViewsForItem(item);

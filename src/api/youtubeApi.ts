@@ -1,15 +1,7 @@
 import { createChannel, createPlaylist, createVideo } from "../tree/tree.crud";
-import {
-  sync24,
-  jordanPeterson,
-  playlistItems,
-  channelItems,
-} from "./sample.responses";
 
 const API_HOST = "https://europe-west1-slapstuk.cloudfunctions.net";
 // const API_HOST = "http://localhost:5001/slapstuk/europe-west1";
-
-const USE_FAKE_API = true;
 
 export const loadSearchResults = (
   item: Item,
@@ -18,19 +10,12 @@ export const loadSearchResults = (
   verifyNonTestEnvironment();
 
   const term = item.title;
-  if (USE_FAKE_API) {
-    if (term.toLocaleLowerCase().indexOf("peterson") >= 0)
-      //@ts-ignore
-      return createMappedResponse(jordanPeterson);
-    //@ts-ignore
-    else return createMappedResponse(sync24);
-  } else {
-    let url = `${API_HOST}/getVideos?q=${term}`;
-    if (pageToken) url += `&pageToken=${pageToken}`;
-    return fetch(url)
-      .then((res) => res.json() as Promise<YoutubeSearchResponse>)
-      .then(createMappedResponse);
-  }
+
+  let url = `${API_HOST}/getVideos?q=${term}`;
+  if (pageToken) url += `&pageToken=${pageToken}`;
+  return fetch(url)
+    .then((res) => res.json() as Promise<YoutubeSearchResponse>)
+    .then(createMappedResponse);
 };
 
 export const loadPlaylistItems = (
@@ -38,16 +23,12 @@ export const loadPlaylistItems = (
   nextPageToken?: string
 ): Promise<MappedResponse> => {
   verifyNonTestEnvironment();
-  if (USE_FAKE_API) {
-    //@ts-ignore
-    return createMappedResponse(playlistItems);
-  } else {
-    let url = `${API_HOST}/getPlaylistItems?playlistId=${item.playlistId}`;
-    if (nextPageToken) url += `&pageToken=${nextPageToken}`;
-    return fetch(url)
-      .then((res) => res.json() as Promise<YoutubePlaylistDetailsResponse>)
-      .then(createMappedResponse);
-  }
+
+  let url = `${API_HOST}/getPlaylistItems?playlistId=${item.playlistId}`;
+  if (nextPageToken) url += `&pageToken=${nextPageToken}`;
+  return fetch(url)
+    .then((res) => res.json() as Promise<YoutubePlaylistDetailsResponse>)
+    .then(createMappedResponse);
 };
 
 export const loadChannelItems = (
@@ -55,25 +36,21 @@ export const loadChannelItems = (
   pageToken?: string
 ): Promise<MappedResponse> => {
   verifyNonTestEnvironment();
-  if (USE_FAKE_API) {
-    //@ts-ignore
-    return createMappedResponse(channelItems);
+
+  if (!pageToken) {
+    return Promise.all([
+      getChannelUploadsPlaylistId(item),
+      getChannelPlaylists(item.channelId!),
+    ]).then(([uploadPlaylist, response]) => ({
+      items: ([uploadPlaylist] as ResponseItem[])
+        .concat(response.items)
+        .map(mapResponseItem),
+      nextPageToken: response.nextPageToken,
+    }));
   } else {
-    if (!pageToken) {
-      return Promise.all([
-        getChannelUploadsPlaylistId(item),
-        getChannelPlaylists(item.channelId!),
-      ]).then(([uploadPlaylist, response]) => ({
-        items: ([uploadPlaylist] as ResponseItem[])
-          .concat(response.items)
-          .map(mapResponseItem),
-        nextPageToken: response.nextPageToken,
-      }));
-    } else {
-      return getChannelPlaylists(item.channelId!, pageToken).then(
-        createMappedResponse
-      );
-    }
+    return getChannelPlaylists(item.channelId!, pageToken).then(
+      createMappedResponse
+    );
   }
 };
 
@@ -122,7 +99,7 @@ const verifyNonTestEnvironment = () => {
     throw new Error("Tried to execute real API call from tests");
 };
 
-type YoutubeSearchResponse = {
+export type YoutubeSearchResponse = {
   items: ResponseItem[];
   nextPageToken?: string;
 };
@@ -137,16 +114,16 @@ type YoutubeChannelPlaylistsResponse = {
   nextPageToken?: string;
 };
 
+type YoutubeChannelUploadPlaylistResponse = {
+  playlistId: string;
+};
+
 export type MappedResponse = {
   items: Item[];
   nextPageToken?: string;
 };
 
-type YoutubeChannelUploadPlaylistResponse = {
-  playlistId: string;
-};
-
-type ResponseItem =
+export type ResponseItem =
   | VideoResponseItem
   | ChannelResponseItem
   | PlaylistResponseItem;
@@ -177,7 +154,7 @@ type PlaylistResponseItem = {
   channelId: string;
 };
 
-const createMappedResponse = (
+export const createMappedResponse = (
   response: YoutubeSearchResponse
 ): MappedResponse => ({
   items: response.items.map(mapResponseItem),

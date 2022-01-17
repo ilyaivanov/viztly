@@ -1,9 +1,4 @@
-import {
-  loadChannelItems,
-  loadPlaylistItems,
-  loadSearchResults,
-  MappedResponse,
-} from "../api/youtubeApi";
+import { loadItem } from "../api";
 import * as events from "../events";
 import { addChildAt, addItemAfter, createItem, removeItem } from "./tree.crud";
 import * as movement from "./tree.movement";
@@ -140,14 +135,7 @@ export const goRight = async () => {
 };
 
 export const loadChildren = async (item: Item) => {
-  console.log(item.type, item);
-  const res =
-    item.type === "YTplaylist"
-      ? await loadPlaylistItems(item)
-      : item.type === "YTsearch"
-      ? await loadSearchResults(item)
-      : await loadChannelItems(item);
-
+  const res = await loadItem(item);
   item.children = res.items;
   res.items.forEach((i) => (i.parent = item));
   item.isOpen = true;
