@@ -1,31 +1,22 @@
-import {
-  createMappedResponse,
-  MappedResponse,
-  ResponseItem,
-  YoutubeSearchResponse,
-} from "./youtubeApi";
+import { ResponseItem, YoutubeResponse } from "./youtubeApi";
 
 export const loadSearchResults = (
   item: Item,
   pageToken?: string
-): Promise<MappedResponse> =>
+): Promise<YoutubeResponse> =>
   item.title.toLocaleLowerCase().indexOf("peterson") >= 0
-    ? Promise.resolve(createMappedResponse(createPetersonResponse()))
-    : Promise.resolve(createMappedResponse(createSync24Response()));
+    ? Promise.resolve(createPetersonResponse())
+    : Promise.resolve(createSync24Response());
 
 export const loadPlaylistItems = (
   item: Item,
   nextPageToken?: string
-): Promise<MappedResponse> => {
-  return Promise.resolve(createMappedResponse(createSamplePlaylistResponse()));
-};
+): Promise<YoutubeResponse> => Promise.resolve(createSamplePlaylistResponse());
 
 export const loadChannelItems = (
   item: Item,
   pageToken?: string
-): Promise<MappedResponse> => {
-  return Promise.resolve(createMappedResponse(createSampleChannelResponse()));
-};
+): Promise<YoutubeResponse> => Promise.resolve(createSampleChannelResponse());
 
 const createPetersonResponse = () =>
   createSampleResponse([
@@ -109,9 +100,7 @@ const createSampleChannelResponse = () =>
     ),
   ]);
 
-const createSampleResponse = (
-  items: ResponseItem[]
-): YoutubeSearchResponse => ({
+const createSampleResponse = (items: ResponseItem[]): YoutubeResponse => ({
   nextPageToken: "CBkQAA",
   items,
 });

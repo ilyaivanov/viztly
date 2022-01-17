@@ -6,35 +6,31 @@ const API_HOST = "https://europe-west1-slapstuk.cloudfunctions.net";
 export const loadSearchResults = (
   item: Item,
   pageToken?: string
-): Promise<MappedResponse> => {
+): Promise<YoutubeResponse> => {
   verifyNonTestEnvironment();
 
   const term = item.title;
 
   let url = `${API_HOST}/getVideos?q=${term}`;
   if (pageToken) url += `&pageToken=${pageToken}`;
-  return fetch(url)
-    .then((res) => res.json() as Promise<YoutubeSearchResponse>)
-    .then(createMappedResponse);
+  return fetch(url).then((res) => res.json());
 };
 
 export const loadPlaylistItems = (
   item: Item,
   nextPageToken?: string
-): Promise<MappedResponse> => {
+): Promise<YoutubeResponse> => {
   verifyNonTestEnvironment();
 
   let url = `${API_HOST}/getPlaylistItems?playlistId=${item.playlistId}`;
   if (nextPageToken) url += `&pageToken=${nextPageToken}`;
-  return fetch(url)
-    .then((res) => res.json() as Promise<YoutubePlaylistDetailsResponse>)
-    .then(createMappedResponse);
+  return fetch(url).then((res) => res.json());
 };
 
 export const loadChannelItems = (
   item: Item,
   pageToken?: string
-): Promise<MappedResponse> => {
+): Promise<YoutubeResponse> => {
   verifyNonTestEnvironment();
 
   if (!pageToken) {
@@ -42,15 +38,11 @@ export const loadChannelItems = (
       getChannelUploadsPlaylistId(item),
       getChannelPlaylists(item.channelId!),
     ]).then(([uploadPlaylist, response]) => ({
-      items: ([uploadPlaylist] as ResponseItem[])
-        .concat(response.items)
-        .map(mapResponseItem),
+      items: ([uploadPlaylist] as ResponseItem[]).concat(response.items),
       nextPageToken: response.nextPageToken,
     }));
   } else {
-    return getChannelPlaylists(item.channelId!, pageToken).then(
-      createMappedResponse
-    );
+    return getChannelPlaylists(item.channelId!, pageToken);
   }
 };
 
@@ -99,7 +91,7 @@ const verifyNonTestEnvironment = () => {
     throw new Error("Tried to execute real API call from tests");
 };
 
-export type YoutubeSearchResponse = {
+export type YoutubeResponse = {
   items: ResponseItem[];
   nextPageToken?: string;
 };
@@ -116,11 +108,6 @@ type YoutubeChannelPlaylistsResponse = {
 
 type YoutubeChannelUploadPlaylistResponse = {
   playlistId: string;
-};
-
-export type MappedResponse = {
-  items: Item[];
-  nextPageToken?: string;
 };
 
 export type ResponseItem =
@@ -152,19 +139,4 @@ type PlaylistResponseItem = {
   name: string;
   channelTitle: string;
   channelId: string;
-};
-
-export const createMappedResponse = (
-  response: YoutubeSearchResponse
-): MappedResponse => ({
-  items: response.items.map(mapResponseItem),
-  nextPageToken: response.nextPageToken,
-});
-
-const mapResponseItem = (item: ResponseItem): Item => {
-  if (item.itemType === "video")
-    return createVideo(item.id, item.name, item.itemId);
-  else if (item.itemType === "channel")
-    return createChannel(item.id, item.name, item.image, item.itemId);
-  else return createPlaylist(item.id, item.name, item.image, item.itemId);
 };
