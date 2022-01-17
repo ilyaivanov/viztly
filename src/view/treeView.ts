@@ -16,7 +16,9 @@ let itemToViews: Map<Item, ItemView2> = new Map();
 
 let itemBeingEdited: Item | undefined;
 export const drawTree = () => {
-  canvas.setTranslation(0, -minimap.canvasOffset);
+  const w = canvas.canvas.width;
+  const leftOffset = Math.max((w - 800) / 2, 0);
+  canvas.setTranslation(leftOffset, -minimap.canvasOffset);
   itemToViews.forEach((view) => {
     const lastChild = view.item.isOpen
       ? itemToViews.get(view.item.children[view.item.children.length - 1])
