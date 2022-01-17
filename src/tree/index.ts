@@ -15,7 +15,7 @@ export type AppEvents = {
   init: { selectedItem: Item };
   "selection-changed": { prev: Item; current: Item };
   "item-toggled": Item;
-  "item-children-loaded": Item;
+  "item-children-loaded": { item: Item; children: Item[] };
   "item-moved": Item;
   "item-focused": { prev: Item; current: Item };
   "item-startEdit": Item;
@@ -135,9 +135,9 @@ export const goRight = () => {
 
 export const loadChildren = async (item: Item) => {
   const res = await loadItem(item);
-  items.setChildren(item, res.items);
+
   item.isOpen = true;
-  trigger("item-children-loaded", item);
+  trigger("item-children-loaded", { item, children: res.items });
 };
 
 export const createItemAfterSelected = () => {

@@ -15,13 +15,13 @@ export type ItemView2 = {
   //targetY is used to determine destinational position of item during animation
   targetY: number;
 
-  isTextHidden?: boolean;
   item: Item;
 };
 
 export const draw = (
-  { item, x, y, opacity, isTextHidden }: ItemView2,
+  { item, x, y, opacity }: ItemView2,
   isSelected: boolean,
+  isBeingEdited: boolean,
   lastChild?: ItemView2
 ) => {
   const c = canvas;
@@ -35,7 +35,7 @@ export const draw = (
 
   drawItemCircle(x, y, item, isSelected);
 
-  if (!isTextHidden) {
+  if (!isBeingEdited) {
     const textX = x + sp.circleToTextDistance;
     const textY = y + 0.32 * fontSize(item);
     const color = getItemColor(isSelected);

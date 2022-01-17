@@ -10,16 +10,18 @@ import { animatePosition, spring } from "../infra/animations";
 import { renderInputAt, updateInputCoords } from "./itemInput";
 import * as minimap from "./minimap";
 import { canvas, engine, fn } from "../infra";
+import { setChildren } from "../tree/tree.crud";
 
 let itemToViews: Map<Item, ItemView2> = new Map();
 
+let itemBeingEdited: Item | undefined;
 export const drawTree = () => {
   canvas.setTranslation(0, -minimap.canvasOffset);
   itemToViews.forEach((view) => {
     const lastChild = view.item.isOpen
       ? itemToViews.get(view.item.children[view.item.children.length - 1])
       : undefined;
-    draw(view, isSelected(view.item), lastChild);
+    draw(view, isSelected(view.item), itemBeingEdited == view.item, lastChild);
   });
 
   canvas.resetTranslation();
@@ -33,8 +35,9 @@ export const init = () => {
 
 const searchDebounced = fn.debounce(loadChildren, 600);
 
-const itemChildrenLoaded = (item: Item) => {
+const itemChildrenLoaded = (item: Item, children: Item[]) => {
   removeChildViewsForItem(item);
+  setChildren(item, children);
   toggleItem(item);
   engine.onTick && engine.onTick();
 };
@@ -64,14 +67,13 @@ export const subscribe = () => {
     removeViewForItem(e.itemRemoved);
   });
 
-  on("item-children-loaded", itemChildrenLoaded);
+  on("item-children-loaded", (e) => itemChildrenLoaded(e.item, e.children));
   on("selection-changed", centerOnSelectedItemIfOffscreen);
 
   on("item-startEdit", (item) => {
+    itemBeingEdited = item;
     const view = itemToViews.get(item);
     if (view) {
-      view.isTextHidden = true;
-
       const onInput = (e: Event) => {
         if (e.currentTarget) {
           const input = e.currentTarget as HTMLInputElement;
@@ -91,9 +93,8 @@ export const subscribe = () => {
       renderInputAt(view.x, view.y, item.title, onInput);
     }
   });
-  on("item-finishEdit", (item) => {
-    const view = itemToViews.get(item);
-    if (view) delete view.isTextHidden;
+  on("item-finishEdit", () => {
+    itemBeingEdited = undefined;
   });
 };
 
