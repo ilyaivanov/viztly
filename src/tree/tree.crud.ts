@@ -16,10 +16,62 @@ export const createItem = (title: string, children: Item[] = []) => {
     type: "folder",
     id: Math.random() + "",
   };
-  children.forEach((c) => (c.parent = item));
+  setChildren(item, children);
+  return item;
+};
+export const createVideo = (id: string, title: string, videoId: string) => {
+  const item: Item = {
+    title,
+    isOpen: false,
+    view: "tree",
+    children: [],
+    type: "YTvideo",
+    videoId,
+    id,
+  };
+  return item;
+};
+export const createPlaylist = (
+  id: string,
+  title: string,
+  image: string,
+  playlistId: string
+) => {
+  const item: Item = {
+    title,
+    isOpen: false,
+    view: "tree",
+    children: [],
+    type: "YTplaylist",
+    image,
+    playlistId,
+    id,
+  };
+  return item;
+};
+export const createChannel = (
+  id: string,
+  title: string,
+  image: string,
+  channelId: string
+) => {
+  const item: Item = {
+    title,
+    isOpen: false,
+    view: "tree",
+    children: [],
+    type: "YTchannel",
+    image,
+    channelId,
+    id,
+  };
   return item;
 };
 
+export const setChildren = (item: Item, children: Item[]) => {
+  item.children = children;
+  children.forEach((i) => (i.parent = item));
+};
 export const removeItem = (item: Item): Item | undefined => {
   let selectedItem: Item | undefined;
   const parent = item.parent;

@@ -27,13 +27,18 @@ export const finishEdit = () => {
   }
 };
 
-export const renderInputAt = (x: number, y: number, title: string) => {
-  input = createInput();
+export const renderInputAt = (
+  x: number,
+  y: number,
+  title: string,
+  onInput: F1<Event>
+) => {
+  input = createInput(title);
   setInputCoords(input, x, y);
   input.style.color = sp.selectedCircle;
-  input.value = title;
 
   input.addEventListener("blur", onBlur);
+  input.addEventListener("input", onInput);
 };
 
 export const updateInputCoords = (x: number, y: number) => {
@@ -42,15 +47,18 @@ export const updateInputCoords = (x: number, y: number) => {
 
 const setInputCoords = (input: HTMLInputElement, x: number, y: number) => {
   const inputX = x + sp.circleToTextDistance;
-  const inputY = y - sp.fontSize * 0.32 * 2.5 - canvasOffset;
+  //TODO: ugly 2.2 constant. Picked by hand. Need to think how to properly allign input with respect to cx cy of a circle
+  const inputY = y - sp.fontSize * 0.32 * 2.2 - canvasOffset;
   setCoords(input, inputX, inputY, canvas.canvas.width - inputX);
 };
 
 //this is used from the modal
-export const createInput = () => {
+export const createInput = (value: string) => {
   const input = document.createElement("input");
   input.autocomplete = "off";
   input.id = "main-input";
+  input.style.fontSize = sp.fontSize + "px";
+  input.value = value;
   document.body.appendChild(input);
   input.focus();
   input.scrollTo({ left: 0 });

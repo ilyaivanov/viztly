@@ -5,7 +5,7 @@ type Item = {
   isOpen: boolean;
   view: "tree" | "board";
 
-  type: string;
+  type: ItemType;
   videoId?: string;
   playlistId?: string;
   channelId?: string;
@@ -14,6 +14,8 @@ type Item = {
   //non-persisted
   parent?: Item;
 };
+
+type ItemType = "folder" | "YTvideo" | "YTchannel" | "YTplaylist" | "YTsearch";
 
 type A = () => void;
 type F1<T> = (a: T) => void;

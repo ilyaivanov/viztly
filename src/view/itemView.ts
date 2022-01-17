@@ -3,6 +3,8 @@ import { canvas } from "../infra";
 import { sp } from "../design";
 import { isFocused } from "../tree";
 import { getMinimapWidth } from "./minimap";
+import * as player from "./player";
+import * as icons from "./playerIcons";
 
 export type ItemView2 = {
   opacity: number;
@@ -48,12 +50,20 @@ export const drawItemCircle = (
   isSelected: boolean
 ) => {
   const c = canvas;
-  const color = getItemColor(isSelected);
-  c.drawCircle(x, y, sp.circleR, color, item.children.length > 0);
+  const color = getIconColor(isSelected);
+  if (item.videoId) {
+    if (player.isVideoPlayed(item)) icons.drawPauseIcon(x, y, color, 10);
+    else icons.drawPlayIcon(x, y, color, 10);
+  } else if (item.type === "YTsearch") icons.drawSearchIcon(x, y, color);
+  else if (item.type === "YTchannel") icons.drawProfileIcon(x, y, color);
+  else if (item.type === "YTplaylist") icons.drawPlaylistIcon(x, y, color);
+  else c.drawCircle(x, y, sp.circleR, color, item.children.length > 0);
 };
 
 const getItemColor = (isSelected: boolean) =>
   isSelected ? sp.selectedCircle : sp.regularColor;
+const getIconColor = (isSelected: boolean) =>
+  isSelected ? sp.selectedCircle : sp.regularCicrle;
 
 export const drawTextOnMinimap = (
   { item, x, y, opacity }: ItemView2,

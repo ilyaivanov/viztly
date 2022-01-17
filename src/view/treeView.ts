@@ -4,12 +4,12 @@ import {
   isRoot,
 } from "../tree/tree.traversal";
 import { sp } from "../design";
-import { on, getFocused, getSelected, isSelected } from "../tree";
+import { on, getFocused, getSelected, isSelected, loadChildren } from "../tree";
 import { createItemView, draw, ItemView2 } from "./itemView";
 import { animatePosition, spring } from "../infra/animations";
 import { renderInputAt, updateInputCoords } from "./itemInput";
 import * as minimap from "./minimap";
-import { canvas } from "../infra";
+import { canvas, engine, fn } from "../infra";
 
 let itemToViews: Map<Item, ItemView2> = new Map();
 
@@ -31,6 +31,13 @@ export const init = () => {
   viewItemChildren(getFocused(), sp.start, sp.start);
 };
 
+const searchDebounced = fn.debounce(loadChildren, 600);
+
+const itemChildrenLoaded = (item: Item) => {
+  removeChildViewsForItem(item);
+  toggleItem(item);
+  engine.onTick && engine.onTick();
+};
 export const subscribe = () => {
   on("item-toggled", toggleItem);
   on("item-focused", refocus);
@@ -57,6 +64,7 @@ export const subscribe = () => {
     removeViewForItem(e.itemRemoved);
   });
 
+  on("item-children-loaded", itemChildrenLoaded);
   on("selection-changed", centerOnSelectedItemIfOffscreen);
 
   on("item-startEdit", (item) => {
@@ -64,7 +72,23 @@ export const subscribe = () => {
     if (view) {
       view.isTextHidden = true;
 
-      renderInputAt(view.x, view.y, item.title);
+      const onInput = (e: Event) => {
+        if (e.currentTarget) {
+          const input = e.currentTarget as HTMLInputElement;
+          if (
+            input.value.trimStart().startsWith("/y") &&
+            item.type !== "YTsearch"
+          ) {
+            item.type = "YTsearch";
+            input.value = input.value.slice(2);
+            engine.onTick && engine.onTick();
+          } else if (item.type === "YTsearch" && input.value) {
+            item.title = input.value;
+            if (item.title.trim().length > 0) searchDebounced(item);
+          }
+        }
+      };
+      renderInputAt(view.x, view.y, item.title, onInput);
     }
   });
   on("item-finishEdit", (item) => {
@@ -87,7 +111,7 @@ export const getPageHeight = () => {
   itemToViews.forEach((view) => {
     if (max < view.y) max = view.y;
   });
-  return max + sp.start;
+  return max + sp.start + 100; //100 pixels is for the player
 };
 
 const centerOnSelectedItemIfOffscreen = () => {
