@@ -12,6 +12,7 @@ import { onKeyDown } from "./keyboard";
 import { loadFromLocalStorage, saveToLocalStorage } from "./persistance";
 import * as modal from "./view/modal/modal";
 import * as player from "./view/player/player";
+import * as perfChart from "./view/perfChart";
 
 const el = canvas.createFullscreenCanvas();
 
@@ -26,10 +27,15 @@ subscribe();
 tree.init(loadFromLocalStorage());
 
 const render = () => {
+  perfChart.renderStart();
+
   canvas.clear();
   drawTree();
   modal.render();
   player.render();
+
+  perfChart.renderFinished();
+  perfChart.render();
 };
 
 //when blured finishEdit is called from input, which won't re-render items

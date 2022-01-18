@@ -1,7 +1,6 @@
 import {
   forEachOpenChild,
   getPreviousSiblingOrItemAbove,
-  isRoot,
 } from "../../tree/tree.traversal";
 import { sp } from "../../design";
 import {
@@ -12,11 +11,12 @@ import {
   loadChildren,
 } from "../../tree";
 import { createItemView, draw, ItemView2 } from "./itemView";
-import { animatePosition, spring } from "../../infra/animations";
+import { spring } from "../../infra/animations";
 import { renderInputAt, updateInputCoords } from "../itemInput";
 import * as minimap from "./minimap";
 import { canvas, engine, fn } from "../../infra";
 import { setChildren } from "../../tree/tree.crud";
+import * as treeLayouter from "./tree.layouter";
 
 let itemToViews: Map<Item, ItemView2> = new Map();
 
@@ -36,7 +36,8 @@ export const drawTree = () => {
 
 export const init = () => {
   itemToViews.clear();
-  viewItemChildren(getFocused(), sp.start, sp.start);
+  const f = getFocused();
+  treeLayouter.renderItemChildren(itemToViews, f, sp.start, sp.start);
 };
 
 const searchDebounced = fn.debounce(loadChildren, 600);
@@ -52,7 +53,7 @@ export const subscribe = () => {
   on("item-focused", refocus);
   on("init", init);
   on("item-moved", () => {
-    updatePositions(getFocused());
+    treeLayouter.updatePositionsForItemAndChildren(itemToViews, getFocused());
     centerOnSelectedItemIfOffscreen();
   });
   on("item-added", (item) => {
@@ -64,7 +65,7 @@ export const subscribe = () => {
         ? createItemView(prevView.x, prevView.y, item)
         : createItemView(0, 0, item);
       itemToViews.set(item, view);
-      updatePositions(getFocused());
+      treeLayouter.updatePositionsForItemAndChildren(itemToViews, getFocused());
       centerOnSelectedItemIfOffscreen();
     }
   });
@@ -135,8 +136,8 @@ const toggleItem = (item: Item) => {
   const isOpened = item.isOpen;
   if (view) {
     if (isOpened) {
-      viewItemChildren(item, view.x, view.y);
-      updatePositions(getFocused());
+      treeLayouter.renderItemChildren(itemToViews, item, view.x, view.y);
+      treeLayouter.updatePositionsForItemAndChildren(itemToViews, getFocused());
       forEachOpenChild(item, (i) => {
         const view = itemToViews.get(i);
         if (view) spring(0, 1, (v) => (view.opacity = v));
@@ -149,7 +150,7 @@ const toggleItem = (item: Item) => {
 
 const removeChildViewsForItem = (item: Item) => {
   forEachOpenChild(item, removeViewForItem);
-  updatePositions(getFocused());
+  treeLayouter.updatePositionsForItemAndChildren(itemToViews, getFocused());
 };
 
 const removeViewForItem = (item: Item) => {
@@ -165,50 +166,9 @@ const removeViewForItem = (item: Item) => {
   }
 };
 
-const viewItemChildren = (item: Item, xStart: number, yStart: number) => {
-  let yOffset = yStart;
-
-  const step = (item: Item, level: number) => {
-    const x = level * sp.xStep + xStart;
-
-    const view = createItemView(x, yOffset, item);
-    itemToViews.set(item, view);
-
-    yOffset += sp.yStep;
-    if (item.isOpen && item.children.length > 0) {
-      item.children.forEach((c) => step(c, level + 1));
-    }
-  };
-
-  if (isRoot(item)) item.children.forEach((c) => step(c, 0));
-  else step(item, 0);
-};
-
-const updatePositions = (item: Item) => {
-  let yOffset = sp.start;
-
-  const step = (item: Item, level: number) => {
-    const x = level * sp.xStep + sp.start;
-    const itemView = itemToViews.get(item);
-
-    if (itemView && (itemView.x !== x || itemView.y !== yOffset)) {
-      itemView.targetY = yOffset;
-      animatePosition(itemView, x, yOffset);
-    }
-
-    yOffset += sp.yStep;
-    if (item.isOpen && item.children.length > 0) {
-      item.children.forEach((c) => step(c, level + 1));
-    }
-  };
-
-  if (isRoot(item)) item.children.forEach((c) => step(c, 0));
-  else step(item, 0);
-};
-
 const refocus = ({ prev, current }: { prev: Item; current: Item }) => {
   itemToViews.clear();
-  viewItemChildren(current, sp.start, sp.start);
+  treeLayouter.renderItemChildren(itemToViews, current, sp.start, sp.start);
   centerOnSelectedItemIfOffscreen();
 };
 
