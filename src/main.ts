@@ -6,12 +6,12 @@ import {
   drawTree,
   updateSelectedItemInputCoords,
   getPageHeight,
-} from "./view/treeView";
-import { appendToOffset } from "./view/minimap";
+} from "./view/tree/treeView";
+import { appendToOffset } from "./view/tree/minimap";
 import { onKeyDown } from "./keyboard";
 import { loadFromLocalStorage, saveToLocalStorage } from "./persistance";
-import * as modal from "./view/modal";
-import * as player from "./view/player";
+import * as modal from "./view/modal/modal";
+import * as player from "./view/player/player";
 
 const el = canvas.createFullscreenCanvas();
 

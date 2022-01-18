@@ -1,9 +1,9 @@
-import { sp } from "../design";
-import { canvas } from "../infra";
-import { engine, springKeyed } from "../infra/animations";
-import * as tree from "../tree";
-import { createInput, removeInput, setCoords } from "./itemInput";
-import { drawItemCircle } from "./itemView";
+import { sp } from "../../design";
+import { canvas } from "../../infra";
+import { engine, springKeyed } from "../../infra/animations";
+import * as tree from "../../tree";
+import { createInput, removeInput, setCoords } from "../itemInput";
+import { drawItemCircle } from "../tree/itemView";
 import { findLocalItems, LocalSearchResults, drawTextAt } from "./modal.text";
 
 type ModalState = "hidden" | "showing" | "shown" | "hiding";

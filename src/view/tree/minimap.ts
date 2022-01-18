@@ -1,7 +1,8 @@
-import { sp } from "../design";
-import { canvas, numbers } from "../infra";
-import { spring } from "../infra/animations";
-import { getSelected, isSelected } from "../tree";
+import { sp } from "../../design";
+import { canvas, numbers } from "../../infra";
+import { spring } from "../../infra/animations";
+import { getSelected, isSelected } from "../../tree";
+import { getPlayerHeight } from "../player/player";
 import { drawTextOnMinimap, ItemView2 } from "./itemView";
 
 export let canvasOffset = 0;
@@ -29,7 +30,7 @@ export const drawMinimap = (
     canvas.canvas.width - minimapWidth,
     getScrollbarOffset(pageHeight, c.canvas.height),
     minimapWidth,
-    canvas.canvas.height / sp.minimapScale,
+    (canvas.canvas.height - getPlayerHeight()) / sp.minimapScale,
     "rgba(255,255,255,0.1)"
   );
 

@@ -1,13 +1,13 @@
-import { sp } from "../design";
-import { canvas, icons } from "../infra";
-import { engine, springKeyed } from "../infra/animations";
-import { getSelected } from "../tree";
+import { sp } from "../../design";
+import { canvas, icons } from "../../infra";
+import { engine, springKeyed } from "../../infra/animations";
+import { getSelected } from "../../tree";
 import * as youtube from "./player.youtube";
 import {
   findFirstChild,
   getItemAbove,
   getItemBelow,
-} from "../tree/tree.traversal";
+} from "../../tree/tree.traversal";
 
 const state = {
   isShown: false,
@@ -23,6 +23,8 @@ export const init = () => {
 
 export const isVideoPlayed = (item: Item) =>
   state.itemInVideo == item && state.isPlaying;
+
+export const getPlayerHeight = () => state.height;
 
 export const show = () => {
   state.isShown = true;

@@ -2,15 +2,21 @@ import {
   forEachOpenChild,
   getPreviousSiblingOrItemAbove,
   isRoot,
-} from "../tree/tree.traversal";
-import { sp } from "../design";
-import { on, getFocused, getSelected, isSelected, loadChildren } from "../tree";
+} from "../../tree/tree.traversal";
+import { sp } from "../../design";
+import {
+  on,
+  getFocused,
+  getSelected,
+  isSelected,
+  loadChildren,
+} from "../../tree";
 import { createItemView, draw, ItemView2 } from "./itemView";
-import { animatePosition, spring } from "../infra/animations";
-import { renderInputAt, updateInputCoords } from "./itemInput";
+import { animatePosition, spring } from "../../infra/animations";
+import { renderInputAt, updateInputCoords } from "../itemInput";
 import * as minimap from "./minimap";
-import { canvas, engine, fn } from "../infra";
-import { setChildren } from "../tree/tree.crud";
+import { canvas, engine, fn } from "../../infra";
+import { setChildren } from "../../tree/tree.crud";
 
 let itemToViews: Map<Item, ItemView2> = new Map();
 

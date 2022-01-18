@@ -1,8 +1,8 @@
 import { loadFromFile, saveToFile } from "./persistance";
 import * as tree from "./tree";
 import * as input from "./view/itemInput";
-import * as modal from "./view/modal";
-import * as player from "./view/player";
+import * as modal from "./view/modal/modal";
+import * as player from "./view/player/player";
 
 export const onKeyDown = async (e: KeyboardEvent) => {
   if (modal.isKeyboardCaptured()) {

@@ -1,5 +1,5 @@
-import { sp } from "../design";
-import { canvas } from "../infra";
+import { sp } from "../../design";
+import { canvas } from "../../infra";
 
 const all = <T>(arr: T[], predicate: (a: T) => boolean): boolean => {
   //not using reduce here because I want to have the ability not to traverse whole array
