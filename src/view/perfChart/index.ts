@@ -13,7 +13,7 @@ export const render = () => {
   ctx.save();
   ctx.shadowBlur = 10;
   canvas.drawRect(x, 20, 80, 80, sp.footer);
-
+  ctx.shadowBlur = 0;
   ctx.textBaseline = "middle";
   ctx.textAlign = "right";
 
