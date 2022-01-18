@@ -1,10 +1,9 @@
 import { isRoot } from "../tree/tree.traversal";
-import { canvas } from "../infra";
+import { canvas, icons } from "../infra";
 import { sp } from "../design";
 import { isFocused } from "../tree";
 import { getMinimapWidth } from "./minimap";
 import * as player from "./player";
-import * as icons from "./playerIcons";
 
 export type ItemView2 = {
   opacity: number;

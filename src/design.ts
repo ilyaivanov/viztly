@@ -1,6 +1,6 @@
 export const sp = {
   start: 50,
-  xStep: 24,
+  xStep: 22,
   yStep: 22,
 
   fontSize: 15,

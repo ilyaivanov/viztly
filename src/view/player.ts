@@ -1,8 +1,7 @@
 import { sp } from "../design";
-import { canvas } from "../infra";
+import { canvas, icons } from "../infra";
 import { engine, springKeyed } from "../infra/animations";
 import { getSelected } from "../tree";
-import * as icons from "./playerIcons";
 import * as youtube from "./player.youtube";
 import {
   findFirstChild,
