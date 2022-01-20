@@ -27,10 +27,19 @@ export const draw = (
 
   c.canvas.ctx.globalAlpha = opacity;
 
-  if (item.parent && !isRoot(item.parent) && !isFocused(item))
-    c.drawLine(x, y, x - sp.xStep, y, sp.line, 2);
+  if (item.parent && !isRoot(item.parent) && !isFocused(item)) {
+    if (item.parent.view === "board")
+      c.drawLine(x, y - sp.yStep, x, y, sp.line, 2);
+    else c.drawLine(x, y, x - sp.xStep, y, sp.line, 2);
+  }
 
-  if (lastChild) c.drawLine(x, y, x, lastChild.y + 1, sp.line, 2);
+  if (lastChild) {
+    if (item.view === "board") {
+      const y1 = y + sp.yStep;
+      c.drawLine(x, y, x, y1, sp.line, 2);
+      c.drawLine(x, y1, lastChild.x + 1, y1, sp.line, 2);
+    } else c.drawLine(x, y, x, lastChild.y + 1, sp.line, 2);
+  }
 
   drawItemCircle(x, y, item, isSelected);
 
@@ -39,6 +48,11 @@ export const draw = (
     const textY = y + 0.32 * fontSize(item);
     const color = getItemColor(isSelected);
     c.drawText(textX, textY, item.title, fontSize(item), color);
+
+    if (item.view === "board") {
+      const x = canvas.canvas.width - getMinimapWidth() - 80;
+      c.drawText(x, y + 0.32 * 12, "board", 12, "gray");
+    }
   }
 };
 

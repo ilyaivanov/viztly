@@ -103,6 +103,9 @@ export const subscribe = () => {
   on("item-finishEdit", () => {
     itemBeingEdited = undefined;
   });
+  on("item-changed-view", () =>
+    treeLayouter.updatePositionsForItemAndChildren(itemToViews, getFocused())
+  );
 };
 
 export const updateSelectedItemInputCoords = () => {

@@ -15,6 +15,7 @@ export type AppEvents = {
   init: { selectedItem: Item };
   "selection-changed": { prev: Item; current: Item };
   "item-toggled": Item;
+  "item-changed-view": Item;
   "item-children-loaded": { item: Item; children: Item[] };
   "item-moved": Item;
   "item-focused": { prev: Item; current: Item };
@@ -149,6 +150,14 @@ export const createItemAfterSelected = () => {
     selectItem(newItem);
     trigger("item-added", tree.selectedItem);
     trigger("item-startEdit", tree.selectedItem);
+  }
+};
+
+export const toggleSelectedItemView = () => {
+  const selected = tree.selectedItem;
+  if (selected) {
+    selected.view = selected.view === "tree" ? "board" : "tree";
+    trigger("item-changed-view", selected);
   }
 };
 

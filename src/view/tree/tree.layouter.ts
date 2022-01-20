@@ -1,6 +1,6 @@
 import { isRoot } from "../../tree/tree.traversal";
 import { createItemView, ItemView2 } from "./itemView";
-import { animatePosition } from "../../infra";
+import { animatePosition, canvas } from "../../infra";
 import { sp } from "../../design";
 
 export const renderItemChildren = (
@@ -9,45 +9,93 @@ export const renderItemChildren = (
   xStart: number,
   yStart: number
 ) => {
-  let yOffset = yStart;
-
-  const step = (item: Item, level: number) => {
-    const x = level * sp.xStep + xStart;
-
-    const view = createItemView(x, yOffset, item);
+  const renderItem = (item: Item, x: number, y: number) => {
+    const view = createItemView(x, y, item);
     views.set(item, view);
-
-    yOffset += sp.yStep;
-    if (item.isOpen && item.children.length > 0) {
-      item.children.forEach((c) => step(c, level + 1));
-    }
   };
 
-  if (isRoot(item)) item.children.forEach((c) => step(c, 0));
-  else step(item, 0);
+  if (isRoot(item)) traverseItems(item.children, xStart, yStart, renderItem);
+  else traverseItems([item], xStart, yStart, renderItem);
 };
 
 export const updatePositionsForItemAndChildren = (
   views: Map<Item, ItemView2>,
   item: Item
 ) => {
-  let yOffset = sp.start;
-
-  const step = (item: Item, level: number) => {
-    const x = level * sp.xStep + sp.start;
+  const updateItemPosition = (item: Item, x: number, y: number) => {
     const itemView = views.get(item);
-
-    if (itemView && (itemView.x !== x || itemView.y !== yOffset)) {
-      itemView.targetY = yOffset;
-      animatePosition(itemView, x, yOffset);
-    }
-
-    yOffset += sp.yStep;
-    if (item.isOpen && item.children.length > 0) {
-      item.children.forEach((c) => step(c, level + 1));
+    if (itemView && (itemView.x !== x || itemView.y !== y)) {
+      itemView.targetY = y;
+      animatePosition(itemView, x, y);
     }
   };
 
-  if (isRoot(item)) item.children.forEach((c) => step(c, 0));
-  else step(item, 0);
+  if (isRoot(item))
+    traverseItems(item.children, sp.start, sp.start, updateItemPosition);
+  else traverseItems([item], sp.start, sp.start, updateItemPosition);
 };
+
+const traverseItems = (
+  items: Item[],
+  x: number,
+  y: number,
+  fn: A3<Item, number, number>
+): number =>
+  items.reduce((totalHeight, child) => {
+    const cy = y + totalHeight;
+    fn(child, x, cy);
+
+    return (
+      totalHeight +
+      sp.yStep +
+      (hasVisibleChildren(child)
+        ? child.view === "tree"
+          ? traverseItemsDeeper(child.children, x, cy, fn)
+          : renderBoardChildren(child.children, x, cy, fn)
+        : 0)
+    );
+  }, 0);
+
+const traverseItemsDeeper = (
+  items: Item[],
+  x: number,
+  y: number,
+  fn: A3<Item, number, number>
+) => traverseItems(items, x + sp.xStep, y + sp.yStep, fn);
+
+const renderBoardChildren = (
+  items: Item[],
+  x: number,
+  y: number,
+  fn: A3<Item, number, number>
+) => {
+  let maxHeight = 0;
+  let xOffset = 0;
+  const viewY = y + sp.yStep * 2;
+
+  let viewX = x + sp.xStep;
+  items.forEach((child) => {
+    fn(child, viewX, viewY);
+
+    xOffset = canvas.getTextWidth(child.title, sp.fontSize);
+
+    if (hasVisibleChildren(child)) {
+      const subtreeHeight = traverseItemsDeeper(
+        child.children,
+        viewX,
+        viewY,
+        (item, x, y) => {
+          const textWidth = canvas.getTextWidth(item.title, sp.fontSize);
+          xOffset = Math.max(xOffset, x - viewX + textWidth);
+          fn(item, x, y);
+        }
+      );
+      maxHeight = Math.max(subtreeHeight, maxHeight);
+    }
+    viewX += xOffset + 30;
+  });
+  return viewY - y + maxHeight;
+};
+
+const hasVisibleChildren = (item: Item) =>
+  item.isOpen && item.children.length > 0;
