@@ -22,9 +22,11 @@ const search = new Path2D(
 const breadcrumps = new Path2D(
   `M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z`
 );
-
 const youtubeIcon = new Path2D(
   `M549.655 124.083c-6.281-23.65-24.787-42.276-48.284-48.597C458.781 64 288 64 288 64S117.22 64 74.629 75.486c-23.497 6.322-42.003 24.947-48.284 48.597-11.412 42.867-11.412 132.305-11.412 132.305s0 89.438 11.412 132.305c6.281 23.65 24.787 41.5 48.284 47.821C117.22 448 288 448 288 448s170.78 0 213.371-11.486c23.497-6.321 42.003-24.171 48.284-47.821 11.412-42.867 11.412-132.305 11.412-132.305s0-89.438-11.412-132.305zm-317.51 213.508V175.185l142.739 81.205-142.739 81.201z`
+);
+const carretIcon = new Path2D(
+  `M0 384.662V127.338c0-17.818 21.543-26.741 34.142-14.142l128.662 128.662c7.81 7.81 7.81 20.474 0 28.284L34.142 398.804C21.543 411.404 0 402.48 0 384.662z`
 );
 
 export const drawSearchIcon = (x: number, y: number, color: string) =>
@@ -43,6 +45,9 @@ export const drawPauseIcon = (
   color: string,
   targetWidth = 20
 ) => drawAt(x, y, regularWidth, targetWidth, pause, color);
+
+export const drawCarretIcon = (x: number, y: number, color: string) =>
+  drawAt(x, y, 192, 4, carretIcon, color);
 
 export const drawPlayNextIcon = (x: number, y: number) =>
   drawAt(x, y, regularWidth, 17, playNext, sp.selectedCircle);

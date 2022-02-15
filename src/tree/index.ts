@@ -15,6 +15,7 @@ export type AppEvents = {
   init: { selectedItem: Item };
   "selection-changed": { prev: Item; current: Item };
   "item-toggled": Item;
+  "item-changed-view": Item;
   "item-children-loaded": { item: Item; children: Item[] };
   "item-moved": Item;
   "item-focused": { prev: Item; current: Item };
@@ -110,6 +111,10 @@ export const goDown = () => changeSelection(traversal.getItemBelow);
 export const goUp = () => changeSelection(traversal.getItemAbove);
 export const goToNextSibling = () =>
   changeSelection(traversal.getNextSiblingOrItemBelow);
+
+export const goToRightTab = () => changeSelection(traversal.getRightTab);
+export const goToLeftTab = () => changeSelection(traversal.getLeftTab);
+
 export const goToPreviousSibling = () =>
   changeSelection(traversal.getPreviousSiblingOrItemAbove);
 export const goLeft = () => {
@@ -149,6 +154,14 @@ export const createItemAfterSelected = () => {
     selectItem(newItem);
     trigger("item-added", tree.selectedItem);
     trigger("item-startEdit", tree.selectedItem);
+  }
+};
+
+export const toggleSelectedItemView = () => {
+  const selected = tree.selectedItem;
+  if (selected) {
+    selected.view = selected.view === "tree" ? "board" : "tree";
+    trigger("item-changed-view", selected);
   }
 };
 

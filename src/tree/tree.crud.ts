@@ -19,6 +19,20 @@ export const createItem = (title: string, children: Item[] = []) => {
   setChildren(item, children);
   return item;
 };
+
+export const createBoard = (title: string, children: Item[] = []) => {
+  const item: Item = {
+    title,
+    isOpen: children.length > 0,
+    view: "board",
+    children,
+    type: "folder",
+    id: Math.random() + "",
+  };
+  setChildren(item, children);
+  return item;
+};
+
 export const createVideo = (id: string, title: string, videoId: string) => {
   const item: Item = {
     title,

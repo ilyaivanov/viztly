@@ -84,6 +84,11 @@ export const drawText = (
   canvas.ctx.fillText(text, x, y);
 };
 
+export const getTextWidth = (text: string, fontSize: number) => {
+  canvas.ctx.font = `${fontSize}px Segoe UI, Ubuntu, Roboto, sans-serif`;
+  return canvas.ctx.measureText(text).width;
+};
+
 export const drawRect = (
   x: number,
   y: number,

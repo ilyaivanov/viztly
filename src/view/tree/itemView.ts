@@ -27,10 +27,19 @@ export const draw = (
 
   c.canvas.ctx.globalAlpha = opacity;
 
-  if (item.parent && !isRoot(item.parent) && !isFocused(item))
-    c.drawLine(x, y, x - sp.xStep, y, sp.line, 2);
+  if (item.parent && !isRoot(item.parent) && !isFocused(item)) {
+    if (item.parent.view === "board")
+      c.drawLine(x, y - sp.yStep, x, y, sp.line, 2);
+    else c.drawLine(x, y, x - sp.xStep, y, sp.line, 2);
+  }
 
-  if (lastChild) c.drawLine(x, y, x, lastChild.y + 1, sp.line, 2);
+  if (lastChild) {
+    if (item.view === "board") {
+      const y1 = y + sp.yStep;
+      c.drawLine(x, y, x, y1, sp.line, 2);
+      c.drawLine(x, y1, lastChild.x + 1, y1, sp.line, 2);
+    } else c.drawLine(x, y, x, lastChild.y + 1, sp.line, 2);
+  }
 
   drawItemCircle(x, y, item, isSelected);
 
@@ -50,6 +59,8 @@ export const drawItemCircle = (
 ) => {
   const c = canvas;
   const color = getIconColor(isSelected);
+  if (item.view === "board") icons.drawCarretIcon(x - 10, y, color);
+
   if (item.videoId) {
     if (player.isVideoPlayed(item)) icons.drawPauseIcon(x, y, color, 10);
     else icons.drawPlayIcon(x, y, color, 10);

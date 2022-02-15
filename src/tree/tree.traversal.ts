@@ -1,9 +1,13 @@
 export const getItemAbove = (item: Item): Item | undefined => {
   const parent = item.parent;
   if (parent) {
+    if (parent.view === "board") return parent;
+
     const index = parent.children.indexOf(item);
     if (index > 0) {
       const previousItem = parent.children[index - 1];
+      if (previousItem.view === "board" && previousItem.isOpen)
+        return getLastNestedItem(previousItem.children[0]);
       return getLastNestedItem(previousItem);
     } else if (!isRoot(parent)) return parent;
   }
@@ -14,11 +18,25 @@ export const getItemBelow = (item: Item): Item | undefined =>
   item.isOpen && item.children ? item.children![0] : getFollowingItem(item);
 
 export const getNextSiblingOrItemBelow = (item: Item): Item | undefined =>
-  getFollowingSibling(item) || getFollowingItem(item);
+  getFollowingItem(item);
 
 export const getPreviousSiblingOrItemAbove = (item: Item): Item | undefined =>
   getRelativeSibling(item, (currentIndex) => currentIndex - 1) ||
   getItemAbove(item);
+
+export const getRightTab = (item: Item): Item | undefined => {
+  const tabInfo = getBoardInParent(item);
+
+  if (tabInfo && tabInfo.tab.children.length - 1 > tabInfo.index)
+    return tabInfo.tab.children[tabInfo.index + 1];
+};
+
+export const getLeftTab = (item: Item): Item | undefined => {
+  const tabInfo = getBoardInParent(item);
+
+  if (tabInfo && tabInfo.index > 0)
+    return tabInfo.tab.children[tabInfo.index - 1];
+};
 
 export const forEachOpenChild = (item: Item, cb: F1<Item>) => {
   const traverse = (children: Item[]) => {
@@ -74,6 +92,23 @@ export const hasItemInPath = (item: Item, itemToSearch: Item) => {
   return false;
 };
 
+const getBoardInParent = (
+  item: Item
+): { tab: Item; index: number } | undefined => {
+  let parent: Item | undefined = item;
+
+  while (parent) {
+    if (parent.parent && parent.parent.view === "board")
+      return {
+        tab: parent.parent,
+        index: parent.parent.children.indexOf(parent),
+      };
+
+    parent = parent.parent;
+  }
+  return undefined;
+};
+
 const getLastNestedItem = (item: Item): Item => {
   if (item.isOpen && item.children) {
     const { children } = item;
@@ -88,11 +123,12 @@ const getFollowingSibling = (item: Item): Item | undefined =>
 
 const getFollowingItem = (item: Item): Item | undefined => {
   const followingItem = getFollowingSibling(item);
-  if (followingItem) return followingItem;
+  if (followingItem && item.parent?.view !== "board") return followingItem;
   else {
     let parent = item.parent;
-    while (parent && isLast(parent)) {
+    while (parent && (isLast(parent) || parent.parent?.view === "board")) {
       parent = parent.parent;
+      console.log(parent);
     }
     if (parent) return getFollowingSibling(parent);
   }

@@ -1,5 +1,5 @@
 {
-  "name": "visulty",
+  "name": "viztly",
   "version": "1.0.0",
   "description": "",
   "scripts": {
@@ -18,10 +18,7 @@
   "license": "ISC",
   "jest": {
     "preset": "ts-jest",
-    "testEnvironment": "jsdom",
-    "setupFilesAfterEnv": [
-      "./src/specs/jest.setup.js"
-    ]
+    "testEnvironment": "jsdom"
   },
   "homepage": "https://github.com/ilyaivanov/viztly",
   "devDependencies": {

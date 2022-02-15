@@ -18,6 +18,7 @@ type Item = {
 type ItemType = "folder" | "YTvideo" | "YTchannel" | "YTplaylist" | "YTsearch";
 
 type A = () => void;
+type A3<T1, T2, T3> = (a: T1, b: T2, c: T3) => void;
 type F1<T> = (a: T) => void;
 type F2<Tin, Tout> = (a: Tin) => Tout;
 

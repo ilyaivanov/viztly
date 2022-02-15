@@ -2,6 +2,7 @@ import { loadFromFile, saveToFile } from "./persistance";
 import * as tree from "./tree";
 import * as input from "./view/itemInput";
 import * as modal from "./view/modal/modal";
+import * as perfChart from "./view/perfChart";
 import * as player from "./view/player/player";
 
 export const onKeyDown = async (e: KeyboardEvent) => {
@@ -49,8 +50,12 @@ const keyMap: CommandDefinition[] = [
   { key: "shift+alt+down", command: tree.moveSelectedDown },
   { key: "shift+alt+up", command: tree.moveSelectedUp },
 
-  { key: "ctrl+alt+up", command: tree.goToPreviousSibling },
-  { key: "ctrl+alt+down", command: tree.goToNextSibling },
+  { key: "ctrl+up", command: tree.goToPreviousSibling, edit: "ignore" },
+  { key: "ctrl+down", command: tree.goToNextSibling, edit: "ignore" },
+  { key: "ctrl+left", command: tree.goToLeftTab, edit: "ignore" },
+  { key: "ctrl+right", command: tree.goToRightTab, edit: "ignore" },
+
+  { key: "ctrl+d", command: perfChart.toggleVisibility },
 
   { key: "shift+alt+backspace", command: tree.removeSelected, edit: "ignore" },
 
@@ -71,6 +76,8 @@ const keyMap: CommandDefinition[] = [
   },
 
   { key: "ctrl+shift+f", command: modal.show },
+
+  { key: "ctrl+space", command: tree.toggleSelectedItemView },
 
   { key: "m", command: player.toggleYoutubeVisibility, edit: "ignore" },
   { key: "x", command: player.toggleVideoState, edit: "ignore" },
