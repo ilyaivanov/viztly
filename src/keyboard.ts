@@ -55,6 +55,12 @@ const keyMap: CommandDefinition[] = [
   { key: "ctrl+left", command: tree.goToLeftTab, edit: "ignore" },
   { key: "ctrl+right", command: tree.goToRightTab, edit: "ignore" },
 
+  {
+    key: "ctrl+enter",
+    command: tree.toggleSelectedItemCompleteness,
+    edit: "ignore",
+  },
+
   { key: "ctrl+d", command: perfChart.toggleVisibility },
 
   { key: "shift+alt+backspace", command: tree.removeSelected, edit: "ignore" },

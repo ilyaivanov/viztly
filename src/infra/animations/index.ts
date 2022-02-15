@@ -38,6 +38,19 @@ export const spring = (
   engine.addAnimation(anim);
 };
 
+export const springProp = <T, TKey extends keyof T>(
+  obj: T,
+  prop: TKey,
+  target: number
+) => {
+  if (typeof obj[prop] !== "number")
+    throw new Error("Expected number during animation for property: " + prop);
+  const current = obj[prop] as unknown as number;
+  spring(current, target, (v, isDone) => {
+    obj[prop] = v as unknown as T[TKey];
+  });
+};
+
 export const springKeyed = (
   key: {},
   from: number,

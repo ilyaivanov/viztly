@@ -11,6 +11,8 @@ type Item = {
   channelId?: string;
   image?: string;
 
+  isFinished?: boolean;
+
   //non-persisted
   parent?: Item;
 };

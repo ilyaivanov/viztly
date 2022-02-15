@@ -1,3 +1,5 @@
+import { roundToHalf } from "./numbers";
+
 type CanvasState = {
   el: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
@@ -136,4 +138,33 @@ export const drawLine = (
   canvas.ctx.moveTo(x1, y1);
   canvas.ctx.lineTo(x2, y2);
   canvas.ctx.stroke();
+};
+
+export const drawHorizontalLine = (
+  x: number,
+  y: number,
+  distance: number,
+  color: string,
+  width: number
+) => {
+  const isWidthEven = width % 2 === 0;
+  if (isWidthEven) {
+    drawLine(
+      roundToHalf(x),
+      Math.round(y),
+      roundToHalf(x + distance),
+      Math.round(y),
+      color,
+      width
+    );
+  } else {
+    drawLine(
+      roundToHalf(x),
+      roundToHalf(y),
+      roundToHalf(x + distance),
+      roundToHalf(y),
+      color,
+      width
+    );
+  }
 };

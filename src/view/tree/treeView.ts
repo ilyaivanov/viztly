@@ -10,8 +10,8 @@ import {
   isSelected,
   loadChildren,
 } from "../../tree";
-import { createItemView, draw, ItemView2 } from "./itemView";
-import { spring } from "../../infra/animations";
+import { createItemView, draw, fontSize, ItemView2 } from "./itemView";
+import { spring, springProp } from "../../infra/animations";
 import { renderInputAt, updateInputCoords } from "../itemInput";
 import * as minimap from "./minimap";
 import { canvas, engine, fn } from "../../infra";
@@ -106,6 +106,13 @@ export const subscribe = () => {
   on("item-changed-view", () =>
     treeLayouter.updatePositionsForItemAndChildren(itemToViews, getFocused())
   );
+  on("item-changed-completed", (item) => {
+    const view = itemToViews.get(item);
+    const target = item.isFinished
+      ? canvas.getTextWidth(item.title, fontSize(item))
+      : 0;
+    if (view) springProp(view, "strikeThroughtWidth", target);
+  });
 };
 
 export const updateSelectedItemInputCoords = () => {

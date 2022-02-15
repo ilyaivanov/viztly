@@ -15,10 +15,12 @@ export type ItemView2 = {
   targetY: number;
 
   item: Item;
+
+  strikeThroughtWidth?: number;
 };
 
 export const draw = (
-  { item, x, y, opacity }: ItemView2,
+  { item, x, y, opacity, strikeThroughtWidth }: ItemView2,
   isSelected: boolean,
   isBeingEdited: boolean,
   lastChild?: ItemView2
@@ -46,8 +48,14 @@ export const draw = (
   if (!isBeingEdited) {
     const textX = x + sp.circleToTextDistance;
     const textY = y + 0.32 * fontSize(item);
-    const color = getItemColor(isSelected);
+    const color = getItemColor(item, isSelected);
+
     c.drawText(textX, textY, item.title, fontSize(item), color);
+
+    if (item.isFinished || strikeThroughtWidth) {
+      const width = c.getTextWidth(item.title, fontSize(item));
+      c.drawHorizontalLine(x + 10, y, strikeThroughtWidth || width, color, 1);
+    }
   }
 };
 
@@ -70,8 +78,13 @@ export const drawItemCircle = (
   else c.drawCircle(x, y, sp.circleR, color, item.children.length > 0);
 };
 
-const getItemColor = (isSelected: boolean) =>
-  isSelected ? sp.selectedCircle : sp.regularColor;
+const getItemColor = (item: Item, isSelected: boolean) =>
+  isSelected
+    ? sp.selectedCircle
+    : item.isFinished
+    ? sp.finishedColor
+    : sp.regularColor;
+
 const getIconColor = (isSelected: boolean) =>
   isSelected ? sp.selectedCircle : sp.regularCicrle;
 
@@ -99,7 +112,16 @@ export const createItemView = (
   x: number,
   y: number,
   item: Item
-): ItemView2 => ({ opacity: 1, x, y, targetY: y, item });
+): ItemView2 => ({
+  opacity: 1,
+  x,
+  y,
+  targetY: y,
+  item,
+  strikeThroughtWidth: item.isFinished
+    ? canvas.getTextWidth(item.title, fontSize(item))
+    : 0,
+});
 
-const fontSize = (item: Item) =>
+export const fontSize = (item: Item) =>
   isFocused(item) ? Math.round(sp.fontSize * 1.3) : sp.fontSize;

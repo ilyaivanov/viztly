@@ -16,6 +16,7 @@ export type AppEvents = {
   "selection-changed": { prev: Item; current: Item };
   "item-toggled": Item;
   "item-changed-view": Item;
+  "item-changed-completed": Item;
   "item-children-loaded": { item: Item; children: Item[] };
   "item-moved": Item;
   "item-focused": { prev: Item; current: Item };
@@ -162,6 +163,14 @@ export const toggleSelectedItemView = () => {
   if (selected) {
     selected.view = selected.view === "tree" ? "board" : "tree";
     trigger("item-changed-view", selected);
+  }
+};
+
+export const toggleSelectedItemCompleteness = () => {
+  const selected = tree.selectedItem;
+  if (selected) {
+    selected.isFinished = !selected.isFinished;
+    trigger("item-changed-completed", selected);
   }
 };
 

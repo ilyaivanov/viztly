@@ -14,6 +14,7 @@ export const sp = {
 
   selectedCircle: "#ACE854",
   regularColor: "white",
+  finishedColor: "rgb(160, 160, 160)",
   regularCicrle: "#D1D2D3",
   minimapColor: "#C5C5C5",
 
