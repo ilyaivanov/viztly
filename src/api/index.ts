@@ -2,7 +2,7 @@ import * as realAPI from "./youtubeApi";
 import * as fakeAPI from "./fake.api";
 import { createMappedResponse, MappedResponse } from "./mapper";
 
-const IS_USING_FAKE_API = true;
+const IS_USING_FAKE_API = false;
 
 export const loadItem = (item: Item) =>
   IS_USING_FAKE_API ? loadItemFaked(item) : loadItemReal(item);
