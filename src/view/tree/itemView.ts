@@ -48,11 +48,6 @@ export const draw = (
     const textY = y + 0.32 * fontSize(item);
     const color = getItemColor(isSelected);
     c.drawText(textX, textY, item.title, fontSize(item), color);
-
-    if (item.view === "board") {
-      const x = canvas.canvas.width - getMinimapWidth() - 80;
-      c.drawText(x, y + 0.32 * 12, "board", 12, "gray");
-    }
   }
 };
 
@@ -64,6 +59,8 @@ export const drawItemCircle = (
 ) => {
   const c = canvas;
   const color = getIconColor(isSelected);
+  if (item.view === "board") icons.drawCarretIcon(x - 10, y, color);
+
   if (item.videoId) {
     if (player.isVideoPlayed(item)) icons.drawPauseIcon(x, y, color, 10);
     else icons.drawPlayIcon(x, y, color, 10);

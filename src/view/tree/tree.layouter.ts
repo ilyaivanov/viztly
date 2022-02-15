@@ -94,7 +94,7 @@ const renderBoardChildren = (
     }
     viewX += xOffset + 30;
   });
-  return viewY - y + maxHeight;
+  return sp.yStep * 2.5 + maxHeight;
 };
 
 const hasVisibleChildren = (item: Item) =>

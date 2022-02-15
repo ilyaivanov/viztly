@@ -8,6 +8,8 @@ export const sp = {
   minimapScale: 10,
   circleToTextDistance: 10,
 
+  treeMaxWidth: 800,
+
   background: "#1e1e1e",
 
   selectedCircle: "#ACE854",

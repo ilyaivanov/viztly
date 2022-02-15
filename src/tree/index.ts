@@ -111,6 +111,10 @@ export const goDown = () => changeSelection(traversal.getItemBelow);
 export const goUp = () => changeSelection(traversal.getItemAbove);
 export const goToNextSibling = () =>
   changeSelection(traversal.getNextSiblingOrItemBelow);
+
+export const goToRightTab = () => changeSelection(traversal.getRightTab);
+export const goToLeftTab = () => changeSelection(traversal.getLeftTab);
+
 export const goToPreviousSibling = () =>
   changeSelection(traversal.getPreviousSiblingOrItemAbove);
 export const goLeft = () => {
