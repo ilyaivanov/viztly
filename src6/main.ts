@@ -1,3 +1,5 @@
+import { createTree, init } from "../src/tree";
+import { createItem, createRoot, list } from "../src/tree/tree.crud";
 import { engine } from "./animations/engine";
 import { App } from "./app";
 import { MyCanvas } from "./canvas";
@@ -9,42 +11,29 @@ const ctx = canvas.getContext("2d")!;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 document.body.appendChild(canvas);
+const medium = createRoot([
+  createItem("Item 1", list("Item 1.", 3)),
+  createItem("Slackbot"),
+  createItem("Slackbot"),
+  createItem("Slackbot"),
+  createItem("Item 3", [
+    createItem("Item 3.1", list("Item 3.1.", 20)),
+    createItem("Item 3.2", list("Item 3.2.", 10)),
+  ]),
+  createItem("Big", list("Big child ", 50)),
+  createItem("Item 4", [
+    createItem("Item 4.1.", list("Item 4.1.", 10)),
+    createItem("Item 4.2.", list("Item 4.2.", 10)),
+    createItem("Item 4.3.", list("Item 4.3.", 10)),
+  ]),
+  createItem("Item 5", list("Item 5.", 5)),
+  createItem("Item 6"),
+  createItem("Item 7"),
+]);
 
-const app = new App(new MyCanvas(ctx));
-
-app.setRoot({
-  text: "Root",
-  children: [
-    {
-      text: "Foo",
-      children: [
-        { text: "Sub" },
-        { text: "Sub" },
-        { text: "Sub" },
-        { text: "Sub" },
-        {
-          text: "Bar",
-          children: [
-            {
-              text: "Bar",
-              children: [{ text: "Bar", children: [{ text: "Bar" }] }],
-            },
-            { text: "Sub" },
-            { text: "Sub" },
-            { text: "Sub" },
-          ],
-        },
-      ],
-    },
-    { text: "Sub" },
-    { text: "Sub" },
-    { text: "Sub" },
-    { text: "Sub" },
-    { text: "Sub" },
-    { text: "Sub" },
-    { text: "Sub" },
-  ],
-});
+const tree = createTree(medium);
+init(tree);
+const app = new App(new MyCanvas(ctx), tree);
 
 document.addEventListener("keydown", (e) => {
   app.handleKey(e);
@@ -61,5 +50,10 @@ window.addEventListener("resize", () => {
 });
 
 app.draw();
+
+document.fonts.load("16px Roboto").then(() => {
+  console.log("loaded");
+  app.draw();
+});
 
 engine.onTick = () => app.draw();

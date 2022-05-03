@@ -102,7 +102,7 @@ describe("Selection ", () => {
     });
 
     it("pressing down selects the second item", () => {
-      app.handleKey("ArrowDown");
+      app.handleKey({ code: "ArrowDown" } as unknown as KeyboardEvent);
       app.draw();
       expectToHaveCircle(context, 20, 20, "gray");
       expectToHaveCircle(context, 20, 40, "green");

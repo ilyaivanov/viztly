@@ -25,11 +25,26 @@ export class MyCanvas {
     // }
   };
 
+  outlineCircle = (
+    x: number,
+    y: number,
+    r: number,
+    lineWidth: number,
+    color: string
+  ) => {
+    this.context.strokeStyle = color;
+    const ctx = this.context;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, 2 * Math.PI);
+    ctx.lineWidth = lineWidth;
+    ctx.stroke();
+  };
+
   fillTextAtMiddle = (x: number, y: number, text: string, color: string) => {
     const ctx = this.context;
     ctx.fillStyle = color;
     ctx.textBaseline = "middle";
-    ctx.font = "16px Segoe UI";
+    ctx.font = "16px Roboto, sans-serif";
     ctx.fillText(text, x, y);
   };
 }
