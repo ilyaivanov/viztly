@@ -1,3 +1,4 @@
+import { engine } from "./animations/engine";
 import { App } from "./app";
 import { MyCanvas } from "./canvas";
 
@@ -46,8 +47,11 @@ app.setRoot({
 });
 
 document.addEventListener("keydown", (e) => {
-  app.handleKey(e.code);
+  app.handleKey(e);
+
   app.draw();
+
+  e.preventDefault();
 });
 
 window.addEventListener("resize", () => {
@@ -57,3 +61,5 @@ window.addEventListener("resize", () => {
 });
 
 app.draw();
+
+engine.onTick = () => app.draw();

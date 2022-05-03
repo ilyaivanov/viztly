@@ -2,7 +2,7 @@ export class MyCanvas {
   constructor(public context: CanvasRenderingContext2D) {}
 
   clearRect = () => {
-    this.context.clearRect(0, 0, 1000, 1000);
+    this.context.clearRect(0, 0, 10000, 10000);
   };
 
   fillRect = (x: number, y: number, w: number, h: number, color: string) => {

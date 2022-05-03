@@ -1,3 +1,4 @@
+import { animateTo, setWidth, view } from "./animatedBox";
 import { MyCanvas } from "./canvas";
 
 export class App {
@@ -15,6 +16,7 @@ export class App {
     ctx.clearRect();
 
     if (this.root?.children) this.drawChildren(this.root?.children, 20, 0);
+    view(ctx);
   }
 
   private drawChildren = (items: Item[], x: number, level: number) => {
@@ -38,9 +40,15 @@ export class App {
     this.canvas.fillTextAtMiddle(x + 10, y, item.text, textColor);
   };
 
-  handleKey(code: string) {
-    if (code === "ArrowDown") {
+  handleKey(e: KeyboardEvent) {
+    if (e.code === "ArrowDown") {
       this.selectedItem = this.root!.children![1];
+    } else if (e.code.startsWith("Digit")) {
+      const k = Number(e.code[e.code.length - 1]);
+      const hex = Math.round((1 / (k + 1)) * 255);
+
+      if (e.ctrlKey) setWidth(k * 100);
+      else animateTo(`#${hex.toString(16).repeat(3)}`);
     }
   }
 }
