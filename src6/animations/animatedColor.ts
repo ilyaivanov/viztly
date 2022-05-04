@@ -42,7 +42,7 @@ export class AnimatedColor implements AnimatedValue {
   }
 
   getHexColor() {
-    return "#" + this.currentValue.toString(16);
+    return "#" + this.currentValue.toString(16).padStart(6, "0");
   }
 
   private parseHex = (s: string): number => parseInt(s.slice(1), 16);
