@@ -30,6 +30,12 @@ const medium = createRoot([
   createItem("Item 6"),
   createItem("Item 7"),
 ]);
+const small = createRoot([
+  createItem("Item 1", list("Item 1.", 3)),
+  createItem("Slackbot 1"),
+  createItem("Slackbot 2"),
+  createItem("Slackbot 3"),
+]);
 
 const tree = createTree(medium);
 init(tree);
@@ -40,7 +46,8 @@ document.addEventListener("keydown", (e) => {
 
   app.draw();
 
-  e.preventDefault();
+  //allow browser to refresh
+  if (e.code !== "KeyR") e.preventDefault();
 });
 
 window.addEventListener("resize", () => {
@@ -48,12 +55,13 @@ window.addEventListener("resize", () => {
   canvas.height = window.innerHeight;
   app.draw();
 });
+window.addEventListener("mousemove", (e) => {
+  app.draw();
+});
 
 app.draw();
 
-document.fonts.load("16px Roboto").then(() => {
-  console.log("loaded");
-  app.draw();
-});
+//ugly way to wait for fonts, tried other APIs and they do not seem to work
+setTimeout(() => app.draw(), 500);
 
 engine.onTick = () => app.draw();

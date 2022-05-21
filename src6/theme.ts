@@ -24,6 +24,8 @@ const themeValues = {
   yStep: 32,
   xStep: 30,
 
+  fontSize: 16,
+
   //colors
   selectedColor: new AnimatedColor(lightTheme.selectedColor),
   circleColor: new AnimatedColor(lightTheme.circleColor),

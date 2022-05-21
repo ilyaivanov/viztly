@@ -18,11 +18,13 @@ export class AnimatedNumber implements AnimatedValue {
     this.target = current;
   }
 
-  switchTo = (to: number) => {
+  private onDone: (() => void) | undefined;
+  switchTo = (to: number, onDoneCb?: () => void) => {
     this.last = this.current;
     this.current = this.current;
     this.target = to;
 
+    this.onDone = onDoneCb;
     this.isAnimating = true;
     engine.addAnimation(this);
   };
@@ -36,7 +38,9 @@ export class AnimatedNumber implements AnimatedValue {
     const acceleration = (spring - damper) * invertedMass;
     const d = (velocity + acceleration) * deltaTime;
 
+    if (target === 0) console.log(this.current + d);
     if (Math.abs(d) < precision && Math.abs(delta) < precision) {
+      this.onDone && this.onDone();
       this.isAnimating = false;
       this.current = target;
     } else {

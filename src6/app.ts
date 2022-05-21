@@ -1,55 +1,129 @@
-import { goDown, goLeft, goRight, goUp, Tree } from "../src/tree";
-import { animateTo, setWidth } from "./animatedBox";
+import { goDown, goLeft, goRight, goUp, on, Tree } from "../src/tree";
+import { forEachOpenChild } from "../src/tree/tree.traversal";
+import { draw } from "../src/view/tree/itemView";
+import { appendToOffset } from "../src/view/tree/minimap";
+import { AnimatedNumber } from "./animations/animatedNumber";
 import { MyCanvas } from "./canvas";
 import theme, { toggleTheme } from "./theme";
 
-export class App {
-  constructor(public canvas: MyCanvas, public tree: Tree) {}
-
-  draw() {
-    const ctx = this.canvas;
-    ctx.clearRect();
-
-    ctx.fillRect(0, 0, 10000, 10000, theme.backgroundColor.getHexColor());
-    if (this.tree.root.children)
-      this.drawChildren(this.tree.root.children, theme.yStart, 0);
+class ItemView {
+  x: AnimatedNumber;
+  y: AnimatedNumber;
+  opacity = new AnimatedNumber(1);
+  constructor(circleX: number, circleY: number, private item: Item) {
+    this.x = new AnimatedNumber(circleX);
+    this.y = new AnimatedNumber(circleY);
   }
 
-  private drawChildren = (items: Item[], x: number, level: number) => {
-    let height = 0;
-    const xStart = getLeftOffest();
-    items.forEach((item) => {
-      this.drawItem(xStart + level * theme.xStep, x + height, item);
-      height += theme.yStep;
-      if (item.isOpen && item.children)
-        height += this.drawChildren(item.children, x + height, level + 1);
-    });
-    return height;
-  };
+  //hotpath
+  draw(canvas: MyCanvas, tree: Tree) {
+    const { item } = this;
+    const x = this.x.current;
+    const y = this.y.current;
 
-  private drawItem = (x: number, y: number, item: Item) => {
-    const isSelected = this.tree.selectedItem === item;
-    const textColor = isSelected
-      ? theme.selectedColor.getHexColor()
-      : theme.textColor.getHexColor();
-    const circleColor = isSelected
-      ? theme.selectedColor.getHexColor()
-      : theme.circleColor.getHexColor();
+    const isSelected = tree.selectedItem === item;
+    const textColor = (
+      isSelected ? theme.selectedColor : theme.textColor
+    ).getHexColor();
+    const circleColor = (
+      isSelected ? theme.selectedColor : theme.circleColor
+    ).getHexColor();
 
     const r = theme.outlineCircleR;
     const lineWidth = theme.outlineCircleLineWidth;
 
+    canvas.context.globalAlpha = this.opacity.current;
     if (!item.isOpen && item.children.length > 0)
-      this.canvas.fillCircle(x, y, r + lineWidth / 2, circleColor);
-    else this.canvas.outlineCircle(x, y, r, lineWidth, circleColor);
+      canvas.fillCircle(x, y, r + lineWidth / 2, circleColor);
+    else canvas.outlineCircle(x, y, r, lineWidth, circleColor);
 
-    this.canvas.fillTextAtMiddle(
-      x + theme.textToCircleDistance + theme.outlineCircleR + 1,
-      y + 1.5,
-      item.title,
-      textColor
+    const textX = x + theme.textToCircleDistance + theme.outlineCircleR + 1;
+    canvas.fillTextAtMiddle(textX, y + 1.5, item.title, textColor);
+    canvas.context.globalAlpha = 1;
+  }
+
+  removeViaTransparency(parentY: number, cb: () => void) {
+    this.opacity.switchTo(0);
+
+    //I'm choosing here listening to coordinate animation, since it happens longer than opacity
+    //but I need to think about animation orchestration
+    this.y.switchTo(parentY, cb);
+  }
+
+  appearViaTransparency(parentY: number) {
+    this.opacity = new AnimatedNumber(0);
+    this.opacity.switchTo(1);
+    const target = this.y.current;
+    this.y = new AnimatedNumber(parentY);
+    this.y.switchTo(target);
+  }
+}
+
+export class App {
+  private views: Map<Item, ItemView> = new Map();
+  constructor(public canvas: MyCanvas, public tree: Tree) {
+    const { children } = this.tree.root;
+    if (children) {
+      traverseItems(children, getLeftOffest(), theme.yStart, this.createView);
+    }
+
+    on("item-toggled", this.onItemToggled);
+  }
+
+  onItemToggled = (item: Item) => {
+    traverseItems(
+      this.tree.root.children,
+      getLeftOffest(),
+      theme.yStart,
+      (item, x, y) => {
+        const view = this.views.get(item);
+        if (view && (view.x.target !== x || view.y.target !== y)) {
+          view.x.switchTo(x);
+          view.y.switchTo(y);
+        }
+      }
     );
+
+    const parentView = this.views.get(item);
+    if (parentView) {
+      if (item.isOpen) {
+        traverseItems(
+          item.children,
+          parentView.x.target + theme.xStep,
+          parentView.y.target + theme.yStep,
+          (item, x, y) => {
+            const view = this.createView(item, x, y);
+            view.appearViaTransparency(parentView.y.current);
+          }
+        );
+      } else {
+        forEachOpenChild(item, (child) => {
+          const view = this.views.get(child);
+          if (view) {
+            view.removeViaTransparency(parentView.y.current, () => {
+              console.log("deleting");
+              this.views.delete(child);
+            });
+          }
+        });
+      }
+    }
   };
+
+  private createView = (item: Item, x: number, y: number) => {
+    const view = new ItemView(x, y, item);
+    this.views.set(item, view);
+    return view;
+  };
+
+  draw() {
+    const ctx = this.canvas;
+    ctx.clearRect(theme.backgroundColor.getHexColor());
+
+    for (const view of this.views.values()) {
+      view.draw(ctx, this.tree);
+    }
+  }
 
   handleKey(e: KeyboardEvent) {
     if (e.code === "ArrowDown") {
@@ -60,12 +134,6 @@ export class App {
       goLeft();
     } else if (e.code === "ArrowRight") {
       goRight();
-    } else if (e.code.startsWith("Digit")) {
-      const k = Number(e.code[e.code.length - 1]);
-      const hex = Math.round((1 / (k + 1)) * 255);
-
-      if (e.ctrlKey) setWidth(k * 100);
-      else animateTo(`#${hex.toString(16).repeat(3)}`);
     } else if (e.code === "Space") {
       toggleTheme();
     }
@@ -74,3 +142,69 @@ export class App {
 
 const getLeftOffest = () =>
   Math.max((window.innerWidth - 800) / 2, theme.xStart);
+
+// Layouter for the tree
+const traverseItems = (
+  items: Item[],
+  x: number,
+  y: number,
+  fn: A3<Item, number, number>
+): number =>
+  items.reduce((totalHeight, child) => {
+    const cy = y + totalHeight;
+    fn(child, x, cy);
+
+    return (
+      totalHeight +
+      theme.yStep +
+      (hasVisibleChildren(child)
+        ? child.view === "tree"
+          ? traverseItemsDeeper(child.children, x, cy, fn)
+          : renderBoardChildren(child.children, x, cy, fn)
+        : 0)
+    );
+  }, 0);
+
+const traverseItemsDeeper = (
+  items: Item[],
+  x: number,
+  y: number,
+  fn: A3<Item, number, number>
+) => traverseItems(items, x + theme.xStep, y + theme.yStep, fn);
+
+const hasVisibleChildren = (item: Item) =>
+  item.isOpen && item.children.length > 0;
+
+const renderBoardChildren = (
+  items: Item[],
+  x: number,
+  y: number,
+  fn: A3<Item, number, number>
+) => {
+  let maxHeight = 0;
+  let xOffset = 0;
+  const viewY = y + theme.yStep * 2;
+
+  let viewX = x + theme.xStep;
+  items.forEach((child) => {
+    fn(child, viewX, viewY);
+
+    xOffset = 200; //canvas.getTextWidth(child.title, theme.fontSize);
+
+    if (hasVisibleChildren(child)) {
+      const subtreeHeight = traverseItemsDeeper(
+        child.children,
+        viewX,
+        viewY,
+        (item, x, y) => {
+          const textWidth = 200; //canvas.getTextWidth(item.title, theme.fontSize);
+          xOffset = Math.max(xOffset, x - viewX + textWidth);
+          fn(item, x, y);
+        }
+      );
+      maxHeight = Math.max(subtreeHeight, maxHeight);
+    }
+    viewX += xOffset + 30;
+  });
+  return theme.yStep * 2.5 + maxHeight;
+};

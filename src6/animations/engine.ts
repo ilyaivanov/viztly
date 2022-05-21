@@ -3,7 +3,7 @@ export interface AnimatedValue {
   tick: (deltaTime: number) => void;
 }
 
-const ANIMATION_SLOW_COEF = 1; // how much times to slow animation
+const ANIMATION_SLOW_COEF = 5; // how much times to slow animation
 
 export class AnimationEngine {
   private currentAnimations: Set<AnimatedValue> = new Set();
