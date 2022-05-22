@@ -11,6 +11,8 @@ export const colors = {
 
   lines: new AnimatedColor("#FFFFFF"),
   gridPoint: new AnimatedColor("#FFFFFF"),
+
+  secondaryBackground: new AnimatedColor("#FFFFFF"),
   background: new AnimatedColor("#FFFFFF"),
 };
 
@@ -21,6 +23,7 @@ const applyTheme = (applier: t.Action2<AnimatedColor, ColorValue>) => {
   applier(colors.lines, "200");
   applier(colors.gridPoint, "200");
   applier(colors.background, "050");
+  applier(colors.secondaryBackground, "100");
 };
 
 const initColors = (pallete: Pallete) =>

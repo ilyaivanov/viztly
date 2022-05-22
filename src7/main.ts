@@ -8,6 +8,7 @@ import initialState from "./viztly.json";
 import { engine } from "./animations/engine";
 
 import { colors, rotateTheme } from "./colors";
+import { initSidebar, toggleVisible } from "./devSidebar";
 
 const canvas = document.createElement("canvas");
 
@@ -33,7 +34,7 @@ const drawItemView = (item: t.Item, { gridX, gridY }: t.ItemView) => {
 
   const isFilled = item.children.length > 0;
   const circleInnerColor = isFilled ? colors.circleFilled : colors.background;
-  const r = sp.circleR;
+  const r = sp.circleRadius;
   canva.outlineCircle(
     x,
     y,
@@ -55,11 +56,13 @@ const drawItemView = (item: t.Item, { gridX, gridY }: t.ItemView) => {
 
 //TODO: think about how to animate between lineBetween and boardChildtoParentLine
 const lineBetween = (view1: t.ItemView, view2: t.ItemView) => {
-  const x1 = view1.gridX * sp.gridSize - sp.circleR - sp.lineToCircleDistance;
+  const x1 =
+    view1.gridX * sp.gridSize - sp.circleRadius - sp.lineToCircleDistance;
   const y1 = view1.gridY * sp.gridSize;
 
   const x2 = view2.gridX * sp.gridSize;
-  const y2 = view2.gridY * sp.gridSize + sp.circleR + sp.lineToCircleDistance;
+  const y2 =
+    view2.gridY * sp.gridSize + sp.circleRadius + sp.lineToCircleDistance;
   ctx.beginPath();
   ctx.lineJoin = "round";
   ctx.moveTo(x1, y1);
@@ -72,10 +75,11 @@ const lineBetween = (view1: t.ItemView, view2: t.ItemView) => {
 
 const boardChildtoParentLine = (from: t.ItemView, to: t.ItemView) => {
   const x1 = from.gridX * sp.gridSize;
-  const y1 = from.gridY * sp.gridSize - sp.circleR - sp.lineToCircleDistance;
+  const y1 =
+    from.gridY * sp.gridSize - sp.circleRadius - sp.lineToCircleDistance;
 
   const x2 = to.gridX * sp.gridSize;
-  const y2 = to.gridY * sp.gridSize + sp.circleR + sp.lineToCircleDistance;
+  const y2 = to.gridY * sp.gridSize + sp.circleRadius + sp.lineToCircleDistance;
 
   const middleYPoint = (from.gridY - 1) * sp.gridSize;
   ctx.beginPath();
@@ -131,6 +135,7 @@ const draw = () => {
   app.renderChildren(rootParsed);
 };
 
+initSidebar(draw);
 draw();
 
 engine.onTick = draw;
@@ -138,5 +143,7 @@ engine.onTick = draw;
 window.addEventListener("keydown", (e) => {
   if (e.code === "Space") {
     rotateTheme();
+  } else if (e.code === "KeyD") {
+    toggleVisible();
   }
 });
