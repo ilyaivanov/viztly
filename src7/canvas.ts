@@ -17,26 +17,6 @@ export class MyCanvas {
     this.context.fillRect(x, y, w, h);
   };
 
-  fillCircle = (
-    x: number,
-    y: number,
-    r: number,
-    color: string | CanvasGradient
-  ) => {
-    this.context.fillStyle = color;
-    const ctx = this.context;
-    ctx.beginPath();
-    // const lineWidth = 1.5;
-    ctx.arc(x, y, r, 0, 2 * Math.PI);
-    // ctx.strokeStyle = "black";
-    // ctx.lineWidth = lineWidth;
-    // ctx.stroke();
-    // if (filled) {
-    //   ctx.fillStyle = color;
-    ctx.fill();
-    // }
-  };
-
   outlineCircle = (
     x: number,
     y: number,
@@ -58,11 +38,17 @@ export class MyCanvas {
     ctx.stroke();
   };
 
-  fillTextAtMiddle = (x: number, y: number, text: string, color: string) => {
+  fillTextAtMiddle = (text: string, x: number, y: number, color: string) => {
     const ctx = this.context;
     ctx.fillStyle = color;
     ctx.textBaseline = "middle";
-    ctx.font = "16px Roboto, sans-serif";
+    ctx.font = "14px Roboto, sans-serif";
     ctx.fillText(text, x, y);
+  };
+
+  getTextWidth = (text: string) => {
+    const ctx = this.context;
+    ctx.font = "14px Roboto, sans-serif";
+    return ctx.measureText(text).width;
   };
 }

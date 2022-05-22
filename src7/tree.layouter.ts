@@ -1,3 +1,4 @@
+import sp from "./spacings";
 import * as t from "./types";
 
 const isRoot = (item: t.Item) => !item.parent;
@@ -6,13 +7,20 @@ export const renderItemChildren = (
   item: t.Item,
   views: Map<t.Item, t.ItemView>,
   gridXStart: number,
-  gridYStart: number
+  gridYStart: number,
+  getTextWidth: (text: string) => number
 ) => {
   const renderItem = (item: t.Item, gridX: number, gridY: number) =>
     views.set(item, { gridX, gridY });
 
   const childsToRender = isRoot(item) ? item.children : [item];
-  traverseItems(childsToRender, gridXStart, gridYStart, renderItem);
+  traverseItems(
+    childsToRender,
+    gridXStart,
+    gridYStart,
+    renderItem,
+    getTextWidth
+  );
 };
 
 // export const updatePositionsForItemAndChildren = (
@@ -36,7 +44,8 @@ const traverseItems = (
   items: t.Item[],
   gridX: number,
   gridY: number,
-  fn: A3<t.Item, number, number>
+  fn: A3<t.Item, number, number>,
+  getTextWidth: (text: string) => number
 ): number =>
   items.reduce((totalGridHeight, child) => {
     const currentGridY = gridY + totalGridHeight;
@@ -47,59 +56,62 @@ const traverseItems = (
       1 +
       (hasVisibleChildren(child)
         ? child.view === "tree"
-          ? traverseItemsDeeper(child.children, gridX, currentGridY, fn)
-          : renderBoardChildren(child.children, gridX, currentGridY, fn)
+          ? traverseItems(
+              child.children,
+              gridX + 1,
+              currentGridY + 1,
+              fn,
+              getTextWidth
+            )
+          : renderBoardChildren(
+              child.children,
+              gridX,
+              currentGridY,
+              fn,
+              getTextWidth
+            )
         : 0)
     );
   }, 0);
-
-const traverseItemsDeeper = (
-  items: t.Item[],
-  gridX: number,
-  gridY: number,
-  fn: A3<t.Item, number, number>
-) => traverseItems(items, gridX + 1, gridY + 1, fn);
 
 const renderBoardChildren = (
   items: t.Item[],
   gridX: number,
   gridY: number,
-  fn: A3<t.Item, number, number>
-) => traverseItems(items, gridX + 1, gridY + 1, fn);
+  fn: A3<t.Item, number, number>,
+  getTextWidth: (text: string) => number
+) => {
+  let maxHeight = 0;
+  const viewY = gridY + 2;
 
-// const renderBoardChildren = (
-//   items: Item[],
-//   x: number,
-//   y: number,
-//   fn: A3<Item, number, number>
-// ) => {
-//   let maxHeight = 0;
-//   let xOffset = 0;
-//   const viewY = y + sp.yStep * 2;
+  let viewX = gridX + 1;
+  items.forEach((child) => {
+    fn(child, viewX, viewY);
 
-//   let viewX = x + sp.xStep;
-//   items.forEach((child) => {
-//     fn(child, viewX, viewY);
+    // text offset * 2 because it's from beggining and end
+    const totalTextWidthWithMargins =
+      getTextWidth(child.title) + sp.textOffsetFromCircleCenter * 2;
 
-//     xOffset = canvas.getTextWidth(child.title, sp.fontSize);
+    let xOffset = Math.ceil(totalTextWidthWithMargins / sp.gridSize);
 
-//     if (hasVisibleChildren(child)) {
-//       const subtreeHeight = traverseItemsDeeper(
-//         child.children,
-//         viewX,
-//         viewY,
-//         (item, x, y) => {
-//           const textWidth = canvas.getTextWidth(item.title, sp.fontSize);
-//           xOffset = Math.max(xOffset, x - viewX + textWidth);
-//           fn(item, x, y);
-//         }
-//       );
-//       maxHeight = Math.max(subtreeHeight, maxHeight);
-//     }
-//     viewX += xOffset + 30;
-//   });
-//   return sp.yStep * 2.5 + maxHeight;
-// };
+    if (hasVisibleChildren(child)) {
+      const subtreeHeight = traverseItems(
+        child.children,
+        viewX + 1,
+        viewY + 1,
+        (item, x, y) => {
+          // const textWidth = canvas.getTextWidth(item.title, sp.fontSize);
+          // xOffset = Math.max(xOffset, x - viewX + textWidth);
+          fn(item, x, y);
+        },
+        getTextWidth
+      );
+      maxHeight = Math.max(subtreeHeight, maxHeight);
+    }
+    viewX += xOffset;
+  });
+  return 3 + maxHeight;
+};
 
 const hasVisibleChildren = (item: t.Item) =>
   item.isOpen && item.children.length > 0;
