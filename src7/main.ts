@@ -39,7 +39,7 @@ const drawGrid = () => {
   }
 };
 
-const drawCircleAndText = (item: t.Item, gridX: number, gridY: number) => {
+const drawItemView = (item: t.Item, { gridX, gridY }: t.ItemView) => {
   const x = gridX * sp.gridSize;
   const y = gridY * sp.gridSize;
 
@@ -119,7 +119,7 @@ class App {
           else lineBetween(view, parentView);
         }
       }
-      drawCircleAndText(item, view.gridX, view.gridY);
+      drawItemView(item, view);
     }
   };
 }

@@ -51,25 +51,14 @@ const traverseItems = (
     const currentGridY = gridY + totalGridHeight;
     fn(child, gridX, currentGridY);
 
+    const childs = child.children;
     return (
       totalGridHeight +
       1 +
       (hasVisibleChildren(child)
         ? child.view === "tree"
-          ? traverseItems(
-              child.children,
-              gridX + 1,
-              currentGridY + 1,
-              fn,
-              getTextWidth
-            )
-          : renderBoardChildren(
-              child.children,
-              gridX,
-              currentGridY,
-              fn,
-              getTextWidth
-            )
+          ? traverseItems(childs, gridX + 1, currentGridY + 1, fn, getTextWidth)
+          : renderBoardChildren(childs, gridX, currentGridY, fn, getTextWidth)
         : 0)
     );
   }, 0);

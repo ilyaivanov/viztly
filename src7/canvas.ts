@@ -25,8 +25,8 @@ export class MyCanvas {
     color: string,
     background?: string
   ) => {
-    this.context.strokeStyle = color;
     const ctx = this.context;
+    ctx.strokeStyle = color;
     ctx.beginPath();
     ctx.arc(x, y, r, 0, 2 * Math.PI);
     ctx.lineWidth = lineWidth;
