@@ -84,15 +84,18 @@ const renderBoardChildren = (
   let maxHeight = 0;
   const viewY = gridY + 2;
 
+  // text offset * 2 because it's from beggining and end
+  const textWidthWithMarging = (label: string) =>
+    getTextWidth(label) + sp.textOffsetFromCircleCenter * 2;
+
+  const gridDistanceForText = (label: string) =>
+    Math.ceil(textWidthWithMarging(label) / sp.gridSize);
+
   let viewX = gridX + 1;
   items.forEach((child) => {
     fn(child, viewX, viewY);
 
-    // text offset * 2 because it's from beggining and end
-    const totalTextWidthWithMargins =
-      getTextWidth(child.title) + sp.textOffsetFromCircleCenter * 2;
-
-    let xOffset = Math.ceil(totalTextWidthWithMargins / sp.gridSize);
+    let xOffset = gridDistanceForText(child.title);
 
     if (hasVisibleChildren(child)) {
       const subtreeHeight = traverseItems(
@@ -100,8 +103,11 @@ const renderBoardChildren = (
         viewX + 1,
         viewY + 1,
         (item, x, y) => {
-          // const textWidth = canvas.getTextWidth(item.title, sp.fontSize);
-          // xOffset = Math.max(xOffset, x - viewX + textWidth);
+          const xGridDistanceToBoardItem = x - viewX;
+          xOffset = Math.max(
+            gridDistanceForText(item.title) + xGridDistanceToBoardItem,
+            xOffset
+          );
           fn(item, x, y);
         },
         getTextWidth
