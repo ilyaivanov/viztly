@@ -2,10 +2,12 @@ import { MyCanvas } from "./canvas";
 import { renderItemChildren } from "./tree.layouter";
 import * as t from "./types";
 import sp from "./spacings";
-import { warmGrey } from "./pallete";
 
 // import initialState from "./initialState";
 import initialState from "./viztly.json";
+import { engine } from "./animations/engine";
+
+import { colors, rotateTheme } from "./colors";
 
 const canvas = document.createElement("canvas");
 
@@ -17,24 +19,10 @@ document.body.appendChild(canvas);
 
 const canva = new MyCanvas(ctx);
 
-const currentTheme = warmGrey;
-
-const colors = {
-  text: currentTheme["900"],
-
-  circleOutline: currentTheme["500"],
-  circleFilled: currentTheme["400"],
-
-  lines: currentTheme["200"],
-
-  gridPoint: currentTheme["200"],
-  background: currentTheme["050"],
-};
-
 const drawGrid = () => {
   for (let x = 0; x < window.innerWidth; x += sp.gridSize) {
     for (let y = 0; y < window.innerHeight; y += sp.gridSize) {
-      canva.fillRect(x - 1, y - 1, 2, 2, colors.gridPoint);
+      canva.fillRect(x - 1, y - 1, 2, 2, colors.gridPoint.getHexColor());
     }
   }
 };
@@ -46,38 +34,48 @@ const drawItemView = (item: t.Item, { gridX, gridY }: t.ItemView) => {
   const isFilled = item.children.length > 0;
   const circleInnerColor = isFilled ? colors.circleFilled : colors.background;
   const r = sp.circleR;
-  canva.outlineCircle(x, y, r, 2, colors.circleOutline, circleInnerColor);
+  canva.outlineCircle(
+    x,
+    y,
+    r,
+    2,
+    colors.circleOutline.getHexColor(),
+    circleInnerColor.getHexColor()
+  );
 
   const xOffset = sp.textOffsetFromCircleCenter;
   const yOffset = 1;
-  canva.fillTextAtMiddle(item.title, x + xOffset, y + yOffset, colors.text);
+  canva.fillTextAtMiddle(
+    item.title,
+    x + xOffset,
+    y + yOffset,
+    colors.text.getHexColor()
+  );
 };
-
-const lineToCircleDistance = 3;
 
 //TODO: think about how to animate between lineBetween and boardChildtoParentLine
 const lineBetween = (view1: t.ItemView, view2: t.ItemView) => {
-  const x1 = view1.gridX * sp.gridSize - sp.circleR - lineToCircleDistance;
+  const x1 = view1.gridX * sp.gridSize - sp.circleR - sp.lineToCircleDistance;
   const y1 = view1.gridY * sp.gridSize;
 
   const x2 = view2.gridX * sp.gridSize;
-  const y2 = view2.gridY * sp.gridSize + sp.circleR + lineToCircleDistance;
+  const y2 = view2.gridY * sp.gridSize + sp.circleR + sp.lineToCircleDistance;
   ctx.beginPath();
   ctx.lineJoin = "round";
   ctx.moveTo(x1, y1);
   ctx.lineTo(x2, y1);
   ctx.lineTo(x2, y2);
   ctx.lineWidth = 2;
-  ctx.strokeStyle = colors.lines;
+  ctx.strokeStyle = colors.lines.getHexColor();
   ctx.stroke();
 };
 
 const boardChildtoParentLine = (from: t.ItemView, to: t.ItemView) => {
   const x1 = from.gridX * sp.gridSize;
-  const y1 = from.gridY * sp.gridSize - sp.circleR - lineToCircleDistance;
+  const y1 = from.gridY * sp.gridSize - sp.circleR - sp.lineToCircleDistance;
 
   const x2 = to.gridX * sp.gridSize;
-  const y2 = to.gridY * sp.gridSize + sp.circleR + lineToCircleDistance;
+  const y2 = to.gridY * sp.gridSize + sp.circleR + sp.lineToCircleDistance;
 
   const middleYPoint = (from.gridY - 1) * sp.gridSize;
   ctx.beginPath();
@@ -88,7 +86,7 @@ const boardChildtoParentLine = (from: t.ItemView, to: t.ItemView) => {
   ctx.lineTo(x2, y2);
 
   ctx.lineWidth = 2;
-  ctx.strokeStyle = colors.lines;
+  ctx.strokeStyle = colors.lines.getHexColor();
   ctx.stroke();
 };
 
@@ -126,7 +124,19 @@ class App {
 
 const app = new App();
 
-canva.clearRect(colors.background);
-drawGrid();
+const draw = () => {
+  canva.clearRect(colors.background.getHexColor());
+  drawGrid();
 
-app.renderChildren(rootParsed);
+  app.renderChildren(rootParsed);
+};
+
+draw();
+
+engine.onTick = draw;
+
+window.addEventListener("keydown", (e) => {
+  if (e.code === "Space") {
+    rotateTheme();
+  }
+});

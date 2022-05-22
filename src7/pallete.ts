@@ -1,4 +1,4 @@
-type ColorValue =
+export type ColorValue =
   | "050"
   | "100"
   | "200"
@@ -9,7 +9,21 @@ type ColorValue =
   | "700"
   | "800"
   | "900";
+
 export type Pallete = Record<ColorValue, string>;
+
+export const darkGrey: Pallete = {
+  "050": "#121212",
+  "100": "#1E1E1E",
+  "200": "#3C413D",
+  "300": "#252525",
+  "400": "#D1D2D3",
+  "500": "#E4E4E4",
+  "600": "#2F2F2F",
+  "700": "#333333",
+  "800": "#353535",
+  "900": "#FFFFFF",
+};
 
 export const blueGrey: Pallete = {
   "050": "#F0F4F8",
@@ -23,6 +37,7 @@ export const blueGrey: Pallete = {
   "800": "#243B53",
   "900": "#102A43",
 };
+
 export const coolGrey: Pallete = {
   "050": "#F5F7FA",
   "100": "#E4E7EB",
@@ -35,6 +50,7 @@ export const coolGrey: Pallete = {
   "800": "#323F4B",
   "900": "#1F2933",
 };
+
 export const grey: Pallete = {
   "050": "#F7F7F7",
   "100": "#E1E1E1",
@@ -47,6 +63,7 @@ export const grey: Pallete = {
   "800": "#3B3B3B",
   "900": "#222222",
 };
+
 export const warmGrey: Pallete = {
   "050": "#FAF9F7",
   "100": "#E8E6E1",
