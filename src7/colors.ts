@@ -5,6 +5,8 @@ import * as palletes from "./pallete";
 
 export const colors = {
   text: new AnimatedColor("#FFFFFF"),
+  selectedText: new AnimatedColor("#FFFFFF"),
+  selectedCircle: new AnimatedColor("#FFFFFF"),
 
   circleOutline: new AnimatedColor("#FFFFFF"),
   circleFilled: new AnimatedColor("#FFFFFF"),
@@ -26,29 +28,66 @@ const applyTheme = (applier: t.Action2<AnimatedColor, ColorValue>) => {
   applier(colors.secondaryBackground, "100");
 };
 
-const initColors = (pallete: Pallete) =>
-  applyTheme((color, value) => color.setValue(pallete[value]));
+const applyAccentColors = (applier: t.Action2<AnimatedColor, ColorValue>) => {
+  if (currentTheme === palletes.darkGrey) {
+    applier(colors.selectedText, "200");
+    applier(colors.selectedCircle, "300");
+  } else {
+    applier(colors.selectedText, "600");
+    applier(colors.selectedCircle, "400");
+  }
+};
 
-const switchTo = (pallete: Pallete) =>
+const initColors = (pallete: Pallete, accent: Pallete) => {
+  applyTheme((color, value) => color.setValue(pallete[value]));
+  applyAccentColors((color, value) => color.setValue(accent[value]));
+};
+
+const switchTo = (pallete: Pallete, accent: Pallete) => {
   applyTheme((color, value) => color.animateTo(pallete[value]));
+  applyAccentColors((color, value) => color.animateTo(accent[value]));
+};
+const switchAccentTo = (pallete: Pallete) => {
+  applyAccentColors((color, value) => color.animateTo(pallete[value]));
+};
 
 export const rotateTheme = () => {
-  let index = themes.indexOf(currentTheme);
-  if (index === themes.length - 1) index = 0;
-  else index += 1;
+  currentTheme = getNextItem(themes, currentTheme);
 
-  currentTheme = themes[index];
+  switchTo(currentTheme, currentAccentTheme);
+};
+export const rotateAccentTheme = () => {
+  currentAccentTheme = getNextItem(accentThemes, currentAccentTheme);
 
-  switchTo(currentTheme);
+  switchAccentTo(currentAccentTheme);
 };
 
 const themes = [
   palletes.darkGrey,
   palletes.warmGrey,
-  palletes.grey,
+  // palletes.grey,
   //   palletes.coolGrey,
   //   palletes.blueGrey,
 ];
 
+const accentThemes = [
+  palletes.greenVivid,
+  palletes.limeGreenVivid,
+  // palletes.green,
+  // palletes.blue,
+  palletes.blueVivid,
+  // palletes.indigo,
+  palletes.indigoVivid,
+];
+
 let currentTheme = themes[0];
-initColors(currentTheme);
+let currentAccentTheme = accentThemes[0];
+initColors(currentTheme, currentAccentTheme);
+
+const getNextItem = <T>(items: T[], item: T): T => {
+  let index = items.indexOf(item);
+  if (index === items.length - 1) index = 0;
+  else index += 1;
+
+  return items[index];
+};

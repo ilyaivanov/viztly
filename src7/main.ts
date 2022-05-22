@@ -7,7 +7,7 @@ import sp from "./spacings";
 import initialState from "./viztly.json";
 import { engine } from "./animations/engine";
 
-import { colors, rotateTheme } from "./colors";
+import { colors, rotateAccentTheme, rotateTheme } from "./colors";
 import { initSidebar, toggleVisible } from "./devSidebar";
 
 const canvas = document.createElement("canvas");
@@ -28,19 +28,27 @@ const drawGrid = () => {
   }
 };
 
-const drawItemView = (item: t.Item, { gridX, gridY }: t.ItemView) => {
+const drawItemView = (
+  item: t.Item,
+  { gridX, gridY }: t.ItemView,
+  isSelected: boolean
+) => {
   const x = gridX * sp.gridSize;
   const y = gridY * sp.gridSize;
 
   const isFilled = item.children.length > 0;
-  const circleInnerColor = isFilled ? colors.circleFilled : colors.background;
+  const circleInnerColor = isFilled
+    ? isSelected
+      ? colors.selectedCircle
+      : colors.circleFilled
+    : colors.background;
   const r = sp.circleRadius;
   canva.outlineCircle(
     x,
     y,
     r,
     2,
-    colors.circleOutline.getHexColor(),
+    (isSelected ? colors.selectedCircle : colors.circleOutline).getHexColor(),
     circleInnerColor.getHexColor()
   );
 
@@ -50,7 +58,7 @@ const drawItemView = (item: t.Item, { gridX, gridY }: t.ItemView) => {
     item.title,
     x + xOffset,
     y + yOffset,
-    colors.text.getHexColor()
+    (isSelected ? colors.selectedText : colors.text).getHexColor()
   );
 };
 
@@ -107,9 +115,12 @@ const mapItem = (item: t.Item): t.Item => {
 const rootParsed = mapItem(initialState as any);
 
 class App {
+  selectedItem: t.Item | undefined = undefined;
+
   renderChildren = (root: t.Item) => {
     const views = new Map<t.Item, t.ItemView>();
 
+    this.selectedItem = root.children[0];
     renderItemChildren(root, views, 8, 2, canva.getTextWidth);
 
     for (const [item, view] of views) {
@@ -121,7 +132,7 @@ class App {
           else lineBetween(view, parentView);
         }
       }
-      drawItemView(item, view);
+      drawItemView(item, view, this.selectedItem === item);
     }
   };
 }
@@ -142,7 +153,8 @@ engine.onTick = draw;
 
 window.addEventListener("keydown", (e) => {
   if (e.code === "Space") {
-    rotateTheme();
+    if (e.ctrlKey) rotateAccentTheme();
+    else rotateTheme();
   } else if (e.code === "KeyD") {
     toggleVisible();
   }

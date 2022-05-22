@@ -11,6 +11,7 @@ elem.style.width = `${width}px`;
 elem.style.backgroundColor = colors.secondaryBackground.getHexColor();
 elem.style.transition = "transform 200ms";
 elem.style.transform = `translateX(${width}px)`;
+elem.style.display = "none";
 
 let isOpen = false;
 export const initSidebar = (render: () => void) => {
