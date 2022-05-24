@@ -17,6 +17,12 @@ export type Item = {
   parent?: Item;
 };
 
+export type Tree = {
+  root: Item;
+  selectedItem: Item;
+  focusedItem: Item;
+};
+
 export type Action1<T1> = (a: T1) => void;
 export type Action2<T1, T2> = (a: T1, b: T2) => void;
 

@@ -71,11 +71,12 @@ const themes = [
 ];
 
 const accentThemes = [
+  palletes.blueVivid,
+
   palletes.greenVivid,
   palletes.limeGreenVivid,
   // palletes.green,
   // palletes.blue,
-  palletes.blueVivid,
   // palletes.indigo,
   palletes.indigoVivid,
 ];

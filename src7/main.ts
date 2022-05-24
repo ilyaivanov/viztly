@@ -9,6 +9,7 @@ import { engine } from "./animations/engine";
 
 import { colors, rotateAccentTheme, rotateTheme } from "./colors";
 import { initSidebar, toggleVisible } from "./devSidebar";
+import { goDown, goLeft, goRight, goUp } from "./treeLogic";
 
 const canvas = document.createElement("canvas");
 
@@ -115,12 +116,9 @@ const mapItem = (item: t.Item): t.Item => {
 const rootParsed = mapItem(initialState as any);
 
 class App {
-  selectedItem: t.Item | undefined = undefined;
-
-  renderChildren = (root: t.Item) => {
+  renderChildren = ({ root, selectedItem }: t.Tree) => {
     const views = new Map<t.Item, t.ItemView>();
 
-    this.selectedItem = root.children[0];
     renderItemChildren(root, views, 8, 2, canva.getTextWidth);
 
     for (const [item, view] of views) {
@@ -132,18 +130,23 @@ class App {
           else lineBetween(view, parentView);
         }
       }
-      drawItemView(item, view, this.selectedItem === item);
+      drawItemView(item, view, selectedItem === item);
     }
   };
 }
 
 const app = new App();
 
+const tree: t.Tree = {
+  root: rootParsed,
+  focusedItem: rootParsed,
+  selectedItem: rootParsed.children[0],
+};
 const draw = () => {
   canva.clearRect(colors.background.getHexColor());
   drawGrid();
 
-  app.renderChildren(rootParsed);
+  app.renderChildren(tree);
 };
 
 initSidebar(draw);
@@ -157,5 +160,14 @@ window.addEventListener("keydown", (e) => {
     else rotateTheme();
   } else if (e.code === "KeyD") {
     toggleVisible();
+  } else if (e.code === "ArrowUp") {
+    goUp(tree);
+  } else if (e.code === "ArrowDown") {
+    goDown(tree);
+  } else if (e.code === "ArrowRight") {
+    goRight(tree);
+  } else if (e.code === "ArrowLeft") {
+    goLeft(tree);
   }
+  draw();
 });
