@@ -1,4 +1,4 @@
-import * as t from "./types";
+import * as t from "../types";
 
 export const list = (prefix: string, count: number): t.Item[] =>
   Array.from(new Array(count)).map((_, index) =>

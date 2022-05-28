@@ -1,6 +1,6 @@
 import { AnimatedValue, engine } from "./engine";
 
-const precision = 0.1;
+const precision = 0.03;
 
 export class AnimatedNumber implements AnimatedValue {
   isAnimating: boolean = false;
@@ -38,7 +38,6 @@ export class AnimatedNumber implements AnimatedValue {
     const acceleration = (spring - damper) * invertedMass;
     const d = (velocity + acceleration) * deltaTime;
 
-    if (target === 0) console.log(this.current + d);
     if (Math.abs(d) < precision && Math.abs(delta) < precision) {
       this.onDone && this.onDone();
       this.isAnimating = false;

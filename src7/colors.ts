@@ -44,7 +44,12 @@ const initColors = (pallete: Pallete, accent: Pallete) => {
 };
 
 const switchTo = (pallete: Pallete, accent: Pallete) => {
-  applyTheme((color, value) => color.animateTo(pallete[value]));
+  applyTheme((color, value) => {
+    if (color === colors.background) {
+      console.trace("Switching bg color");
+    }
+    color.animateTo(pallete[value]);
+  });
   applyAccentColors((color, value) => color.animateTo(accent[value]));
 };
 const switchAccentTo = (pallete: Pallete) => {

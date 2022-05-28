@@ -1,44 +1,24 @@
 import sp from "./spacings";
 import * as t from "./types";
 
-const isRoot = (item: t.Item) => !item.parent;
-
-export const renderItemChildren = (
+export const layoutChildren = (
   item: t.Item,
-  views: Map<t.Item, t.ItemView>,
+  renderItem: (item: t.Item, gridX: number, gridY: number) => void,
   gridXStart: number,
   gridYStart: number,
   getTextWidth: (text: string) => number
-) => {
-  const renderItem = (item: t.Item, gridX: number, gridY: number) =>
-    views.set(item, { gridX, gridY });
+) => viewItem(item, gridXStart, gridYStart, renderItem, getTextWidth);
 
-  const childsToRender = isRoot(item) ? item.children : [item];
-  traverseItems(
-    childsToRender,
-    gridXStart,
-    gridYStart,
-    renderItem,
-    getTextWidth
-  );
-};
-
-// export const updatePositionsForItemAndChildren = (
-//   views: Map<Item, t.ItemView>,
-//   item: Item
-// ) => {
-//   const updateItemPosition = (item: Item, x: number, y: number) => {
-//     const itemView = views.get(item);
-//     if (itemView && (itemView.x !== x || itemView.y !== y)) {
-//       itemView.targetY = y;
-//       animatePosition(itemView, x, y);
-//     }
-//   };
-
-//   if (isRoot(item))
-//     traverseItems(item.children, sp.start, sp.start, updateItemPosition);
-//   else traverseItems([item], sp.start, sp.start, updateItemPosition);
-// };
+const viewItem = (
+  item: t.Item,
+  gridX: number,
+  gridY: number,
+  fn: A3<t.Item, number, number>,
+  getTextWidth: (text: string) => number
+) =>
+  item.view === "tree"
+    ? traverseItems(item.children, gridX, gridY, fn, getTextWidth)
+    : renderBoardChildren(item.children, gridX, gridY, fn, getTextWidth);
 
 const traverseItems = (
   items: t.Item[],
@@ -51,14 +31,11 @@ const traverseItems = (
     const currentGridY = gridY + totalGridHeight;
     fn(child, gridX, currentGridY);
 
-    const childs = child.children;
     return (
       totalGridHeight +
       1 +
       (hasVisibleChildren(child)
-        ? child.view === "tree"
-          ? traverseItems(childs, gridX + 1, currentGridY + 1, fn, getTextWidth)
-          : renderBoardChildren(childs, gridX, currentGridY, fn, getTextWidth)
+        ? viewItem(child, gridX + 1, currentGridY + 1, fn, getTextWidth)
         : 0)
     );
   }, 0);
@@ -71,7 +48,7 @@ const renderBoardChildren = (
   getTextWidth: (text: string) => number
 ) => {
   let maxHeight = 0;
-  const viewY = gridY + 2;
+  const viewY = gridY + 1;
 
   // text offset * 2 because it's from beggining and end
   const textWidthWithMarging = (label: string) =>
@@ -80,7 +57,7 @@ const renderBoardChildren = (
   const gridDistanceForText = (label: string) =>
     Math.ceil(textWidthWithMarging(label) / sp.gridSize);
 
-  let viewX = gridX + 1;
+  let viewX = gridX;
   items.forEach((child) => {
     fn(child, viewX, viewY);
 

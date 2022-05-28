@@ -1,5 +1,18 @@
+import { setGlobalCanvas } from "./globalCanvas";
+
 export class MyCanvas {
-  constructor(public context: CanvasRenderingContext2D) {}
+  public context: CanvasRenderingContext2D;
+  public el: HTMLCanvasElement;
+  constructor() {
+    this.el = document.createElement("canvas");
+
+    this.context = this.el.getContext("2d")!;
+
+    this.el.width = window.innerWidth;
+    this.el.height = window.innerHeight;
+
+    setGlobalCanvas(this);
+  }
 
   clearRect = (backgroundColor?: string | CanvasGradient) => {
     this.context.clearRect(0, 0, 10000, 10000);

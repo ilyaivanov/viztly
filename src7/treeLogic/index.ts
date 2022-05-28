@@ -1,4 +1,31 @@
 import * as t from "../types";
+import * as events from "../infra/events";
+
+export type AppEvents = {
+  // init: { selectedItem: Item };
+  // "selection-changed": { prev: Item; current: Item };
+  "item-toggled": t.Item;
+  // "item-changed-view": Item;
+  // "item-changed-completed": Item;
+  // "item-children-loaded": { item: Item; children: Item[] };
+  // "item-moved": Item;
+  // "item-focused": { prev: Item; current: Item };
+  // "item-startEdit": Item;
+  // "item-finishEdit": Item;
+  // "item-removed": { itemRemoved: Item; itemSelected: Item | undefined };
+  // "item-added": Item;
+};
+//Events
+
+const source = events.createSource<AppEvents>();
+
+export const trigger = <T extends keyof AppEvents>(
+  event: T,
+  data: AppEvents[T]
+) => events.trigger(source, event, data);
+
+export const on = <T extends keyof AppEvents>(event: T, cb: F1<AppEvents[T]>) =>
+  events.on(source, event, cb);
 
 export const goDown = (tree: t.Tree) => {
   const itemBelow = getItemBelow(tree.selectedItem);
@@ -30,14 +57,14 @@ const close = (item: t.Item) => {
   // if (isFocused(item)) return;
 
   item.isOpen = false;
-  // trigger("item-toggled", item);
+  trigger("item-toggled", item);
 };
 
 const open = (item: t.Item) => {
   // if (isFocused(item)) return;
 
   item.isOpen = true;
-  // trigger("item-toggled", item);
+  trigger("item-toggled", item);
 };
 
 const getItemAbove = (item: t.Item): t.Item | undefined => {

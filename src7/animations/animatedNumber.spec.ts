@@ -1,6 +1,6 @@
 import { AnimatedNumber } from "./animatedNumber";
-//done cb
-it("checking animation from 0..1 and 350..50", () => {
+
+xit("checking animation from 0..1 and 350..50", () => {
   const a = new AnimatedNumber(0);
 
   const cb = jest.fn();
