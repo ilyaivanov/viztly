@@ -14,6 +14,15 @@ elem.style.transform = `translateX(${width}px)`;
 elem.style.display = "none";
 
 let isOpen = false;
+
+const steps: Partial<Record<keyof typeof sp, number>> = {
+  circleLineWidth: 0.1,
+  circleRadius: 0.1,
+};
+const max: Partial<Record<keyof typeof sp, number>> = {
+  circleLineWidth: 5,
+  circleRadius: 10,
+};
 export const initSidebar = (render: () => void) => {
   document.body.style.overflow = "hidden";
   document.body.appendChild(elem);
@@ -23,14 +32,15 @@ export const initSidebar = (render: () => void) => {
 
   Object.keys(sp).forEach((key) => {
     const keyTyped = key as keyof typeof sp;
-    const step = keyTyped === "circleRadius" ? 0.5 : 1;
+    const step = steps[keyTyped] || 1;
+    console.log(key, step);
     table.appendChild(
       row({
         label: convertCamelCaseToSpaces(key),
         value: (sp as any)[key],
         min: 1,
         step,
-        max: 50,
+        max: max[keyTyped] || 50,
         onChange: (v) => {
           (sp as any)[key] = v;
           render();

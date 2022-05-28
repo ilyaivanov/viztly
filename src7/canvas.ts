@@ -1,4 +1,5 @@
 import { setGlobalCanvas } from "./globalCanvas";
+import sp from "./spacings";
 
 export class MyCanvas {
   public context: CanvasRenderingContext2D;
@@ -48,6 +49,7 @@ export class MyCanvas {
       ctx.fillStyle = background;
       ctx.fill();
     }
+
     ctx.stroke();
   };
 
@@ -55,13 +57,13 @@ export class MyCanvas {
     const ctx = this.context;
     ctx.fillStyle = color;
     ctx.textBaseline = "middle";
-    ctx.font = "14px Roboto, sans-serif";
+    ctx.font = `${sp.fontSize}px Roboto, sans-serif`;
     ctx.fillText(text, x, y);
   };
 
   getTextWidth = (text: string) => {
     const ctx = this.context;
-    ctx.font = "14px Roboto, sans-serif";
+    ctx.font = `${sp.fontSize}px Roboto, sans-serif`;
     return ctx.measureText(text).width;
   };
 }

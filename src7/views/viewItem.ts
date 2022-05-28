@@ -68,7 +68,7 @@ const drawItemView = (item: t.Item, view: t.ItemView, isSelected: boolean) => {
     x,
     y,
     r,
-    2,
+    sp.circleLineWidth,
     (isSelected ? colors.selectedCircle : colors.circleOutline).getHexColor(),
     circleInnerColor.getHexColor()
   );

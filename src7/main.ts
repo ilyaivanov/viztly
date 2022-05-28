@@ -114,7 +114,10 @@ const tree: t.Tree = loadItems();
 
 const app = new App(tree);
 
-initSidebar(app.draw);
+initSidebar(() => {
+  app.renderChildren();
+  app.draw();
+});
 app.draw();
 
 engine.onTick = app.draw;
