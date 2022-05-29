@@ -1,41 +1,46 @@
-import { forEachOpenChild, goDown, goLeft, goRight, goUp } from ".";
+import {
+  forEachOpenChild,
+  goDown,
+  selectNextSibling,
+  goLeft,
+  goRight,
+  goUp,
+} from ".";
 import * as t from "../types";
+import { buildTree } from "./treeBuilder";
 
 // GOING DOWN
 
-// Item 1  <- when selected going down
-// Item 2  <- selects this item
 it("having two items side by side moving down selects next sibling", () => {
-  const tree = createTree([createItem("Item 1"), createItem("Item 2")]);
+  const tree = buildTree(`
+    Item 1 # when selected going down selects Item 2
+    Item 2
+  `);
 
   expect(tree.selectedItem.title).toBe("Item 1");
   goDown(tree);
   expect(tree.selectedItem.title).toBe("Item 2");
 });
 
-// Item 1      <- when selected going down
-//   Item 1.1  <- selects this item
-// Item 2
 it("when item is open and has children going down selected first child", () => {
-  const tree = createTree([
-    createItem("Item 1", [createItem("Item 1.1")]),
-    createItem("Item 2"),
-  ]);
+  const tree = buildTree(`
+   Item 1      # when selected going down selects Item 1.1
+     Item 1.1  
+   Item 2
+  `);
 
   expect(tree.selectedItem.title).toBe("Item 1");
   goDown(tree);
   expect(tree.selectedItem.title).toBe("Item 1.1");
 });
 
-// Item 1
-//   Item 1.1
-//     Item 1.1.1  <- when selected going down
-// Item 2          <- selects this item
 it("when last child is selected going down selects sibling of first non-last parent", () => {
-  const tree = createTree([
-    createItem("Item 1", [createItem("Item 1.1", [createItem("Item 1.1.1")])]),
-    createItem("Item 2"),
-  ]);
+  const tree = buildTree(`
+    Item 1
+      Item 1.1
+        Item 1.1.1  # when selected going down selectes Item 2
+    Item 2 
+ `);
 
   selectItemByName(tree, "Item 1.1.1");
 
@@ -43,27 +48,54 @@ it("when last child is selected going down selects sibling of first non-last par
   expect(tree.selectedItem.title).toBe("Item 2");
 });
 
+it("when last child is selected going down selects sibling of first non-last parent", () => {
+  const tree = buildTree(`
+   Item 1
+     Item 1.1      # when selected going down with ctrl selectes Item 1.2
+       Item 1.1.1
+     Item 1.2
+ `);
+
+  selectItemByName(tree, "Item 1.1");
+
+  selectNextSibling(tree);
+  expect(tree.selectedItem.title).toBe("Item 1.2");
+});
+
+it("when last child is selected going down selects sibling of first non-last parent", () => {
+  const tree = buildTree(`
+     Item 1
+       Item 1.1      # when selected going down with ctrl selectes Item 2
+         Item 1.1.1
+     Item 2
+ `);
+
+  selectItemByName(tree, "Item 1.1");
+
+  selectNextSibling(tree);
+  expect(tree.selectedItem.title).toBe("Item 2");
+});
+
 // GOING UP
 
-// Item 1
-// Item 2  <- when selected going up selects prevous item
 it("having two items side by side up down selectes previous sibling", () => {
-  const tree = createTree([createItem("Item 1"), createItem("Item 2")]);
+  const tree = buildTree(`
+    Item 1 
+    Item 2 # when selected going up selects prevous item
+`);
   selectItemByName(tree, "Item 2");
 
   goUp(tree);
   expect(tree.selectedItem.title).toBe("Item 1");
 });
 
-// Item 1
-//   Item 1.1
-//     Item 1.1.1
-// Item 2          <- when selected going up selects parent
 it("going up while previuos sibling is open selects most nested item", () => {
-  const tree = createTree([
-    createItem("Item 1", [createItem("Item 1.1", [createItem("Item 1.1.1")])]),
-    createItem("Item 2"),
-  ]);
+  const tree = buildTree(`
+     Item 1
+       Item 1.1
+         Item 1.1.1
+     Item 2          # when selected going up selects parent
+`);
 
   selectItemByName(tree, "Item 2");
 
@@ -73,34 +105,32 @@ it("going up while previuos sibling is open selects most nested item", () => {
 
 // GOING LEFT
 
-// Item 1          <- when selected going left closes it
-//   Item 1.1
 it("going up while previuos sibling is open selects most nested item", () => {
-  const tree = createTree([
-    createItem("Item 1", [createItem("Item 1.1")]),
-    createItem("Item 2"),
-  ]);
+  const tree = buildTree(`
+    Item 1          # when selected going left closes it
+      Item 1.1
+    Item 2          
+`);
 
   goLeft(tree);
   expect(tree.selectedItem.isOpen).toBe(false);
 });
 
-// Item 1          <- when selected going left does nothing
-// Item 2
 it("going up while previuos sibling is open selects most nested item", () => {
-  const tree = createTree([createItem("Item 1"), createItem("Item 2")]);
+  const tree = buildTree(`
+    Item 1 # when selected going left does nothing
+    Item 2 
+`);
 
   goLeft(tree);
   expect(tree.selectedItem.title).toBe("Item 1");
 });
 
-// Item 1
-//   Item 1.1      <- when selected going left selects parent
 it("going up while previuos sibling is open selects most nested item", () => {
-  const tree = createTree([
-    createItem("Item 1", [createItem("Item 1.1")]),
-    createItem("Item 2"),
-  ]);
+  const tree = buildTree(`
+     Item 1
+       Item 1.1    # when selected going left selects parent
+`);
 
   selectItemByName(tree, "Item 1.1");
   goLeft(tree);
@@ -109,16 +139,14 @@ it("going up while previuos sibling is open selects most nested item", () => {
 
 // GOING RIGHT
 
-// Item 1
-//   Item 1.1      <- when selected and closed going right opens
-//     Item 1.1.1
 it("going up while previuos sibling is open selects most nested item", () => {
-  const tree = createTree([
-    createItem("Item 1", [
-      createItem("Item 1.1", [createItem("Item 1.1.1")], { isOpen: false }),
-    ]),
-    createItem("Item 2"),
-  ]);
+  const tree = buildTree(`
+      Item 1
+        Item 1.1      # when closed and selected going right opens it
+          Item 1.1.1
+`);
+
+  getItemByName(tree, "Item 1.1").isOpen = false;
 
   selectItemByName(tree, "Item 1.1");
 
@@ -130,14 +158,12 @@ it("going up while previuos sibling is open selects most nested item", () => {
   expect(tree.selectedItem.isOpen).toBe(true);
 });
 
-// Item 1
-//   Item 1.1      <- when selected going right selects first child
-//     Item 1.1.1
 it("going up while previuos sibling is open selects most nested item", () => {
-  const tree = createTree([
-    createItem("Item 1", [createItem("Item 1.1", [createItem("Item 1.1.1")])]),
-    createItem("Item 2"),
-  ]);
+  const tree = buildTree(`
+    Item 1
+      Item 1.1      # when selected going right selects first child
+        Item 1.1.1
+`);
 
   selectItemByName(tree, "Item 1.1");
 
@@ -147,12 +173,16 @@ it("going up while previuos sibling is open selects most nested item", () => {
 });
 
 const selectItemByName = (tree: t.Tree, name: string) => {
+  tree.selectedItem = getItemByName(tree, name);
+};
+
+const getItemByName = (tree: t.Tree, name: string): t.Item => {
   let itemFound: t.Item | undefined = undefined;
   forEachOpenChild(tree.root, (item) => {
     if (item.title === name) itemFound = item;
   });
   if (!itemFound) throw new Error(`Item '${name}' not found`);
-  else tree.selectedItem = itemFound;
+  return itemFound;
 };
 
 //

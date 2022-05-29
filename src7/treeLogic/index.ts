@@ -32,6 +32,16 @@ export const goDown = (tree: t.Tree) => {
 
   if (itemBelow) tree.selectedItem = itemBelow;
 };
+
+export const selectNextSibling = (tree: t.Tree) => {
+  const nextSibling = getFollowingSibling(tree.selectedItem);
+  if (!nextSibling) {
+    const followingItem = getFollowingItem(tree.selectedItem);
+    if (followingItem) tree.selectedItem = followingItem;
+  }
+  if (nextSibling) tree.selectedItem = nextSibling;
+};
+
 export const goUp = (tree: t.Tree) => {
   const itemBelow = getItemAbove(tree.selectedItem);
 
