@@ -1,13 +1,5 @@
-import {
-  forEachOpenChild,
-  goDown,
-  selectNextSibling,
-  goLeft,
-  goRight,
-  goUp,
-  selectPreviousSibling,
-} from ".";
-import * as t from "../types";
+import * as actions from ".";
+import { getItemByName, selectItemByName } from "./testUtils";
 import { buildTree } from "./treeBuilder";
 
 // GOING DOWN
@@ -19,7 +11,7 @@ it("having two items side by side moving down selects next sibling", () => {
   `);
 
   expect(tree.selectedItem.title).toBe("Item 1");
-  goDown(tree);
+  actions.goDown(tree);
   expect(tree.selectedItem.title).toBe("Item 2");
 });
 
@@ -31,7 +23,7 @@ it("when item is open and has children going down selected first child", () => {
   `);
 
   expect(tree.selectedItem.title).toBe("Item 1");
-  goDown(tree);
+  actions.goDown(tree);
   expect(tree.selectedItem.title).toBe("Item 1.1");
 });
 
@@ -45,7 +37,7 @@ it("when last child is selected going down selects sibling of first non-last par
 
   selectItemByName(tree, "Item 1.1.1");
 
-  goDown(tree);
+  actions.goDown(tree);
   expect(tree.selectedItem.title).toBe("Item 2");
 });
 
@@ -59,7 +51,7 @@ it("select next sibling jumps over open items and selectes next sibling", () => 
 
   selectItemByName(tree, "Item 1.1");
 
-  selectNextSibling(tree);
+  actions.selectNextSibling(tree);
   expect(tree.selectedItem.title).toBe("Item 1.2");
 });
 
@@ -73,7 +65,7 @@ it("select next sibling selects parent sibling if last item in context", () => {
 
   selectItemByName(tree, "Item 1.1");
 
-  selectNextSibling(tree);
+  actions.selectNextSibling(tree);
   expect(tree.selectedItem.title).toBe("Item 2");
 });
 
@@ -86,7 +78,7 @@ it("having two items side by side up down selectes previous sibling", () => {
 `);
   selectItemByName(tree, "Item 2");
 
-  goUp(tree);
+  actions.goUp(tree);
   expect(tree.selectedItem.title).toBe("Item 1");
 });
 
@@ -100,7 +92,7 @@ it("going up while previuos sibling is open selects most nested item", () => {
 
   selectItemByName(tree, "Item 2");
 
-  goUp(tree);
+  actions.goUp(tree);
   expect(tree.selectedItem.title).toBe("Item 1.1.1");
 });
 
@@ -114,7 +106,7 @@ it("going up with ctrl jumps over prevously open nested items", () => {
 
   selectItemByName(tree, "Item 1.2");
 
-  selectPreviousSibling(tree);
+  actions.selectPreviousSibling(tree);
   expect(tree.selectedItem.title).toBe("Item 1.1");
 });
 
@@ -128,7 +120,7 @@ it("going up with ctrl selects parent when first in context", () => {
 
   selectItemByName(tree, "Item 1.1");
 
-  selectPreviousSibling(tree);
+  actions.selectPreviousSibling(tree);
   expect(tree.selectedItem.title).toBe("Item 1");
 });
 
@@ -141,7 +133,7 @@ it("going up while previuos sibling is open selects most nested item", () => {
     Item 2          
 `);
 
-  goLeft(tree);
+  actions.goLeft(tree);
   expect(tree.selectedItem.isOpen).toBe(false);
 });
 
@@ -151,7 +143,7 @@ it("going up while previuos sibling is open selects most nested item", () => {
     Item 2 
 `);
 
-  goLeft(tree);
+  actions.goLeft(tree);
   expect(tree.selectedItem.title).toBe("Item 1");
 });
 
@@ -162,7 +154,7 @@ it("going up while previuos sibling is open selects most nested item", () => {
 `);
 
   selectItemByName(tree, "Item 1.1");
-  goLeft(tree);
+  actions.goLeft(tree);
   expect(tree.selectedItem.title).toBe("Item 1");
 });
 
@@ -181,7 +173,7 @@ it("going up while previuos sibling is open selects most nested item", () => {
 
   expect(tree.selectedItem.isOpen).toBe(false);
 
-  goRight(tree);
+  actions.goRight(tree);
 
   expect(tree.selectedItem.title).toBe("Item 1.1");
   expect(tree.selectedItem.isOpen).toBe(true);
@@ -196,70 +188,7 @@ it("going up while previuos sibling is open selects most nested item", () => {
 
   selectItemByName(tree, "Item 1.1");
 
-  goRight(tree);
+  actions.goRight(tree);
 
   expect(tree.selectedItem.title).toBe("Item 1.1.1");
 });
-
-const selectItemByName = (tree: t.Tree, name: string) => {
-  tree.selectedItem = getItemByName(tree, name);
-};
-
-const getItemByName = (tree: t.Tree, name: string): t.Item => {
-  let itemFound: t.Item | undefined = undefined;
-  forEachOpenChild(tree.root, (item) => {
-    if (item.title === name) itemFound = item;
-  });
-  if (!itemFound) throw new Error(`Item '${name}' not found`);
-  return itemFound;
-};
-
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-// UTILS
-const createTree = (items: t.Item[]): t.Tree => {
-  const root = createRoot(items);
-  return {
-    root,
-    selectedItem: root.children[0],
-    focusedItem: root,
-  };
-};
-
-const createRoot = (children: t.Item[]) => createItem("Root", children);
-
-const createItem = (
-  title: string,
-  children: t.Item[] = [],
-  options: Partial<t.Item> = {}
-) => {
-  const item: t.Item = {
-    title,
-    isOpen: children.length > 0,
-    view: "tree",
-    children,
-    type: "folder",
-    id: Math.random() + "",
-    ...options,
-  };
-  setChildren(item, children);
-  return item;
-};
-
-const setChildren = (item: t.Item, children: t.Item[]) => {
-  item.children = children;
-  children.forEach((i) => (i.parent = item));
-};
-
-const list = (prefix: string, count: number): t.Item[] =>
-  Array.from(new Array(count)).map((_, index) =>
-    createItem(`${prefix}${index + 1}`)
-  );
