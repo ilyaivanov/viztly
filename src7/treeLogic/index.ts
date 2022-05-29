@@ -42,6 +42,16 @@ export const selectNextSibling = (tree: t.Tree) => {
   if (nextSibling) tree.selectedItem = nextSibling;
 };
 
+export const selectPreviousSibling = (tree: t.Tree) => {
+  const prev = getPrevousSibling(tree.selectedItem);
+
+  if (prev) tree.selectedItem = prev;
+  else {
+    const parent = tree.selectedItem.parent;
+    if (parent && !isRoot(parent)) tree.selectedItem = parent;
+  }
+};
+
 export const goUp = (tree: t.Tree) => {
   const itemBelow = getItemAbove(tree.selectedItem);
 
@@ -106,6 +116,9 @@ const getItemBelow = (item: t.Item): t.Item | undefined =>
 //this always returns following item without going down to children
 const getFollowingSibling = (item: t.Item): t.Item | undefined =>
   getRelativeSibling(item, (currentIndex) => currentIndex + 1);
+
+const getPrevousSibling = (item: t.Item): t.Item | undefined =>
+  getRelativeSibling(item, (currentIndex) => currentIndex - 1);
 
 const getFollowingItem = (item: t.Item): t.Item | undefined => {
   const followingItem = getFollowingSibling(item);

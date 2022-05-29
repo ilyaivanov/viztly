@@ -11,6 +11,8 @@ import {
   goRight,
   goUp,
   on,
+  selectNextSibling,
+  selectPreviousSibling,
 } from "./treeLogic";
 import {
   createView,
@@ -129,9 +131,11 @@ window.addEventListener("keydown", (e) => {
   } else if (e.code === "KeyD") {
     toggleVisible();
   } else if (e.code === "ArrowUp") {
-    goUp(tree);
+    if (e.ctrlKey) selectPreviousSibling(tree);
+    else goUp(tree);
   } else if (e.code === "ArrowDown") {
-    goDown(tree);
+    if (e.ctrlKey) selectNextSibling(tree);
+    else goDown(tree);
   } else if (e.code === "ArrowRight") {
     goRight(tree);
   } else if (e.code === "ArrowLeft") {

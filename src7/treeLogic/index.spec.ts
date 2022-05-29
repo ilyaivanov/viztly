@@ -5,6 +5,7 @@ import {
   goLeft,
   goRight,
   goUp,
+  selectPreviousSibling,
 } from ".";
 import * as t from "../types";
 import { buildTree } from "./treeBuilder";
@@ -48,7 +49,7 @@ it("when last child is selected going down selects sibling of first non-last par
   expect(tree.selectedItem.title).toBe("Item 2");
 });
 
-it("when last child is selected going down selects sibling of first non-last parent", () => {
+it("select next sibling jumps over open items and selectes next sibling", () => {
   const tree = buildTree(`
    Item 1
      Item 1.1      # when selected going down with ctrl selectes Item 1.2
@@ -62,7 +63,7 @@ it("when last child is selected going down selects sibling of first non-last par
   expect(tree.selectedItem.title).toBe("Item 1.2");
 });
 
-it("when last child is selected going down selects sibling of first non-last parent", () => {
+it("select next sibling selects parent sibling if last item in context", () => {
   const tree = buildTree(`
      Item 1
        Item 1.1      # when selected going down with ctrl selectes Item 2
@@ -101,6 +102,34 @@ it("going up while previuos sibling is open selects most nested item", () => {
 
   goUp(tree);
   expect(tree.selectedItem.title).toBe("Item 1.1.1");
+});
+
+it("going up with ctrl jumps over prevously open nested items", () => {
+  const tree = buildTree(`
+   Item 1
+     Item 1.1     
+       Item 1.1.1
+     Item 1.2     # when selected going up with ctrl selectes Item 1.1
+ `);
+
+  selectItemByName(tree, "Item 1.2");
+
+  selectPreviousSibling(tree);
+  expect(tree.selectedItem.title).toBe("Item 1.1");
+});
+
+it("going up with ctrl selects parent when first in context", () => {
+  const tree = buildTree(`
+   Item 1
+     Item 1.1      # when selected going up with ctrl selectes Item 1
+       Item 1.1.1
+     Item 1.2     
+ `);
+
+  selectItemByName(tree, "Item 1.1");
+
+  selectPreviousSibling(tree);
+  expect(tree.selectedItem.title).toBe("Item 1");
 });
 
 // GOING LEFT
