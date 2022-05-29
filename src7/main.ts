@@ -34,14 +34,9 @@ class App {
   views = new Map<t.Item, t.ItemView>();
 
   constructor(public tree: t.Tree) {
+    on("item-toggled", this.onItemToggled);
     this.renderChildren();
   }
-
-  updatePositions = () => {
-    on("item-toggled", this.onItemToggled);
-    // this.views.clear();
-    // this.renderChildren();
-  };
 
   addView = (item: t.Item, gridX: number, gridY: number) => {
     const view = createView(item, gridX, gridY);
@@ -141,6 +136,5 @@ window.addEventListener("keydown", (e) => {
   } else if (e.code === "ArrowLeft") {
     goLeft(tree);
   }
-  app.updatePositions();
   app.draw();
 });
