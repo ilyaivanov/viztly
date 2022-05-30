@@ -5,7 +5,7 @@ export type Item = {
   title: string;
   children: Item[];
   isOpen: boolean;
-  view?: "tree" | "board";
+  view?: "tree" | "board" | "gallery";
 
   type: ItemType;
   // videoId?: string;

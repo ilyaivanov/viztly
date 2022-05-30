@@ -33,7 +33,6 @@ export const initSidebar = (render: () => void) => {
   Object.keys(sp).forEach((key) => {
     const keyTyped = key as keyof typeof sp;
     const step = steps[keyTyped] || 1;
-    console.log(key, step);
     table.appendChild(
       row({
         label: convertCamelCaseToSpaces(key),

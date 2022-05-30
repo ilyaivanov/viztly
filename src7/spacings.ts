@@ -1,5 +1,5 @@
 export default {
-  fontSize: 15,
+  fontSize: 14,
   circleRadius: 3.2,
   circleLineWidth: 1.5,
   textOffsetFromCircleCenter: 10,

@@ -3,6 +3,7 @@ import { colors } from "../colors";
 import sp from "../spacings";
 import { globalCanvas } from "../globalCanvas";
 import { AnimatedNumber } from "../animations/animatedNumber";
+import { gridDistanceForText, textWidthWithMarging } from "../tree.layouter";
 
 //canvas is required to
 export const viewItem = (
@@ -12,12 +13,18 @@ export const viewItem = (
   parentView: t.ItemView | undefined
 ) => {
   globalCanvas.context.globalAlpha = itemView.opacity.current;
-  if (parentView) {
-    if (item.parent?.view === "board")
-      boardChildtoParentLine(itemView, parentView);
-    else lineBetween(itemView, parentView);
+
+  if (item.view === "gallery") {
+    drawGallery(item, itemView, isSelected, parentView);
+  } else {
+    if (parentView) {
+      if (item.parent?.view === "board")
+        boardChildtoParentLine(itemView, parentView);
+      else lineBetween(itemView, parentView);
+    }
+    drawItemView(item, itemView, isSelected);
   }
-  drawItemView(item, itemView, isSelected);
+
   globalCanvas.context.globalAlpha = 1;
 };
 
@@ -126,3 +133,55 @@ const boardChildtoParentLine = (from: t.ItemView, to: t.ItemView) => {
   ctx.strokeStyle = colors.lines.getHexColor();
   ctx.stroke();
 };
+
+const galleryWidth = 200;
+
+const img = new Image();
+img.src = "https://i.ytimg.com/vi/bdr3056fXVs/mqdefault.jpg";
+//"https://img.youtube.com/vi/bdr3056fXVs/0.jpg";
+const drawGallery = (
+  item: t.Item,
+  itemView: t.ItemView,
+  isSelected: boolean,
+  parentView: t.ItemView | undefined
+) => {
+  drawItemView(item, itemView, isSelected);
+  if (parentView) lineBetween(itemView, parentView);
+
+  const distance = textWidthWithMarging(item.title) - sp.circleRadius;
+
+  const ctx = globalCanvas.context;
+  ctx.moveTo(itemView.x.current + distance, itemView.y.current);
+
+  ctx.lineTo(itemView.x.current + distance + galleryWidth, itemView.y.current);
+  ctx.lineTo(
+    itemView.x.current + distance + galleryWidth,
+    itemView.y.current + galleryWidth
+  );
+  ctx.lineTo(itemView.x.current, itemView.y.current + galleryWidth);
+  ctx.lineTo(
+    itemView.x.current,
+    itemView.y.current + sp.circleRadius + sp.circleLineWidth
+  );
+  ctx.stroke();
+
+  ctx.drawImage(
+    img,
+    itemView.x.current + sp.gridSize,
+    itemView.y.current + sp.gridSize,
+    sp.gridSize * 7,
+    sp.gridSize * 4
+  );
+
+  ctx.drawImage(
+    img,
+    itemView.x.current + sp.gridSize + sp.gridSize * 8,
+    itemView.y.current + sp.gridSize,
+    sp.gridSize * 7,
+    sp.gridSize * 4
+  );
+
+  console.log(item);
+};
+
+// const drawImage = ()

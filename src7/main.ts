@@ -56,13 +56,7 @@ class App {
   };
 
   animatePositions = () =>
-    layoutChildren(
-      this.tree.root,
-      this.animatePosition,
-      8,
-      2,
-      canva.getTextWidth
-    );
+    layoutChildren(this.tree.root, this.animatePosition, 8, 2);
 
   onItemToggled = (item: t.Item) => {
     if (!item.isOpen) {
@@ -78,13 +72,7 @@ class App {
 
       const view = this.views.get(item);
       if (view) {
-        layoutChildren(
-          item,
-          this.addAndFadeIn,
-          view.gridX + 1,
-          view.gridY + 1,
-          canva.getTextWidth
-        );
+        layoutChildren(item, this.addAndFadeIn, view.gridX + 1, view.gridY + 1);
       }
     }
   };
@@ -92,7 +80,7 @@ class App {
   renderChildren = () => {
     const { root } = this.tree;
 
-    layoutChildren(root, this.addView, 8, 2, canva.getTextWidth);
+    layoutChildren(root, this.addView, 8, 2);
   };
 
   draw = () => {

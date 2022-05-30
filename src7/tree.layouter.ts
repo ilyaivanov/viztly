@@ -1,3 +1,4 @@
+import { globalCanvas } from "./globalCanvas";
 import sp from "./spacings";
 import * as t from "./types";
 
@@ -5,27 +6,30 @@ export const layoutChildren = (
   item: t.Item,
   renderItem: (item: t.Item, gridX: number, gridY: number) => void,
   gridXStart: number,
-  gridYStart: number,
-  getTextWidth: (text: string) => number
-) => viewItem(item, gridXStart, gridYStart, renderItem, getTextWidth);
+  gridYStart: number
+) => viewItem(item, gridXStart, gridYStart, renderItem);
 
 const viewItem = (
   item: t.Item,
   gridX: number,
   gridY: number,
-  fn: A3<t.Item, number, number>,
-  getTextWidth: (text: string) => number
-) =>
-  item.view === "tree"
-    ? traverseItems(item.children, gridX, gridY, fn, getTextWidth)
-    : renderBoardChildren(item.children, gridX, gridY, fn, getTextWidth);
+  fn: A3<t.Item, number, number>
+) => {
+  const renderer =
+    item.view === "tree"
+      ? traverseItems
+      : item.view === "gallery"
+      ? renderGallery
+      : renderBoardChildren;
+
+  return renderer(item.children, gridX, gridY, fn);
+};
 
 const traverseItems = (
   items: t.Item[],
   gridX: number,
   gridY: number,
-  fn: A3<t.Item, number, number>,
-  getTextWidth: (text: string) => number
+  fn: A3<t.Item, number, number>
 ): number =>
   items.reduce((totalGridHeight, child) => {
     const currentGridY = gridY + totalGridHeight;
@@ -35,27 +39,28 @@ const traverseItems = (
       totalGridHeight +
       1 +
       (hasVisibleChildren(child)
-        ? viewItem(child, gridX + 1, currentGridY + 1, fn, getTextWidth)
+        ? viewItem(child, gridX + 1, currentGridY + 1, fn)
         : 0)
     );
   }, 0);
+
+const renderGallery = (
+  items: t.Item[],
+  gridX: number,
+  gridY: number,
+  fn: A3<t.Item, number, number>
+) => {
+  return 10;
+};
 
 const renderBoardChildren = (
   items: t.Item[],
   gridX: number,
   gridY: number,
-  fn: A3<t.Item, number, number>,
-  getTextWidth: (text: string) => number
+  fn: A3<t.Item, number, number>
 ) => {
   let maxHeight = 0;
   const viewY = gridY + 1;
-
-  // text offset * 2 because it's from beggining and end
-  const textWidthWithMarging = (label: string) =>
-    getTextWidth(label) + sp.textOffsetFromCircleCenter * 2;
-
-  const gridDistanceForText = (label: string) =>
-    Math.ceil(textWidthWithMarging(label) / sp.gridSize);
 
   let viewX = gridX;
   items.forEach((child) => {
@@ -75,8 +80,7 @@ const renderBoardChildren = (
             xOffset
           );
           fn(item, x, y);
-        },
-        getTextWidth
+        }
       );
       maxHeight = Math.max(subtreeHeight, maxHeight);
     }
@@ -87,3 +91,10 @@ const renderBoardChildren = (
 
 const hasVisibleChildren = (item: t.Item) =>
   item.isOpen && item.children.length > 0;
+
+// text offset * 2 because it's from beggining and end
+export const textWidthWithMarging = (label: string) =>
+  globalCanvas.getTextWidth(label) + sp.textOffsetFromCircleCenter * 2;
+
+export const gridDistanceForText = (label: string) =>
+  Math.ceil(textWidthWithMarging(label) / sp.gridSize);

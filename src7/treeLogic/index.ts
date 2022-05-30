@@ -60,6 +60,7 @@ export const goUp = (tree: t.Tree) => {
 
 export const goLeft = (tree: t.Tree) => {
   const selected = tree.selectedItem;
+  console.log(selected);
   if (selected && selected.isOpen) close(selected);
   else if (selected && selected.parent && !isRoot(selected.parent))
     tree.selectedItem = selected.parent;
@@ -155,8 +156,29 @@ export const forEachOpenChild = (item: t.Item, cb: F1<t.Item>) => {
   traverse(item.children);
 };
 
-const hasVisibleChildren = (item: t.Item) =>
-  item.isOpen && item.children.length;
+export const forEachChild = (item: t.Item, cb: A2<t.Item, t.Item>) => {
+  const traverse = (children: t.Item[]) => {
+    children.forEach((c) => {
+      cb(c, item);
+      if (hasChildren(c)) forEachChild(c, cb);
+    });
+  };
+  traverse(item.children);
+};
+
+export const forEachParent = (item: t.Item, cb: A1<t.Item>) => {
+  let parent = item.parent;
+  while (parent) {
+    cb(parent);
+    parent = parent.parent;
+  }
+};
+
+type A1<T1> = (a: T1) => void;
+type A2<T1, T2> = (a: T1, b: T2) => void;
+
+const hasVisibleChildren = (item: t.Item) => item.isOpen && hasChildren(item);
+const hasChildren = (item: t.Item) => item.children.length > 0;
 
 const isBoard = (item: t.Item | undefined): boolean => item?.view === "board";
 const isRoot = (item: t.Item) => !item.parent;

@@ -192,3 +192,20 @@ it("going up while previuos sibling is open selects most nested item", () => {
 
   expect(tree.selectedItem.title).toBe("Item 1.1.1");
 });
+
+it("s", () => {
+  // 120 x 90
+
+  120 / 90  //?
+  480 / 360 //?
+  320 / 180 //?
+  const gridSize = 20;
+  32 / 2 //?
+  18 / 2 //?
+  const wCells = 8;
+  const hCells = 4;
+  const w = gridSize * wCells;
+  const h = gridSize * hCells;
+  const r = `${w} x ${h}`;
+  r; //?
+});
